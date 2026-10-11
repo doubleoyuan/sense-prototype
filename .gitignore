@@ -1,0 +1,8 @@
+# 只上傳分享用的頁面，其餘一律不追蹤（doc/ 內含機密資料，不得上傳）
+/*
+!/.gitignore
+!/index.html
+
+!/prototype/
+/prototype/*
+!/prototype/pr-sense.html
