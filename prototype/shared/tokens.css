@@ -1,0 +1,47 @@
+/* SENSE 共用 design tokens（依 Figma：Sense - Master File 的變數） */
+:root{
+  color-scheme: light;
+
+  /* 灰階：color/black/* */
+  --white:#FFFFFF;
+  --black-50:#FAFAFA; --black-100:#F5F5F5; --black-200:#EEEEEE; --black-300:#E0E0E0;
+  --black-400:#BDBDBD; --black-500:#9E9E9E; --black-600:#757575; --black-700:#616161; --black-800:#424242;
+  --line-soft:#EBEBEB;
+
+  /* 字型 */
+  --font-cjk:"Noto Sans TC", system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font:"Roboto Condensed", var(--font-cjk);
+  --tracking-wider:.8px; --tracking-super:2.4px; --tracking-ultra:3.2px;
+
+  /* 圓角 */
+  --r-8:8px; --r-10:10px; --r-16:16px; --r-20:20px; --r-30:30px;
+
+  /* 平台共用色 */
+  --cta-orange:#FF6100;          /* 找商務合作 */
+  --hover-teal:#49BFBB;          /* 卡片 hover 外框 */
+  --badge-blue:#4DB8EE;          /* 已認證商家、分頁選取 */
+  --ticket:#F3EBE4;              /* 入口頁票券 */
+  --metric-bg:#FFF7F2;           /* 卡片指標區 */
+
+  /* 模組識別色：--mod-* 為側欄色條，--mod-*-strong 為文字／選取色 */
+  --mod-product:#99C7FB;   --mod-product-strong:#1A81F6; --mod-product-tint:#E6F1FE;
+  --mod-marketing:#B6E6E4; --mod-marketing-strong:#2E8F8B;
+  --mod-strategy:#FFB080;  --mod-strategy-strong:#E0702A;
+  --mod-pr:#B6BDFF;        --mod-pr-strong:#4C56C9;
+  --mod-finance:#FFDD80;   --mod-finance-strong:#B8860B;
+
+  /* 目前模組的強調色（各頁在 .app[data-module] 覆寫） */
+  --accent:#4D9DF8; --accent-border:#1A81F6;
+  /* CTA 上方圓形圖示的彩色外框（Figma 為線性漸層 stroke，程式碼匯出只會給第一個色標） */
+  --accent-ring:linear-gradient(90deg,#0073F5 0%,#71D1A6 32.7%,#FAB431 75%,#FF5B26 100%);
+
+  --sidebar-w:320px;
+  --header-h:77px;        /* sticky header 高度（36 + 上下 20 + 底線 1），手機版在 components.css 覆寫 */
+  --content-max:1280px;   /* 內容區最大寬度（不含左右 padding），大螢幕置中 */
+}
+
+.app[data-module="product"]{ --accent:#4D9DF8; --accent-border:#1A81F6; }
+
+/* header 頁籤：淡色底＋模組色外框＋模組深色字（2026-10-13 選定，優先度低於 CTA）。
+   其他模組的色值確認後再加，未設定前維持灰色 */
+.app[data-module="product"] .title-tab{ --tab-fill:var(--mod-product-tint); --tab-stroke:var(--mod-product); --tab-text:var(--mod-product-strong); }

@@ -3,770 +3,265 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>公關 SENSE 原型</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik01Ny4yMzA1IDU2LjEwOUM1Ni44MTc5IDU0LjcwNjUgNTQuMTYzIDQ3LjU2NzkgNjYuNjQ3OSAzOC41NTkzQzY4LjgwMDUgMzYuOTk0OSA3Mi41MTM3IDM1LjU5MjMgNzUuNTA5MyAzNC40Nzc1Qzg4Ljc0NzYgMjguODEzNCA5NC40MzQgMjYuMTg4MSAxMTEuNjM3IDE4LjgzMzdDMTE2LjUxNiAxNi43NDc5IDEyMS45ODcgMTguNiAxMjQuMjQ3IDI0LjEzODJDMTMwLjE2NyAzOC41NDEzIDEzNC44NjYgNDkuNjE3OCAxNDAuODc2IDYzLjg5NUgxNDAuOTI5QzE0My40NTkgNjkuMzA3MyAxNDEuMTI3IDc0LjU5MzggMTM2LjMwMSA3Ni43ODc2QzEzNC43MDUgNzcuNTA2OCAxMTMuODc5IDg3LjE0NDggMTA3LjQ3NSA4OS44NzhDMTAyLjU5NiA5MS45NDU4IDk3LjEyNDcgOTAuMDc1OCA5NC44ODI1IDg0LjUzNzVDOTAuMzA4MyA3My42MjI5IDc5LjY1MyA0OC4zNzcxIDc4LjYzMDYgNDYuODQ4N0M3Ni4yNDQ4IDQzLjI3MDQgNjkuMTIzNCA0Mi4zMTc0IDY0LjIwODQgNDQuNjM3QzYwLjMzMzcgNDYuNDUzMSA1NS43Nzc1IDUwLjk2NjQgNTcuMjQ4NCA1Ni4xMDlINTcuMjMwNVoiIGZpbGw9InVybCgjcGFpbnQwX2xpbmVhcl8zMjQ4XzE1MjI1KSIvPgo8cGF0aCBkPSJNMTM4LjI5MSAxNTIuMzgxQzExNy42ODEgMTYxLjc0OSAxMTMuNTczIDE2My4zNSA5My4wMTU4IDE3Mi44MDhDOTIuNDA1OSAxNzMuMDc3IDkxLjY3MDQgMTczLjQwMSA5MC44NjMyIDE3My43NDNDNzguNzM3MSAxNzQuMzkgNzQuOTM0MiAxNjguNDkyIDc0LjkzNDIgMTY4LjQ5MlYxNjguNDU2Qzc3Ljk4MzcgMTcxLjkyNyA4My42NTIxIDE3MS41MzEgODcuMjkzNSAxNzAuMDIxQzkyLjMzNDEgMTY3LjkzNSA5Ni40MjQgMTYyLjAzNyA5NS40MTk1IDE1Ny44NjVDOTQuOTg5IDE1Ni4wNjcgOTQuMjM1NiAxNTQuMzQxIDkzLjQ2NDIgMTUyLjY1MUw3MC43NTQ2IDEwMS40MjJMNzQuNzAxIDk4LjY4ODdDNzguMDM3NSAxMDUuMDM2IDgyLjQxNDQgMTA2LjYzNiA4Ny43MDYxIDEwNS41MDRDOTIuMjk4MyAxMDQuNTUxIDExMC43MzkgOTUuNzAzOCAxMTIuMzUzIDk1LjAwMjVDMTE3LjIzMiA5Mi45MTY3IDEyMi42ODUgOTQuNzY4NyAxMjQuOTgxIDEwMC4zMDdMMTI0LjkyOCAxMDAuMzQzQzEzMS4zNjcgMTE0LjQ0IDEzNi4zNTQgMTI1LjM5MSAxNDIuOTU1IDEzOS40ODhDMTQ1LjUwMyAxNDQuOTE5IDE0My4xNzEgMTUwLjIwNSAxMzguMzQ1IDE1Mi4zOTlMMTM4LjI5MSAxNTIuMzgxWiIgZmlsbD0idXJsKCNwYWludDFfcmFkaWFsXzMyNDhfMTUyMjUpIi8+CjxwYXRoIGQ9Ik02NC4yMDc0IDQ0LjYzNjhDNjYuMjM0NCA0My43NTU3IDY5Ljg0IDQzLjE2MjQgNzMuMTU4NSA0My42NjU4Qzc1LjUyNjMgNDQuMzMxMSA3Ny4wMzMxIDQ0Ljc5ODcgNzguNjQ3NiA0Ni44NDg1QzgyLjM2MDggNTQuMzQ2NyA5NC44OTk1IDg0LjUzNzQgOTQuODk5NSA4NC41Mzc0Qzk0Ljg5OTUgODQuNTM3NCA5Ny43ODc1IDkyLjE5NzQgMTA1LjAxNyA5MC41NzkxTDg2LjgwOTQgNDQuNzgwN0M4My44MTM3IDM3LjU3MDIgNzIuMDI4NCAzNC4wNjM4IDYxLjAxNDQgNDAuNTkxQzU2LjcyNzIgNDMuMTI2NCA1My40NjI1IDQ1LjQyOCA1Mi4xNTMgNTEuODgzM0M1MS4xMTI2IDU3LjE2OTggNTMuMTIxNyA2MS40MzE0IDUzLjEyMTcgNjEuNDMxNEM1My4xMjE3IDYxLjQzMTQgNjcuNTA4IDk0LjEyMTQgNzAuNDg1NyAxMDAuODgyQzcwLjQ4NTcgMTAwLjkxOCA3MC41MjE2IDEwMC45NTQgNzAuNTM5NiAxMDAuOTlDNzIuMjI1NyAxMDQuODAyIDc0LjU1NzcgMTEwLjAzNSA3NC42Mjk0IDExMC4yMzNMOTMuNDQ2NSAxNTIuNjY5QzkzLjQ0NjUgMTUyLjY2OSA5NS40MTk3IDE1Ni43MTQgOTUuNTYzMiAxNTguOTk4Qzk1LjU2MzIgMTU4Ljk5OCA5NS45NTc4IDE2MS44MzkgOTMuMTk1NCAxNjUuMzQ1QzkzLjE5NTQgMTY1LjM0NSA5MC40NTA4IDE2OC43NDQgODguMTM2OCAxNjkuNjYxQzg1LjgyMjggMTcwLjU2IDg0LjUxMzMgMTcwLjg4NCA4NC41MTMzIDE3MC44ODRDODQuNTEzMyAxNzAuODg0IDgxLjU1MzUgMTcyLjA1MiA3Ny4yMzA1IDE3MC4yMzZDNzcuMjMwNSAxNzAuMjM2IDc2LjA2NDUgMTY5Ljc1MSA3NS4wMjQxIDE2OC42NTRDNzQuOTcwMyAxNjguNTgyIDc0LjkzNDQgMTY4LjUyOCA3NC45MzQ0IDE2OC41MjhMNzQuMTQ1MSAxNjcuNDY3TDcwLjkxNjMgMTYxLjY5NUM3MC45MTYzIDE2MS42OTUgNTMuODc1MSAxMjQuMzMgNTMuMDMyIDEyMi41MTRDNTIuMTcxIDEyMS40ODkgNTEuNTQzMSAxMjAuNDQ2IDQ5LjQwODUgMTIxLjQ3MUM0Ny4yOTE4IDEyMi40NzggNDguMTg4NyAxMjQuNTEgNDguMTg4NyAxMjQuNTFMNTQuNDMxMiAxMzguNDA5TDYyLjI3MDEgMTU1LjYxOEw2Ny40MzYzIDE2Ni44OTJDNjcuNDM2MyAxNjYuODkyIDY4LjIwNzYgMTY4LjcyNiA2OS45MTE3IDE3MC43NThDNzMuMDUwOSAxNzQuNTE2IDc2LjcyODIgMTc1LjcyMSA4MC4zNTE3IDE3Ni4wOThDODMuOTU3MiAxNzYuNDc2IDkwLjg0NTUgMTczLjcyNSA5MC44NDU1IDE3My43MjVMOTIuNzQ2OSAxNzIuODYyQzEwMC42NzYgMTY5LjI4MyAxMDQuMDg0IDE1OS44NDMgMTAwLjMxNyAxNTIuMDAzTDc0LjY2NTMgOTguNjcwN0w3My43NTA1IDk2LjQ3N0M3Mi40NDEgOTMuNDU2MSA2Ny45MjA2IDgyLjgyOTIgNjcuOTIwNiA4Mi44MjkyTDU4LjE5ODIgNTkuNDUzNEM1OC4xOTgyIDU5LjQ1MzQgNTcuNzEzOCA1Ny43NDUyIDU3LjIyOTUgNTYuMTA4OUM1Ny4xMjE5IDU1LjczMTMgNTYuOTI0NiA1NS4wMyA1Ni45MjQ2IDU0LjAyMzFWNTQuMjAyOUM1Ni45MjQ2IDU0LjIwMjkgNTYuOTk2MyA0OC4xMDcyIDY0LjE4OTUgNDQuNjM2OEg2NC4yMDc0WiIgZmlsbD0idXJsKCNwYWludDJfbGluZWFyXzMyNDhfMTUyMjUpIi8+CjxwYXRoIGQ9Ik04Ni44MjgyIDk2LjI2MTJDODUuNDExMSA5Ni44OTA1IDgzLjc3ODcgOTYuMjQzMiA4My4xNTA5IDk0LjgyMjdMNjYuMDIgNTUuODAzMkM2NS4zOTIyIDU0LjM4MjYgNjYuMDM4IDUyLjc0NjMgNjcuNDU1MSA1Mi4xMTdDNjguODcyMiA1MS40ODc3IDcwLjUyMjUgNTIuMTM1IDcxLjEzMjQgNTMuNTU1NUw4OC4yNjMyIDkyLjU3NUM4OC44OTExIDkzLjk3NzUgODguMjYzMiA5NS42MzE4IDg2LjgyODIgOTYuMjYxMloiIGZpbGw9InVybCgjcGFpbnQzX2xpbmVhcl8zMjQ4XzE1MjI1KSIvPgo8cGF0aCBkPSJNNjMuMDA1IDExNy4wM0M2NC40MjIxIDExNi40IDY2LjA1NDUgMTE3LjAzIDY2LjY4MjMgMTE4LjQ1TDg0LjA0NjMgMTU3LjM2MkM4NC42NzQyIDE1OC43NjQgODQuMDQ2MyAxNjAuNDM3IDgyLjYyOTIgMTYxLjA2NkM4MS4yMzAxIDE2MS42OTUgNzkuNTc5OCAxNjEuMDY2IDc4LjkzNCAxNTkuNjQ1TDYxLjU2OTkgMTIwLjczNEM2MC45NDIxIDExOS4zMTMgNjEuNTY5OSAxMTcuNjU5IDYyLjk4NzEgMTE3LjAzSDYzLjAwNVoiIGZpbGw9InVybCgjcGFpbnQ0X3JhZGlhbF8zMjQ4XzE1MjI1KSIvPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJwYWludDBfbGluZWFyXzMyNDhfMTUyMjUiIHgxPSIxMTIuOTEiIHkxPSI4OC43NjMxIiB4Mj0iNTkuNTgzNiIgeTI9Ii0yNy42MjI4IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIG9mZnNldD0iMC4wOSIgc3RvcC1jb2xvcj0iIzAwNzNGNSIvPgo8c3RvcCBvZmZzZXQ9IjAuMTgiIHN0b3AtY29sb3I9IiMxNDk1RTkiLz4KPHN0b3Agb2Zmc2V0PSIwLjMiIHN0b3AtY29sb3I9IiMyOUI4REMiLz4KPHN0b3Agb2Zmc2V0PSIwLjM5IiBzdG9wLWNvbG9yPSIjMzdDRUQ0Ii8+CjxzdG9wIG9mZnNldD0iMC40NSIgc3RvcC1jb2xvcj0iIzNDRDdEMiIvPgo8L2xpbmVhckdyYWRpZW50Pgo8cmFkaWFsR3JhZGllbnQgaWQ9InBhaW50MV9yYWRpYWxfMzI0OF8xNTIyNSIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSg5Mi4wNDcxIDkzLjY4OTkpIHNjYWxlKDk0LjQ2MTkgOTQuNjg5NykiPgo8c3RvcCBzdG9wLWNvbG9yPSIjMDA3M0Y1Ii8+CjxzdG9wIG9mZnNldD0iMC4wOCIgc3RvcC1jb2xvcj0iIzBEODNFQiIvPgo8c3RvcCBvZmZzZXQ9IjAuMTkiIHN0b3AtY29sb3I9IiMxRDk2RTEiLz4KPHN0b3Agb2Zmc2V0PSIwLjI1IiBzdG9wLWNvbG9yPSIjMkNCNkQ5Ii8+CjxzdG9wIG9mZnNldD0iMC4zMSIgc3RvcC1jb2xvcj0iIzM3Q0VEMyIvPgo8c3RvcCBvZmZzZXQ9IjAuMzQiIHN0b3AtY29sb3I9IiMzQ0Q3RDIiLz4KPHN0b3Agb2Zmc2V0PSIwLjU1IiBzdG9wLWNvbG9yPSIjQUFDODc0Ii8+CjxzdG9wIG9mZnNldD0iMC43MSIgc3RvcC1jb2xvcj0iI0ZGQkUyRCIvPgo8c3RvcCBvZmZzZXQ9IjAuNzMiIHN0b3AtY29sb3I9IiNGRkFGMkIiLz4KPHN0b3Agb2Zmc2V0PSIwLjg4IiBzdG9wLWNvbG9yPSIjRkY2MDI1Ii8+CjxzdG9wIG9mZnNldD0iMC45NSIgc3RvcC1jb2xvcj0iI0ZGNDEyMyIvPgo8L3JhZGlhbEdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9InBhaW50Ml9saW5lYXJfMzI0OF8xNTIyNSIgeDE9IjkxLjc0MjQiIHkxPSI0Ni43MjI3IiB4Mj0iNjIuODkzIiB5Mj0iMTYyLjU2MiIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBvZmZzZXQ9IjAuMTIiIHN0b3AtY29sb3I9IiMwMDczRjUiLz4KPHN0b3Agb2Zmc2V0PSIwLjE1IiBzdG9wLWNvbG9yPSIjMTY3N0Y2Ii8+CjxzdG9wIG9mZnNldD0iMC4yMiIgc3RvcC1jb2xvcj0iIzRGODRGQSIvPgo8c3RvcCBvZmZzZXQ9IjAuMjgiIHN0b3AtY29sb3I9IiM4NzkxRkYiLz4KPHN0b3Agb2Zmc2V0PSIwLjMxIiBzdG9wLWNvbG9yPSIjOEI5MkY3Ii8+CjxzdG9wIG9mZnNldD0iMC4zNiIgc3RvcC1jb2xvcj0iIzk3OTdFMiIvPgo8c3RvcCBvZmZzZXQ9IjAuNDIiIHN0b3AtY29sb3I9IiNBQjlFQkYiLz4KPHN0b3Agb2Zmc2V0PSIwLjQ5IiBzdG9wLWNvbG9yPSIjQzZBODhGIi8+CjxzdG9wIG9mZnNldD0iMC41NyIgc3RvcC1jb2xvcj0iI0U5QjU1MyIvPgo8c3RvcCBvZmZzZXQ9IjAuNjIiIHN0b3AtY29sb3I9IiNGRkJFMkQiLz4KPHN0b3Agb2Zmc2V0PSIwLjg3IiBzdG9wLWNvbG9yPSIjRkZCRTJEIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0ZGNkUyRCIvPgo8L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9InBhaW50M19saW5lYXJfMzI0OF8xNTIyNSIgeDE9IjY4LjExODgiIHkxPSI1My44MjUyIiB4Mj0iODIuMTQ4OCIgeTI9Ijg1LjMwMzQiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KPHN0b3Agc3RvcC1jb2xvcj0iIzAwNzNGNSIvPgo8c3RvcCBvZmZzZXQ9IjAuMiIgc3RvcC1jb2xvcj0iIzE2NzdGNiIvPgo8c3RvcCBvZmZzZXQ9IjAuNjMiIHN0b3AtY29sb3I9IiM0Rjg0RkEiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjODc5MUZGIi8+CjwvbGluZWFyR3JhZGllbnQ+CjxyYWRpYWxHcmFkaWVudCBpZD0icGFpbnQ0X3JhZGlhbF8zMjQ4XzE1MjI1IiBjeD0iMCIgY3k9IjAiIHI9IjEiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiBncmFkaWVudFRyYW5zZm9ybT0idHJhbnNsYXRlKDY5LjgyMTUgMTAwLjEyNykgc2NhbGUoNjUuNDkxOSA2NS42NDk4KSI+CjxzdG9wIHN0b3AtY29sb3I9IiMwMDczRjUiLz4KPHN0b3Agb2Zmc2V0PSIwLjA4IiBzdG9wLWNvbG9yPSIjMEQ4M0VCIi8+CjxzdG9wIG9mZnNldD0iMC4xOSIgc3RvcC1jb2xvcj0iIzFEOTZFMSIvPgo8c3RvcCBvZmZzZXQ9IjAuMjciIHN0b3AtY29sb3I9IiMyQ0I2RDkiLz4KPHN0b3Agb2Zmc2V0PSIwLjM0IiBzdG9wLWNvbG9yPSIjMzdDRUQzIi8+CjxzdG9wIG9mZnNldD0iMC4zOCIgc3RvcC1jb2xvcj0iIzNDRDdEMiIvPgo8c3RvcCBvZmZzZXQ9IjAuNDIiIHN0b3AtY29sb3I9IiM0RkQ0QzEiLz4KPHN0b3Agb2Zmc2V0PSIwLjUxIiBzdG9wLWNvbG9yPSIjODNDRDk1Ii8+CjxzdG9wIG9mZnNldD0iMC42NCIgc3RvcC1jb2xvcj0iI0Q0QzM1MCIvPgo8c3RvcCBvZmZzZXQ9IjAuNzEiIHN0b3AtY29sb3I9IiNGRkJFMkQiLz4KPHN0b3Agb2Zmc2V0PSIwLjczIiBzdG9wLWNvbG9yPSIjRkZBRjJCIi8+CjxzdG9wIG9mZnNldD0iMC44OCIgc3RvcC1jb2xvcj0iI0ZGNjAyNSIvPgo8c3RvcCBvZmZzZXQ9IjAuOTUiIHN0b3AtY29sb3I9IiNGRjQxMjMiLz4KPC9yYWRpYWxHcmFkaWVudD4KPC9kZWZzPgo8L3N2Zz4=">
+<title>公關 SENSE</title>
+<link rel="icon" type="image/svg+xml" href="shared/assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="shared/tokens.css?v=20261016f">
+<link rel="stylesheet" href="shared/components.css?v=20261016f">
+<link rel="stylesheet" href="shared/forms.css?v=20261016f">
 <style>
-  /* ── SENSE Design System tokens（沿用 datamart／公關原型） ── */
-  :root{
-    color-scheme: light;
-    --page:#F5F7FB; --surface:#FFFFFF; --subtle:#F6F8FD;
-    --border:#E8EBF3; --border-strong:#DFDFDF;
-    --text:#2C2C2C; --text-2:#56575B; --text-3:#8A8B90;
-    --brand:#49BFBB; --brand-50:#EDFFFF;
-    /* 模組識別色 */
-    --mk:#49BFBB; --pd:#E0912A; --st:#3F3AA9; --ai:#9AA0A6;
-    --tf:#1E88A8; --fin:#B8860B;
-    --pr:#B33A29; --pr-600:#9A2E20; --pr-700:#7E2A20; --pr-50:#FBEDEB; --pr-100:#F6D9D4;
-    --danger:#FF4D4F; --success:#1E8F17;
-    --radius-sm:4px; --radius-md:8px; --radius-pill:999px;
-    --shadow-md:0 6px 20px rgba(28,44,60,.10);
-    --sidebar-w:240px; --header-h:56px;
-    --font:"Noto Sans TC", system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:#fff;color:var(--text);font-family:var(--font);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
-  h1,h2,h3,p{margin:0}
-  button,input,select{font:inherit;color:inherit}
-  button{cursor:pointer}
-  [hidden]{display:none!important}
-
-  /* ── App shell ── */
-  .app{display:flex;min-height:100vh}
-  .main{flex:1;min-width:0;display:flex;flex-direction:column}
-
-  /* ── Sidebar（依 Figma：Sense - Master File · node 4004:3719） ── */
-  .sidebar{width:320px;max-width:86vw;flex:none;background:#EEEEEE;position:sticky;top:0;height:100vh;overflow-y:auto;
-    padding:20px;display:flex;flex-direction:column;gap:20px;z-index:40;
-    font-family:"Roboto Condensed",var(--font);color:#424242;letter-spacing:3.2px}
-  .sidebar button{font-family:inherit;letter-spacing:inherit;color:inherit;background:none;border:0;padding:0;text-align:left}
-  .sidebar button:focus-visible{outline:2px solid #4C56C9;outline-offset:2px;border-radius:4px}
-  .sb-card{background:#fff;border-radius:20px;padding:10px 20px 20px;display:flex;flex-direction:column;align-items:flex-start;gap:20px;flex:none}
-
-  /* Logo */
-  .sb-logo{display:flex;align-items:center}
-  .sb-logo-mark{position:relative;width:40px;height:40px;overflow:hidden;flex:none}
-  .sb-logo-mark img{position:absolute;left:25%;top:9.38%;width:50%;height:82.36%;display:block}
-  .sb-wordmark{font-size:24px;font-weight:600;line-height:24px;letter-spacing:3.2px;
-    background:linear-gradient(90deg,#0073F5 3.85%,#42D6CD 34.82%,#FABF32 69.95%,#FF5024 99.99%);
-    -webkit-background-clip:text;background-clip:text;color:transparent}
-
-  /* 主按鈕：找商務合作 */
-  .sidebar .sb-cta{position:relative;display:flex;align-items:center;gap:40px;padding:10px 20px;border:2px solid #FF6100;border-radius:40px;
-    background:#FF6100;filter:drop-shadow(0 2px 0 #EEEEEE);transition:filter .15s}
-  .sidebar .sb-cta:hover{filter:drop-shadow(0 2px 0 #EEEEEE) brightness(1.05)}
-  .sb-cta .cta-bg{position:absolute;left:0;top:0;width:90px;height:44px;display:block}
-  .sb-cta .cta-line{position:absolute;left:73px;top:0;width:133px;height:44px;display:block;transform:rotate(180deg)}
-  .sb-cta .cta-icon{position:relative;display:flex;align-items:center;padding:0 10px}
-  .sb-cta .cta-icon span{position:relative;width:24px;height:24px;display:block}
-  .sb-cta .cta-icon img{position:absolute;left:0;top:0;width:24px;height:28px;display:block}
-  /* 瀏覽器會在最後一個字後面多加一次字距，Figma 不會；抵銷掉才能跟設計稿同寬 */
-  .sb-cta .cta-text{position:relative;color:#fff;font-size:14px;font-weight:600;line-height:24px;white-space:nowrap;margin-right:-3.2px}
-
-  /* 模組卡片 */
-  .sb-mod{width:100%;border:1px solid #EEEEEE;border-radius:10px;box-shadow:0 1px 0 0 #EEEEEE;padding:10px 20px;
-    display:flex;flex-direction:column;gap:10px;background:#fff;transition:background .15s}
-  .sb-mod-head{display:flex;align-items:center;gap:10px;min-height:24px}
-  .sb-blocker{width:4px;align-self:stretch;min-height:24px;background:var(--c);flex:none}
-  .sidebar .sb-mod-label{flex:1;min-width:0;font-size:14px;font-weight:600;line-height:24px;color:#424242}
-  .sidebar .sb-chev{width:32px;height:32px;margin:-4px;display:grid;place-items:center;flex:none;border-radius:6px}
-  .sidebar .sb-chev:hover{background:#F5F5F5}
-  .sb-chev img{width:24px;height:24px;display:block}
-  .sb-mod.inert{cursor:pointer}
-  .sb-mod.inert:hover{background:#FAFAFA}
-  .sb-mod.is-current .sb-mod-label{color:#4C56C9}
-  .sb-sub{display:flex;flex-direction:column;gap:10px;width:100%}
-  .sidebar .sb-sub-item{width:100%;padding:0 10px}
-  .sb-sub-item span{display:block;padding:0 10px;border-bottom:1px solid #EEEEEE;font-size:14px;font-weight:400;line-height:24px;white-space:nowrap;transition:color .15s,border-color .15s}
-  .sb-sub-item:hover span{color:#4C56C9}
-  .sb-sub-item.active span{color:#4C56C9;font-weight:600;border-bottom-color:#B6BDFF}
-
-  /* 分區標題（我的專屬內容／後台管理） */
-  .sb-sec{position:relative;width:100%;height:28px;display:flex;gap:4px;flex:none}
-  .sb-sec::before{content:"";width:4px;border-radius:1px;background:var(--c);flex:none}
-  .sb-sec span{flex:1;min-width:0;background:var(--c);border-radius:1px;padding:0 10px;display:flex;align-items:center;
-    color:#fff;font-size:14px;font-weight:600;line-height:24px}
-  .sb-sec img{position:absolute;right:0;top:0;width:9px;height:28px;display:block}
-  .sidebar .sb-link{width:100%;padding:0 0 4px 10px;border-bottom:1px solid var(--line);font-size:12px;font-weight:500;line-height:24px;transition:color .15s,border-color .15s}
-  .sidebar .sb-link:hover{color:var(--strong)}
-  .sidebar .sb-link.active{color:var(--strong);font-weight:600;border-bottom-color:var(--c)}
-
-  /* 使用者 */
-  .sb-user{background:#fff;border-radius:20px;padding:20px;display:flex;align-items:center;gap:20px;flex:none}
-  .sb-user-info{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:4px}
-  .sb-user-name{font-size:12px;font-weight:500;line-height:24px}
-  .sb-badge{background:#4DB8EE;border-radius:30px;padding:0 10px;color:#fff;font-size:10px;font-weight:600;letter-spacing:.8px;line-height:20px;white-space:nowrap}
-  .sidebar .sb-logout{border:1px solid #EEEEEE;border-radius:10px;box-shadow:0 1px 0 0 #EEEEEE;padding:0 16.8px 0 20px;background:#fff;font-size:12px;font-weight:500;line-height:24px;white-space:nowrap}
-  .sidebar .sb-logout:hover{background:#FAFAFA}
-
-  /* ── Header（只留 breadcrumb、搜尋、通知） ── */
-  .header{position:sticky;top:0;z-index:30;height:64px;background:#fff;border-bottom:1px solid #EEEEEE;
-    display:flex;align-items:center;gap:16px;padding:0 32px;font-family:"Roboto Condensed",var(--font)}
-  .hamburger{display:none;width:36px;height:36px;border:1px solid #EEEEEE;border-radius:10px;background:#fff;align-items:center;justify-content:center;color:#424242}
-  .crumbs{display:flex;align-items:center;gap:8px;flex:1;min-width:0;font-size:13px;letter-spacing:1px;color:#9E9E9E;white-space:nowrap;overflow:hidden}
-  .crumbs .sep{color:#D6D6D6}
-  .crumbs .cur{color:#424242;font-weight:600}
-  .crumbs button{border:0;background:none;padding:0;font:inherit;letter-spacing:inherit;color:inherit}
-  .crumbs button:hover{color:#4C56C9}
-  .search{display:flex;align-items:center;gap:8px;width:300px;background:#FAFAFA;border:1px solid #EEEEEE;border-radius:10px;padding:8px 12px;color:#9E9E9E}
-  .search:focus-within{border-color:#B6BDFF;background:#fff}
-  .search input{border:0;outline:0;background:transparent;font-size:13px;flex:1;min-width:0;color:#424242}
-  .search svg{width:16px;height:16px;flex:none}
-  .icon-btn{position:relative;width:38px;height:38px;border:1px solid #EEEEEE;border-radius:10px;background:#fff;color:#616161;display:inline-grid;place-items:center;flex:none}
-  .icon-btn:hover{background:#FAFAFA}
-  .icon-btn svg{width:18px;height:18px}
-  .icon-btn .ping{position:absolute;top:8px;right:9px;width:7px;height:7px;border-radius:50%;background:#FF6100;box-shadow:0 0 0 2px #fff}
-
-  /* ── Content（白底） ── */
-  .main{background:#fff}
-  .content{padding:32px;max-width:1280px;width:100%;margin:0 auto}
-  .page-head h1{font-size:22px;font-weight:900;letter-spacing:.01em}
-  .page-head p{margin-top:4px;color:var(--text-2);font-size:13.5px}
-  .placeholder{margin-top:20px;background:var(--surface);border:1px dashed #D5D8E2;border-radius:var(--radius-md);
-    min-height:360px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:32px;color:var(--text-3)}
-  .placeholder .ph-icon{width:44px;height:44px;border-radius:12px;background:var(--pr-50);color:var(--pr);display:grid;place-items:center}
-  .placeholder .ph-icon svg{width:22px;height:22px}
-  .placeholder b{color:var(--text-2);font-size:14px}
-  .placeholder .src{font-size:12px;background:var(--subtle);border:1px solid var(--border);border-radius:var(--radius-pill);padding:3px 10px}
-
-  /* ── 公關 SENSE 一覽 ── */
-  .ov{--ink:#424242;--ink-2:#6B6B6B;--ink-3:#9E9E9E;--line:#EEEEEE;--prc:#B6BDFF;--prs:#4C56C9;--prsoft:#F4F5FF;--teal:#2E8F8B;--teal-soft:#E8F6F5;
-    color:var(--ink)}
-  .ov .num{font-family:"Roboto Condensed",var(--font);font-variant-numeric:tabular-nums}
-  .ov-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px}
-  .ov-eyebrow{display:flex;align-items:center;gap:10px;font-family:"Roboto Condensed",var(--font);font-size:12px;font-weight:600;letter-spacing:3.2px;color:var(--prs)}
-  .ov-eyebrow::before{content:"";width:4px;height:16px;background:var(--prc)}
-  .ov-head h1{font-size:26px;font-weight:900;letter-spacing:2px;margin-top:6px}
-  .ov-head p{margin-top:4px;color:var(--ink-2);font-size:14px}
-
-  .ov-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:20px}
-  .ov-card{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 1px 0 0 var(--line);padding:24px;min-width:0;display:flex;flex-direction:column;gap:18px}
-  .span-12{grid-column:span 12}.span-8{grid-column:span 8}.span-7{grid-column:span 7}.span-5{grid-column:span 5}.span-4{grid-column:span 4}
-  .card-h{display:flex;align-items:center;gap:10px}
-  .card-h::before{content:"";width:4px;height:20px;background:var(--prc);flex:none}
-  .card-h h2{flex:1;font-size:17px;font-weight:700;letter-spacing:2px}
-  .card-h small{font-size:12px;color:var(--ink-3);font-weight:400;letter-spacing:.5px;margin-left:8px}
-  .more{border:0;background:none;padding:4px 0;font-size:13px;color:var(--prs);font-weight:600;letter-spacing:1px;white-space:nowrap}
-  .more:hover{text-decoration:underline;text-underline-offset:3px}
-  .chip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;line-height:20px;color:var(--ink-2);background:#fff;white-space:nowrap}
-  .chip.pr{border-color:var(--prc);color:var(--prs);background:var(--prsoft)}
-  .chip.pr-solid{border-color:var(--prs);background:var(--prs);color:#fff}
-  .chip.teal{border-color:#BFE6E4;color:var(--teal);background:var(--teal-soft)}
-  .chip.gray{background:#F5F5F5;color:var(--ink-2)}
-  .chip.orange{border-color:#FFD2B3;color:#C24A00;background:#FFF4EC}
-  .logo-sq{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px;flex:none;letter-spacing:0}
-  .btn2{border:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:0 1px 0 0 var(--line);padding:7px 16px;font-size:13px;font-weight:600;color:var(--ink);letter-spacing:1px;white-space:nowrap}
-  .btn2:hover{background:#FAFAFA}
-  .btn2.primary{background:var(--prs);border-color:var(--prs);color:#fff;box-shadow:none}
-  .btn2.primary:hover{filter:brightness(1.08);background:var(--prs)}
-
-  /* ① 我的公司 */
-  .me-card{flex-direction:row;gap:28px;padding:28px;background:linear-gradient(120deg,#fff 55%,var(--prsoft))}
-  .me-id{flex:0 0 340px;display:flex;flex-direction:column;gap:14px;min-width:0}
-  .me-top{display:flex;gap:14px;align-items:center}
-  .me-top .logo-sq{width:64px;height:64px;border-radius:16px;font-size:20px}
-  .me-name{font-size:22px;font-weight:900;letter-spacing:2px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .me-brand{font-size:13px;color:var(--ink-3);margin-top:2px;letter-spacing:1px}
-  .verified{width:20px;height:20px;flex:none;display:block}
-  .me-intro{font-size:14px;color:var(--ink-2);line-height:1.7}
-  .me-facts{display:flex;gap:6px;flex-wrap:wrap}
-  .me-stats{display:flex;gap:24px;padding-top:14px;border-top:1px solid var(--line);margin-top:auto}
-  .me-stats div{font-size:12px;color:var(--ink-3);letter-spacing:1px}
-  .me-stats b{display:block;font-size:22px;color:var(--ink);font-weight:600;letter-spacing:0}
-  .me-res{flex:1;min-width:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-  .res-col{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
-  .res-col h3{font-size:13px;font-weight:700;letter-spacing:2px;display:flex;align-items:center;gap:8px}
-  .res-col h3 i{width:8px;height:8px;border-radius:2px;background:var(--c);flex:none}
-  .res-col ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
-  .res-col li{font-size:13.5px;line-height:1.5;padding-left:12px;position:relative}
-  .res-col li::before{content:"";position:absolute;left:0;top:9px;width:4px;height:4px;border-radius:50%;background:var(--ink-3)}
-  .res-col p{font-size:13.5px;line-height:1.6;color:var(--ink)}
-  .me-actions{display:flex;gap:8px;justify-content:flex-end;grid-column:1/-1}
-
-  /* ② 近期活動 */
-  .ac-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:20px}
-  .next{border-radius:16px;background:var(--prsoft);border:1px solid #E3E6FF;padding:20px;display:flex;flex-direction:column;gap:12px}
-  .next-when{display:flex;align-items:center;gap:14px}
-  .datebox{width:58px;border-radius:12px;background:#fff;border:1px solid #E3E6FF;text-align:center;padding:6px 0;flex:none}
-  .datebox small{display:block;font-size:11px;color:var(--prs);font-weight:600;letter-spacing:1px}
-  .datebox b{display:block;font-size:24px;line-height:1.1;font-weight:600}
-  .next h3{font-size:17px;font-weight:700;line-height:1.45;letter-spacing:.5px}
-  .next-meta{font-size:13px;color:var(--ink-2);display:flex;flex-direction:column;gap:4px}
-  .seat-h{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px;color:var(--ink-2)}
-  .next-foot{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:auto}
-  .tip{display:flex;gap:8px;font-size:12.5px;line-height:1.6;color:var(--ink-2);background:#fff;border-radius:10px;padding:10px 12px}
-  .tip b{color:var(--ink);font-weight:600}
-  .type{display:inline-flex;align-items:center;font-size:11.5px;line-height:18px;padding:0 8px;border-radius:4px;white-space:nowrap;
-    background:#fff;border:1px solid var(--line);color:var(--ink-2);font-weight:500}
-  .type.day{border-color:#FFD2B3;color:#C24A00;background:#FFF4EC}
-  .ev-list{display:flex;flex-direction:column}
-  .ev-month{font-size:12px;font-weight:700;color:var(--ink-3);letter-spacing:2px;padding:4px 0 6px}
-  .ev-month:not(:first-child){margin-top:10px}
-  .ev-row{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 4px;border:0;border-bottom:1px solid var(--line);background:none;text-align:left;width:100%}
-  .ev-row:hover{background:#FAFAFA}
-  .ev-d{font-size:15px;font-weight:600;line-height:1.1}
-  .ev-d small{display:block;font-size:11px;color:var(--ink-3);font-weight:400;letter-spacing:1px}
-  .ev-t{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:14px;font-weight:500;line-height:1.45}
-  .ev-s{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-3);margin-top:3px;min-width:0}
-  .ev-s span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-  /* ③ 公司名冊 */
-  .dir-lead{font-size:13.5px;color:var(--ink-2);line-height:1.6}
-  .sub-h{font-size:12px;font-weight:700;color:var(--ink-3);letter-spacing:2px}
-  .ind-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-  .ind-btn{border:1px solid var(--line);border-radius:10px;background:#fff;padding:10px 6px;font-size:13px;color:var(--ink);text-align:center;white-space:nowrap;transition:border-color .15s,background .15s,color .15s}
-  .ind-btn:hover{border-color:var(--prc);background:var(--prsoft);color:var(--prs)}
-  .logo-wall{display:flex;flex-wrap:wrap;gap:8px}
-  .logo-wall button{border:0;background:none;padding:0;border-radius:10px}
-  .logo-wall .logo-sq{width:40px;height:40px;font-size:12px}
-
-  /* ④ 活動回顧 */
-  .media{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:16/9;background:var(--g);display:grid;place-items:center}
-  .media .play{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;box-shadow:0 4px 14px rgba(0,0,0,.15)}
-  .media .play svg{width:20px;height:20px;margin-left:3px;color:var(--prs)}
-  .mock{position:absolute;top:10px;left:10px;font-size:11px;letter-spacing:1px;color:#fff;background:rgba(0,0,0,.35);border-radius:4px;padding:1px 7px}
-  .media .count{position:absolute;right:10px;bottom:10px;font-size:12px;color:#fff;background:rgba(0,0,0,.45);border-radius:999px;padding:2px 10px}
-  .recap{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px;align-items:start}
-  .recap-txt{display:flex;flex-direction:column;gap:10px}
-  .recap-txt .r-meta{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-3);letter-spacing:.5px;flex-wrap:wrap}
-  .recap-txt h3{font-size:16px;font-weight:700;line-height:1.5;letter-spacing:.5px}
-  .recap-txt p{font-size:13.5px;line-height:1.7;color:var(--ink-2)}
-  .recap-txt ul{margin:0;padding-left:18px;font-size:13px;line-height:1.7;color:var(--ink-2)}
-  .recap-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
-  .thumbs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-  .thumb{border:0;background:none;padding:0;text-align:left;display:flex;flex-direction:column;gap:8px}
-  .thumb .media{border-radius:10px}
-  .thumb .media .mock{top:6px;left:6px;font-size:10px}
-  .thumb b{font-size:13px;font-weight:500;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-  .thumb small{font-size:12px;color:var(--ink-3)}
-  .thumb:hover b{color:var(--prs)}
-
-  /* ⑤ 俱樂部 */
-  .club{border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;text-align:left;background:#fff;width:100%}
-  .club:hover{border-color:var(--prc)}
-  .club-top{display:flex;align-items:center;gap:12px}
-  .club-ic{width:40px;height:40px;border-radius:12px;background:var(--prsoft);color:var(--prs);display:grid;place-items:center;flex:none;font-size:18px}
-  .club-name{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .club-name b{font-size:15px;font-weight:700;letter-spacing:1px}
-  .club-top small{display:block;font-size:12px;color:var(--ink-3);margin-top:2px}
-  .club-new{display:flex;gap:6px}
+  /* ── 本頁新增的元件（推導）：UI Library 尚未收錄，確認後再移到 shared/ ── */
+  /* 狀態標籤：已報名／開放報名／即將開放、消息／優惠 */
+  .status{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:var(--tracking-wider);white-space:nowrap}
+  .status.joined{background:var(--accent);color:var(--white)}
+  .status.open{background:var(--mod-product-tint);color:var(--accent-border)}
+  .status.soon{background:var(--black-100);color:var(--black-500)}
+  .status.deal{background:var(--metric-bg);color:#C25E1F}
+  .status.news{background:var(--mod-product-tint);color:var(--accent-border)}
+  /* 下一場活動：日期方塊＋資訊 */
+  .next-event{display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:start}
+  .date-box{width:72px;padding:8px 0;border-radius:16px;background:var(--ticket);display:flex;flex-direction:column;align-items:center}
+  .date-box small{font-size:12px;font-weight:600;letter-spacing:var(--tracking-wider);color:var(--black-600)}
+  .date-box b{font-size:32px;font-weight:500;font-style:italic;line-height:40px;color:var(--black-800)}
+  .next-title{font-size:18px;font-weight:700;line-height:28px;letter-spacing:var(--tracking-super);color:var(--black-800)}
+  .meta-line{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;font-size:14px;line-height:24px;letter-spacing:1.6px;color:var(--black-600)}
+  .tip{padding:10px 14px;border-radius:12px;background:var(--step-highlight);font-size:14px;line-height:24px;letter-spacing:1.6px;color:var(--black-700)}
+  /* 公司方塊 */
+  .co-grid{width:100%;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+  .co-tile{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--line-soft);border-radius:16px;background:var(--white);text-align:left;transition:border-color .15s}
+  .co-tile:hover{border-color:var(--hover-teal)}
+  .co-tile b{display:block;font-size:14px;font-weight:500;line-height:20px;letter-spacing:1.6px;color:var(--black-800);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .co-tile small{font-size:12px;line-height:18px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+  .co-tile > span:last-child{min-width:0}
+  /* 俱樂部卡 */
+  .club-grid{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+  .club-head{display:flex;align-items:center;gap:12px}
+  .club-icon{width:40px;height:40px;flex:none;border-radius:12px;display:grid;place-items:center;background:var(--mod-product-tint);color:var(--accent-border);font-size:18px}
+  .club-name{font-size:16px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-super)}
   .feed{display:flex;flex-direction:column}
-  .feed-item{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
-  .feed-item > .chip{align-self:start;margin-top:1px}
-  .feed-item p{font-size:13.5px;line-height:1.55}
-  .feed-item small{display:block;font-size:12px;color:var(--ink-3);margin-top:3px}
-
-  @media (max-width:1180px){
-    .me-card{flex-direction:column}
-    .me-id{flex:none}
-    .span-8,.span-7,.span-5,.span-4{grid-column:span 12}
-  }
-  @media (max-width:720px){
-    .me-res,.ac-body{grid-template-columns:1fr}
-    .recap{grid-template-columns:1fr}
-    .thumbs{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .content{padding:20px 16px}
-    .ov-card{padding:18px}
-  }
-
-  /* ── Toast ── */
-  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(16px);opacity:0;pointer-events:none;
-    background:#2C2C2C;color:#fff;font-size:13px;padding:9px 16px;border-radius:6px;box-shadow:var(--shadow-md);transition:all .2s;z-index:100}
-  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-  /* ── Responsive ── */
-  .backdrop{display:none}
-  @media (max-width:1080px){ .search{display:none} }
-  @media (max-width:900px){
-    .sidebar{position:fixed;left:0;top:0;transform:translateX(-100%);transition:transform .2s;box-shadow:var(--shadow-md)}
-    .app.nav-open .sidebar{transform:none}
-    .app.nav-open .backdrop{display:block;position:fixed;inset:0;background:rgba(0,0,0,.28);z-index:35}
-    .hamburger{display:inline-flex}
-    .header{padding:0 16px;gap:12px}
-    .content{padding:16px}
-  }
+  .feed-item{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;padding:12px 0;border-bottom:1px solid var(--black-100)}
+  .feed-item:last-child{border-bottom:0}
+  .feed-item p{font-size:14px;line-height:24px;letter-spacing:1.6px;color:var(--black-800)}
+  .feed-item small{font-size:12px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+  .verified{width:18px;height:18px;vertical-align:-3px;margin-left:6px}
+  .ro-list{margin:0;padding-left:20px;font-size:15px;line-height:26px;letter-spacing:1.6px;color:var(--black-800)}
+  .content > section, .content > .content-section{scroll-margin-top:calc(var(--header-h) + 16px)}
+  @media (max-width:767px){ .club-grid{grid-template-columns:minmax(0,1fr)} .next-event{grid-template-columns:minmax(0,1fr)} }
 </style>
 </head>
 <body>
-<div class="app" id="app">
-
-  <!-- ═════════ Sidebar ═════════ -->
-  <aside class="sidebar" id="sidebar" aria-label="主選單">
-    <nav class="sb-card" id="nav"></nav>
-    <div class="sb-user">
-      <div class="sb-user-info">
-        <span class="sb-user-name" id="sb-user-name"></span>
-        <span class="sb-badge">已認證商家</span>
-      </div>
-      <button class="sb-logout" data-toast="原型不提供登出">登出</button>
-    </div>
-  </aside>
-  <div class="backdrop" id="backdrop"></div>
-
-  <!-- ═════════ Main ═════════ -->
+<!-- 僅供內部使用，非經許可不得外流。公關 SENSE 一覽頁，以 UI Library（shared/）重新組裝；舊版（單一檔案）備份於 dist/pr-sense-prototype-20261012-V1.html。公司與活動資料沿用原版示意資料。 -->
+<div class="app" data-module="pr" data-page="home">
+  <aside class="sidebar" id="sidebar" aria-label="主選單"></aside>
   <div class="main">
-    <header class="header">
-      <button class="hamburger" id="hamburger" aria-label="開啟選單">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-      </button>
-      <div class="crumbs" id="crumbs"></div>
+    <header class="header" id="header"></header>
 
-      <label class="search">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input placeholder="搜尋公司、講座、報告、俱樂部…" aria-label="搜尋">
-      </label>
-      <button class="icon-btn" aria-label="通知" data-toast="通知中心尚未規劃">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <span class="ping"></span>
-      </button>
-    </header>
+    <main class="content">
+      <nav class="breadcrumb" aria-label="麵包屑"><span class="root">SENSE</span><span class="sep">/</span><span class="cur" aria-current="page">公關SENSE</span></nav>
 
-    <main class="content" id="content"></main>
+      <!-- 模組介紹＋我的統計 -->
+      <section class="content-section" aria-labelledby="h-intro">
+        <div class="section-title"><h2 id="h-intro">公關 SENSE</h2></div>
+        <section class="ticket" aria-label="公關 SENSE 概況">
+          <span class="ticket-paper left"></span>
+          <div class="ticket-body">
+            <div class="ticket-slogan"><h1>認識圈層裡的企業夥伴</h1><p>透過講座、聚會與俱樂部，找到下一個合作機會</p></div>
+            <span class="ticket-perf" aria-hidden="true">
+              <span class="ticket-notch top"><span><img src="shared/assets/ticket-notch-top.svg" alt=""></span></span>
+              <span class="ticket-notch bottom"><span><img src="shared/assets/ticket-notch-bottom.svg" alt=""></span></span>
+            </span>
+            <div class="ticket-stats">
+              <p class="ticket-stat"><b id="st-events">0</b><span>場已參加活動</span></p><hr>
+              <p class="ticket-stat"><b id="st-met">0</b><span>家已認識企業</span></p>
+            </div>
+          </div>
+          <span class="ticket-paper right"></span>
+          <button class="ticket-close" aria-label="關閉公關 SENSE 概況"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
+        </section>
+      </section>
+
+      <!-- 我的公司 -->
+      <section class="content-section" id="me" aria-labelledby="h-me">
+        <div class="section-title"><h2 id="h-me">我的公司</h2></div>
+        <div class="form-card form-group review-card" id="me-card"></div>
+      </section>
+
+      <!-- 近期活動 -->
+      <section class="content-section" id="academy" aria-labelledby="h-academy">
+        <div class="section-title"><h2 id="h-academy">近期活動</h2></div>
+        <div class="form-card form-group" id="next-event"></div>
+        <div class="form-card form-group" aria-label="接下來的場次"><div class="form-group-title"><h2>接下來的場次</h2></div><div style="overflow-x:auto"><table class="ro-table" id="ev-table"></table></div></div>
+      </section>
+
+      <!-- 公司名冊 -->
+      <section class="content-section" id="directory" aria-labelledby="h-dir">
+        <div class="section-title"><h2 id="h-dir">公司名冊</h2></div>
+        <p class="field-help">認識 SENSE 平台上的會員企業，依產業找到想合作的夥伴。</p>
+        <div class="chips" id="ind-chips" role="group" aria-label="依產業篩選"></div>
+        <div class="co-grid" id="co-grid"></div>
+      </section>
+
+      <!-- 活動回顧 -->
+      <section class="content-section" id="reports" aria-labelledby="h-reports">
+        <div class="section-title"><h2 id="h-reports">活動回顧</h2></div>
+        <div class="card-grid" id="recap-grid"></div>
+        <button type="button" class="add-link" id="more-recaps" data-toast="活動回顧列表頁尚未製作"></button>
+      </section>
+
+      <!-- 俱樂部 -->
+      <section class="content-section" id="clubs" aria-labelledby="h-clubs">
+        <div class="section-title"><h2 id="h-clubs">俱樂部</h2></div>
+        <div class="club-grid" id="club-grid"></div>
+        <div class="form-card form-group"><div class="form-group-title"><h2>最新消息與優惠</h2></div><div class="feed" id="club-feed"></div></div>
+        <button type="button" class="add-link" id="more-clubs"></button>
+      </section>
+    </main>
   </div>
 </div>
-<div class="toast" id="toast"></div>
 
+<script src="shared/shell.js?v=20261016f"></script>
+<script src="shared/components.js?v=20261016f"></script>
 <script>
-/* ═════════ Icons ═════════ */
-const ICON = {
-  home:'M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
-  calendar:'M4 5h16v16H4zM4 9h16M8 3v4M16 3v4',
-  users:'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75',
-  handshake:'M7 4v16 M3 8l4-4 4 4 M17 20V4 M13 16l4 4 4-4',
-  chat:'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',
-  star:'M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z',
-  ticket:'M3 8a2 2 0 0 0 0 4v4h18v-4a2 2 0 0 0 0-4V4H3z M13 4v16',
-  building:'M4 21V5l8-3v19 M12 9h8v12 M8 8h.01 M8 12h.01 M8 16h.01 M16 13h.01 M16 17h.01',
-  doc:'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6 M9 13h6 M9 17h4',
-  check:'M9 11l3 3L22 4 M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11',
-  funnel:'M3 4h18l-7 8v6l-4 2v-8z',
-  chart:'M3 3v18h18 M7 14l4-4 4 4 5-5',
-  chev:'M6 9l6 6 6-6',
-  listings:'M4 6h16M4 12h16M4 18h16',
-  key:'M21 2l-2 2m-7.6 7.6a5.5 5.5 0 1 1-7.8 7.8 5.5 5.5 0 0 1 7.8-7.8zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4'
-};
-const svg = (k, cls='') => `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${ICON[k]}"/></svg>`;
+SenseShell.mount();
+const esc = SenseUI.esc;
 
-/* ═════════ 登入者（原型示意） ═════════ */
-const ME = { name:'王志明', companyId:'aidai' };
-const state = { route:'overview', prOpen:true };
-
-/* ═════════ 頁面定義 ═════════
-   group：pr 公關 SENSE／me 我的專屬內容／admin 後台管理 */
-const PAGES = {
-  overview:     { group:'pr',    label:'一覽',         icon:'home',      desc:'公司名冊、近期活動、活動回顧、俱樂部的摘要一覽' },
-  directory:    { group:'pr',    label:'公司名冊',     icon:'users',     desc:'我的公司資料，以及所有在 SENSE 平台上的公司資料', sub:true },
-  academy:      { group:'pr',    label:'近期活動',     icon:'calendar',  desc:'即將舉辦的 SENSE INSIGHT 學院講座與 SENSE DAY 主題式交流聚會', sub:true },
-  reports:      { group:'pr',    label:'活動回顧',     icon:'chart',     desc:'過往活動的概要、精華影片與照片', sub:true },
-  clubs:        { group:'pr',    label:'俱樂部',       icon:'chat',      desc:'各公司透過 SENSE 平台建立的社團組織', sub:true },
-
-  myListings:   { group:'me',    label:'我的上架',     icon:'listings',  desc:'本公司在 SENSE 平台上架的項目' },
-  myContracts:  { group:'me',    label:'我的合作',     icon:'doc',       desc:'本公司進行中與已完成的合作' },
-  profile:      { group:'me',    label:'公司資料',     icon:'building',  desc:'編輯本公司的公開資料' },
-
-  adminUnit:    { group:'admin', label:'單位管理',     icon:'building',  desc:'管理所屬單位' },
-  adminAccount: { group:'admin', label:'帳號管理',     icon:'users',     desc:'管理單位內的使用者帳號' },
-  adminKeys:    { group:'admin', label:'鑰匙管理',     icon:'key',       desc:'管理存取金鑰' }
-};
-const GROUP_LABEL = { pr:'公關 SENSE', me:'我的專屬內容', admin:'後台管理' };
-
-/* Figma 素材（內嵌以維持單一 HTML 檔） */
-const ASSET = {
-  illustration:'data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9Ijk1Ljk5OTkiIGhlaWdodD0iMTU4LjEzMyIgdmlld0JveD0iMCAwIDk1Ljk5OTkgMTU4LjEzMyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9ImlsbHVzdHJhdGlvbiI+CjxwYXRoIGlkPSJWZWN0b3IiIGQ9Ik05LjIzMDQgMzguMTA4NkM4LjgxNzgzIDM2LjcwNjEgNi4xNjI5OSAyOS41Njc1IDE4LjY0NzkgMjAuNTU4OUMyMC44MDA1IDE4Ljk5NDUgMjQuNTEzNiAxNy41OTIgMjcuNTA5MyAxNi40NzcxQzQwLjc0NzYgMTAuODEzIDQ2LjQzNCA4LjE4NzcyIDYzLjYzNjYgMC44MzMzNTZDNjguNTE1NyAtMS4yNTI0OCA3My45ODY4IDAuNTk5NTk5IDc2LjI0NyA2LjEzNzg1QzgyLjE2NjYgMjAuNTQwOSA4Ni44NjY0IDMxLjYxNzQgOTIuODc1NiA0NS44OTQ2SDkyLjkyOTRDOTUuNDU4NyA1MS4zMDY5IDkzLjEyNjggNTYuNTkzNSA4OC4zMDE0IDU4Ljc4NzJDODYuNzA0OSA1OS41MDY0IDY1Ljg3ODggNjkuMTQ0NCA1OS40NzQ5IDcxLjg3NzZDNTQuNTk1OCA3My45NDU0IDQ5LjEyNDcgNzIuMDc1NCA0Ni44ODI0IDY2LjUzNzFDNDIuMzA4MiA1NS42MjI1IDMxLjY1MyAzMC4zNzY3IDMwLjYzMDUgMjguODQ4M0MyOC4yNDQ4IDI1LjI3IDIxLjEyMzMgMjQuMzE3IDE2LjIwODMgMjYuNjM2NkMxMi4zMzM3IDI4LjQ1MjcgNy43Nzc0MiAzMi45NjYgOS4yNDgzNCAzOC4xMDg2SDkuMjMwNFoiIGZpbGw9InVybCgjcGFpbnQwX2xpbmVhcl8wXzM0KSIvPgo8cGF0aCBpZD0iVmVjdG9yXzIiIGQ9Ik05MC4yOTE1IDEzNC4zODFDNjkuNjgwNyAxNDMuNzQ5IDY1LjU3MjkgMTQ1LjM0OSA0NS4wMTU4IDE1NC44MDdDNDQuNDA1OSAxNTUuMDc3IDQzLjY3MDUgMTU1LjQwMSA0Mi44NjMzIDE1NS43NDJDMzAuNzM3MSAxNTYuMzkgMjYuOTM0MyAxNTAuNDkyIDI2LjkzNDMgMTUwLjQ5MlYxNTAuNDU2QzI5Ljk4MzcgMTUzLjkyNiAzNS42NTIyIDE1My41MzEgMzkuMjkzNiAxNTIuMDJDNDQuMzM0MiAxNDkuOTM0IDQ4LjQyNDEgMTQ0LjAzNiA0Ny40MTk1IDEzOS44NjVDNDYuOTg5IDEzOC4wNjcgNDYuMjM1NiAxMzYuMzQgNDUuNDY0MyAxMzQuNjVMMjIuNzU0NyA4My40MjE0TDI2LjcwMTEgODAuNjg4M0MzMC4wMzc1IDg3LjAzNTcgMzQuNDE0NCA4OC42MzYgMzkuNzA2MiA4Ny41MDMyQzQ0LjI5ODMgODYuNTUwMiA2Mi43Mzg2IDc3LjcwMzQgNjQuMzUzMSA3Ny4wMDIxQzY5LjIzMjIgNzQuOTE2MyA3NC42ODU0IDc2Ljc2ODQgNzYuOTgxNSA4Mi4zMDY2TDc2LjkyNzcgODIuMzQyNkM4My4zNjc0IDk2LjQzOTkgODguMzU0MiAxMDcuMzkxIDk0Ljk1NTQgMTIxLjQ4OEM5Ny41MDI2IDEyNi45MTggOTUuMTcwNyAxMzIuMjA1IDkwLjM0NTMgMTM0LjM5OEw5MC4yOTE1IDEzNC4zODFaIiBmaWxsPSJ1cmwoI3BhaW50MV9yYWRpYWxfMF8zNCkiLz4KPHBhdGggaWQ9IlZlY3Rvcl8zIiBkPSJNMTYuMjA3NCAyNi42MzY0QzE4LjIzNDQgMjUuNzU1MyAyMS44NCAyNS4xNjIgMjUuMTU4NSAyNS42NjU0QzI3LjUyNjMgMjYuMzMwNyAyOS4wMzMxIDI2Ljc5ODMgMzAuNjQ3NiAyOC44NDgxQzM0LjM2MDggMzYuMzQ2MyA0Ni44OTk1IDY2LjUzNyA0Ni44OTk1IDY2LjUzN0M0Ni44OTk1IDY2LjUzNyA0OS43ODc1IDc0LjE5NyA1Ny4wMTY1IDcyLjU3ODdMMzguODA5NCAyNi43ODAzQzM1LjgxMzcgMTkuNTY5OCAyNC4wMjg0IDE2LjA2MzQgMTMuMDE0NCAyMi41OTA2QzguNzI3MjUgMjUuMTI2IDUuNDYyNTIgMjcuNDI3NiA0LjE1MzA0IDMzLjg4MjlDMy4xMTI2MyAzOS4xNjk0IDUuMTIxNyA0My40MzEgNS4xMjE3IDQzLjQzMUM1LjEyMTcgNDMuNDMxIDE5LjUwOCA3Ni4xMjEgMjIuNDg1NyA4Mi44ODJDMjIuNDg1NyA4Mi45MTggMjIuNTIxNiA4Mi45NTM5IDIyLjUzOTYgODIuOTg5OUMyNC4yMjU3IDg2LjgwMiAyNi41NTc3IDkyLjAzNDUgMjYuNjI5NCA5Mi4yMzIzTDQ1LjQ0NjUgMTM0LjY2OEM0NS40NDY1IDEzNC42NjggNDcuNDE5NyAxMzguNzE0IDQ3LjU2MzIgMTQwLjk5OEM0Ny41NjMyIDE0MC45OTggNDcuOTU3OCAxNDMuODM5IDQ1LjE5NTQgMTQ3LjM0NUM0NS4xOTU0IDE0Ny4zNDUgNDIuNDUwOCAxNTAuNzQ0IDQwLjEzNjggMTUxLjY2MUMzNy44MjI4IDE1Mi41NiAzNi41MTMzIDE1Mi44ODMgMzYuNTEzMyAxNTIuODgzQzM2LjUxMzMgMTUyLjg4MyAzMy41NTM1IDE1NC4wNTIgMjkuMjMwNSAxNTIuMjM2QzI5LjIzMDUgMTUyLjIzNiAyOC4wNjQ1IDE1MS43NSAyNy4wMjQxIDE1MC42NTRDMjYuOTcwMyAxNTAuNTgyIDI2LjkzNDQgMTUwLjUyOCAyNi45MzQ0IDE1MC41MjhMMjYuMTQ1MSAxNDkuNDY3TDIyLjkxNjMgMTQzLjY5NUMyMi45MTYzIDE0My42OTUgNS44NzUwOSAxMDYuMzMgNS4wMzIwMSAxMDQuNTE0QzQuMTcwOTggMTAzLjQ4OSAzLjU0MzE1IDEwMi40NDYgMS40MDg1MiAxMDMuNDcxQy0wLjcwODE3NyAxMDQuNDc4IDAuMTg4NzI2IDEwNi41MDkgMC4xODg3MjYgMTA2LjUwOUw2LjQzMTE4IDEyMC40MDlMMTQuMjcwMSAxMzcuNjE3TDE5LjQzNjMgMTQ4Ljg5MUMxOS40MzYzIDE0OC44OTEgMjAuMjA3NiAxNTAuNzI2IDIxLjkxMTcgMTUyLjc1N0MyNS4wNTA5IDE1Ni41MTYgMjguNzI4MiAxNTcuNzIgMzIuMzUxNyAxNTguMDk4QzM1Ljk1NzIgMTU4LjQ3NiA0Mi44NDU1IDE1NS43MjQgNDIuODQ1NSAxNTUuNzI0TDQ0Ljc0NjkgMTU0Ljg2MUM1Mi42NzU1IDE1MS4yODMgNTYuMDgzOCAxNDEuODQzIDUyLjMxNjggMTM0LjAwM0wyNi42NjUzIDgwLjY3MDNMMjUuNzUwNSA3OC40NzY2QzI0LjQ0MSA3NS40NTU3IDE5LjkyMDYgNjQuODI4OCAxOS45MjA2IDY0LjgyODhMMTAuMTk4MiA0MS40NTNDMTAuMTk4MiA0MS40NTMgOS43MTM4NCAzOS43NDQ4IDkuMjI5NTEgMzguMTA4NUM5LjEyMTg5IDM3LjczMDkgOC45MjQ1NyAzNy4wMjk2IDguOTI0NTcgMzYuMDIyN1YzNi4yMDI1QzguOTI0NTcgMzYuMjAyNSA4Ljk5NjMyIDMwLjEwNjggMTYuMTg5NSAyNi42MzY0SDE2LjIwNzRaIiBmaWxsPSJ1cmwoI3BhaW50Ml9saW5lYXJfMF8zNCkiLz4KPHBhdGggaWQ9IlZlY3Rvcl80IiBkPSJNMzguODI4MSA3OC4yNjA4QzM3LjQxMSA3OC44OTAxIDM1Ljc3ODYgNzguMjQyOCAzNS4xNTA4IDc2LjgyMjNMMTguMDE5OSAzNy44MDI4QzE3LjM5MjEgMzYuMzgyMyAxOC4wMzc5IDM0Ljc0NiAxOS40NTUgMzQuMTE2NkMyMC44NzIxIDMzLjQ4NzMgMjIuNTIyNCAzNC4xMzQ2IDIzLjEzMjMgMzUuNTU1MUw0MC4yNjMxIDc0LjU3NDZDNDAuODkxIDc1Ljk3NzEgNDAuMjYzMSA3Ny42MzE0IDM4LjgyODEgNzguMjYwOFoiIGZpbGw9InVybCgjcGFpbnQzX2xpbmVhcl8wXzM0KSIvPgo8cGF0aCBpZD0iVmVjdG9yXzUiIGQ9Ik0xNS4wMDQ5IDk5LjAyOTJDMTYuNDIyIDk4LjM5OTkgMTguMDU0NCA5OS4wMjkyIDE4LjY4MjIgMTAwLjQ1TDM2LjA0NjIgMTM5LjM2MUMzNi42NzQxIDE0MC43NjQgMzYuMDQ2MiAxNDIuNDM2IDM0LjYyOTEgMTQzLjA2NUMzMy4yMyAxNDMuNjk1IDMxLjU3OTcgMTQzLjA2NSAzMC45MzM5IDE0MS42NDVMMTMuNTY5OCAxMDIuNzMzQzEyLjk0MiAxMDEuMzEzIDEzLjU2OTggOTkuNjU4NiAxNC45ODcgOTkuMDI5MkgxNS4wMDQ5WiIgZmlsbD0idXJsKCNwYWludDRfcmFkaWFsXzBfMzQpIi8+CjwvZz4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQwX2xpbmVhcl8wXzM0IiB4MT0iNjQuOTEwMiIgeTE9IjcwLjc2MjciIHgyPSIxMS41ODM2IiB5Mj0iLTQ1LjYyMzIiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KPHN0b3Agb2Zmc2V0PSIwLjA5IiBzdG9wLWNvbG9yPSIjMDA3M0Y1Ii8+CjxzdG9wIG9mZnNldD0iMC4xOCIgc3RvcC1jb2xvcj0iIzE0OTVFOSIvPgo8c3RvcCBvZmZzZXQ9IjAuMyIgc3RvcC1jb2xvcj0iIzI5QjhEQyIvPgo8c3RvcCBvZmZzZXQ9IjAuMzkiIHN0b3AtY29sb3I9IiMzN0NFRDQiLz4KPHN0b3Agb2Zmc2V0PSIwLjQ1IiBzdG9wLWNvbG9yPSIjM0NEN0QyIi8+CjwvbGluZWFyR3JhZGllbnQ+CjxyYWRpYWxHcmFkaWVudCBpZD0icGFpbnQxX3JhZGlhbF8wXzM0IiBjeD0iMCIgY3k9IjAiIHI9IjEiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiBncmFkaWVudFRyYW5zZm9ybT0idHJhbnNsYXRlKDQ0LjA0NzIgNzUuNjg5NSkgc2NhbGUoOTQuNDYxOSA5NC42ODk3KSI+CjxzdG9wIHN0b3AtY29sb3I9IiMwMDczRjUiLz4KPHN0b3Agb2Zmc2V0PSIwLjA4IiBzdG9wLWNvbG9yPSIjMEQ4M0VCIi8+CjxzdG9wIG9mZnNldD0iMC4xOSIgc3RvcC1jb2xvcj0iIzFEOTZFMSIvPgo8c3RvcCBvZmZzZXQ9IjAuMjUiIHN0b3AtY29sb3I9IiMyQ0I2RDkiLz4KPHN0b3Agb2Zmc2V0PSIwLjMxIiBzdG9wLWNvbG9yPSIjMzdDRUQzIi8+CjxzdG9wIG9mZnNldD0iMC4zNCIgc3RvcC1jb2xvcj0iIzNDRDdEMiIvPgo8c3RvcCBvZmZzZXQ9IjAuNTUiIHN0b3AtY29sb3I9IiNBQUM4NzQiLz4KPHN0b3Agb2Zmc2V0PSIwLjcxIiBzdG9wLWNvbG9yPSIjRkZCRTJEIi8+CjxzdG9wIG9mZnNldD0iMC43MyIgc3RvcC1jb2xvcj0iI0ZGQUYyQiIvPgo8c3RvcCBvZmZzZXQ9IjAuODgiIHN0b3AtY29sb3I9IiNGRjYwMjUiLz4KPHN0b3Agb2Zmc2V0PSIwLjk1IiBzdG9wLWNvbG9yPSIjRkY0MTIzIi8+CjwvcmFkaWFsR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQyX2xpbmVhcl8wXzM0IiB4MT0iNDMuNzQyNCIgeTE9IjI4LjcyMjMiIHgyPSIxNC44OTMiIHkyPSIxNDQuNTYxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIG9mZnNldD0iMC4xMiIgc3RvcC1jb2xvcj0iIzAwNzNGNSIvPgo8c3RvcCBvZmZzZXQ9IjAuMTUiIHN0b3AtY29sb3I9IiMxNjc3RjYiLz4KPHN0b3Agb2Zmc2V0PSIwLjIyIiBzdG9wLWNvbG9yPSIjNEY4NEZBIi8+CjxzdG9wIG9mZnNldD0iMC4yOCIgc3RvcC1jb2xvcj0iIzg3OTFGRiIvPgo8c3RvcCBvZmZzZXQ9IjAuMzEiIHN0b3AtY29sb3I9IiM4QjkyRjciLz4KPHN0b3Agb2Zmc2V0PSIwLjM2IiBzdG9wLWNvbG9yPSIjOTc5N0UyIi8+CjxzdG9wIG9mZnNldD0iMC40MiIgc3RvcC1jb2xvcj0iI0FCOUVCRiIvPgo8c3RvcCBvZmZzZXQ9IjAuNDkiIHN0b3AtY29sb3I9IiNDNkE4OEYiLz4KPHN0b3Agb2Zmc2V0PSIwLjU3IiBzdG9wLWNvbG9yPSIjRTlCNTUzIi8+CjxzdG9wIG9mZnNldD0iMC42MiIgc3RvcC1jb2xvcj0iI0ZGQkUyRCIvPgo8c3RvcCBvZmZzZXQ9IjAuODciIHN0b3AtY29sb3I9IiNGRkJFMkQiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRkY2RTJEIi8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQzX2xpbmVhcl8wXzM0IiB4MT0iMjAuMTE4NyIgeTE9IjM1LjgyNDgiIHgyPSIzNC4xNDg3IiB5Mj0iNjcuMzAzIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiMwMDczRjUiLz4KPHN0b3Agb2Zmc2V0PSIwLjIiIHN0b3AtY29sb3I9IiMxNjc3RjYiLz4KPHN0b3Agb2Zmc2V0PSIwLjYzIiBzdG9wLWNvbG9yPSIjNEY4NEZBIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzg3OTFGRiIvPgo8L2xpbmVhckdyYWRpZW50Pgo8cmFkaWFsR3JhZGllbnQgaWQ9InBhaW50NF9yYWRpYWxfMF8zNCIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSgyMS44MjE0IDgyLjEyNjgpIHNjYWxlKDY1LjQ5MTkgNjUuNjQ5OCkiPgo8c3RvcCBzdG9wLWNvbG9yPSIjMDA3M0Y1Ii8+CjxzdG9wIG9mZnNldD0iMC4wOCIgc3RvcC1jb2xvcj0iIzBEODNFQiIvPgo8c3RvcCBvZmZzZXQ9IjAuMTkiIHN0b3AtY29sb3I9IiMxRDk2RTEiLz4KPHN0b3Agb2Zmc2V0PSIwLjI3IiBzdG9wLWNvbG9yPSIjMkNCNkQ5Ii8+CjxzdG9wIG9mZnNldD0iMC4zNCIgc3RvcC1jb2xvcj0iIzM3Q0VEMyIvPgo8c3RvcCBvZmZzZXQ9IjAuMzgiIHN0b3AtY29sb3I9IiMzQ0Q3RDIiLz4KPHN0b3Agb2Zmc2V0PSIwLjQyIiBzdG9wLWNvbG9yPSIjNEZENEMxIi8+CjxzdG9wIG9mZnNldD0iMC41MSIgc3RvcC1jb2xvcj0iIzgzQ0Q5NSIvPgo8c3RvcCBvZmZzZXQ9IjAuNjQiIHN0b3AtY29sb3I9IiNENEMzNTAiLz4KPHN0b3Agb2Zmc2V0PSIwLjcxIiBzdG9wLWNvbG9yPSIjRkZCRTJEIi8+CjxzdG9wIG9mZnNldD0iMC43MyIgc3RvcC1jb2xvcj0iI0ZGQUYyQiIvPgo8c3RvcCBvZmZzZXQ9IjAuODgiIHN0b3AtY29sb3I9IiNGRjYwMjUiLz4KPHN0b3Agb2Zmc2V0PSIwLjk1IiBzdG9wLWNvbG9yPSIjRkY0MTIzIi8+CjwvcmFkaWFsR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==',
-  whiteBackground:'data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjkwIiBoZWlnaHQ9IjQ0IiB2aWV3Qm94PSIwIDAgOTAgNDQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGlkPSJ3aGl0ZS1iYWNrZ3JvdW5kIiBkPSJNMCAyMkMwIDkuODQ5NzQgOS44NDk3NCAwIDIyIDBIOTBMNzAgNDRIMjJDOS44NDk3MyA0NCAwIDM0LjE1MDMgMCAyMloiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo=',
-  whiteLine:'data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjEzMyIgaGVpZ2h0PSI0NCIgdmlld0JveD0iMCAwIDEzMyA0NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggaWQ9IndoaXRlLWxpbmUiIGQ9Ik0yMiAwLjVIMTMyLjIyOUwxMTMuMDc1IDQzLjVIMjJDMTAuMTI1OSA0My41IDAuNSAzMy44NzQxIDAuNSAyMkMwLjUgMTAuMTI1OSAxMC4xMjU5IDAuNSAyMiAwLjVaIiBzdHJva2U9IndoaXRlIi8+Cjwvc3ZnPgo=',
-  ionic:'data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjI0LjAwMSIgaGVpZ2h0PSIyOCIgdmlld0JveD0iMCAwIDI0LjAwMSAyOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9InNpbXBsZS1pY29uczppb25pYyI+CjxlbGxpcHNlIGlkPSJzaGFkb3ciIGN4PSIxMS41IiBjeT0iMjMiIHJ4PSIxMS41IiByeT0iNSIgZmlsbD0iI0VFRUVFRSIvPgo8Y2lyY2xlIGlkPSJ2ZWN0b3IiIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIgZmlsbD0iI0Y1RjVGNSIvPgo8cGF0aCBpZD0iVmVjdG9yIiBkPSJNMTIuMDAxIDAuMDAwOTc2NTYyQzEzLjkxNCAtMC4wMDM3Mjg5MSAxNS44IDAuNDUyODkxIDE3LjQ5OSAxLjMzMjAzTDE3LjcyMzYgMS40NDkyMkwxNy41MjczIDEuNjA4NEMxNy4wNDYyIDEuOTk1NTUgMTYuNjY2IDIuNDkzNjcgMTYuNDIwOSAzLjA2MDU1TDE2LjM1NDUgMy4yMTU4MkwxNi4yMDAyIDMuMTQwNjJDMTQuODgzMiAyLjUxMjYzIDEzLjQ2NyAyLjE5NDM0IDEyIDIuMTk0MzRDNi41OTYgMi4xOTQzNCAyLjE5NDM0IDYuNTk1MDEgMi4xOTQzNCAxMkMyLjE5NDM0IDE3LjQwNSA2LjU4NzA5IDIxLjgwMTggMTEuOTk2MSAyMS44MDE4QzE3LjQwNSAyMS44MDE3IDIxLjgwMTcgMTcuNDAxIDIxLjgwMTggMTEuOTk2MUMyMS44MDQzIDEwLjcwNTcgMjEuNTQ5MyA5LjQyNzkgMjEuMDUxOCA4LjIzNzNMMjAuOTg2MyA4LjA4MjAzTDIxLjE0NDUgOC4wMjE0OEMyMS43MjE1IDcuODA1NDggMjIuMjQyNCA3LjQ0OTM1IDIyLjY1MDQgNi45ODUzNUwyMi44MTkzIDYuNzk2ODhMMjIuOTIxOSA3LjAyNzM0QzIzLjYzODggOC41OTcyNyAyNC4wMDEgMTAuMjcxMSAyNC4wMDEgMTIuMDAxQzI0LjAwMSAxOC42MiAxOC42MiAyNC4wMDEgMTIuMDAxIDI0LjAwMUM1LjM4MTk4IDI0LjAwMSAwLjAwMDk3NjU2MiAxOC42MiAwLjAwMDk3NjU2MiAxMi4wMDFDMC4wMDA5OTYyMDQgNS4zODE5OSA1LjM4MTk5IDAuMDAwOTc2NTYyIDEyLjAwMSAwLjAwMDk3NjU2MloiIGZpbGw9IiMwMTczRjUiLz4KPHBhdGggaWQ9IlZlY3Rvcl8yIiBkPSJNMTIgNi41MzAyN0MxMy40NDk5IDYuNTMyOTIgMTQuODQgNy4xMDk1MiAxNS44NjUyIDguMTM0NzdDMTYuODkwNSA5LjE2MDAxIDE3LjQ2NzEgMTAuNTUwMSAxNy40Njk3IDEyQzE3LjQ2ODEgMTMuNDUwMiAxNi44OTE3IDE0Ljg0MDcgMTUuODY2MiAxNS44NjYyQzE0Ljg0MDcgMTYuODkxNyAxMy40NTAyIDE3LjQ2ODEgMTIgMTcuNDY5N0MxMC41NDk4IDE3LjQ2ODEgOS4xNTkyNyAxNi44OTE3IDguMTMzNzkgMTUuODY2MkM3LjEwODMxIDE0Ljg0MDcgNi41MzE4NiAxMy40NTAyIDYuNTMwMjcgMTJDNi41MzE4NiAxMC41NDk4IDcuMTA4MzEgOS4xNTkyNyA4LjEzMzc5IDguMTMzNzlDOS4xNTkyNyA3LjEwODMyIDEwLjU0OTggNi41MzE4NiAxMiA2LjUzMDI3WiIgZmlsbD0iI0ZGMUUwMCIvPgo8cGF0aCBpZD0iVmVjdG9yXzMiIGQ9Ik0xOS44NTA2IDIuMDI5M0MyMC41MTIgMi4wMjkzIDIxLjE0NjUgMi4yOTIwNSAyMS42MTQzIDIuNzU5NzdDMjIuMDgyIDMuMjI3NDggMjIuMzQ0NyAzLjg2MiAyMi4zNDQ3IDQuNTIzNDRDMjIuMzQ0NyA0Ljg1MDgxIDIyLjI4MDYgNS4xNzUwOCAyMi4xNTUzIDUuNDc3NTRDMjIuMDMgNS43ODAwNyAyMS44NDU4IDYuMDU0NTcgMjEuNjE0MyA2LjI4NjEzQzIxLjM4MjcgNi41MTc2NiAyMS4xMDgyIDYuNzAxODIgMjAuODA1NyA2LjgyNzE1QzIwLjUwMzEgNi45NTI0OCAyMC4xNzgxIDcuMDE2NiAxOS44NTA2IDcuMDE2NkMxOS41MjMyIDcuMDE2NTUgMTkuMTk4OSA2Ljk1MjQzIDE4Ljg5NjUgNi44MjcxNUMxOC41OTM5IDYuNzAxODIgMTguMzE5NSA2LjUxNzY5IDE4LjA4NzkgNi4yODYxM0MxNy44NTYzIDYuMDU0NTcgMTcuNjcyMiA1Ljc4MDA4IDE3LjU0NjkgNS40Nzc1NEMxNy40MjE2IDUuMTc1MDggMTcuMzU3NSA0Ljg1MDgxIDE3LjM1NzQgNC41MjM0NEMxNy4zNTc0IDMuODYxOTkgMTcuNjIwMiAzLjIyNzQ4IDE4LjA4NzkgMi43NTk3N0MxOC41NTU1IDIuMjkyMTkgMTkuMTg5MyAyLjAyOTQgMTkuODUwNiAyLjAyOTNaIiBmaWxsPSIjRkZDOTMzIi8+CjwvZz4KPC9zdmc+Cg==',
-  chevDown:'data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJpY29uIj4KPG1hc2sgaWQ9Im1hc2swXzBfNzUiIHN0eWxlPSJtYXNrLXR5cGU6YWxwaGEiIG1hc2tVbml0cz0idXNlclNwYWNlT25Vc2UiIHg9IjAiIHk9IjAiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCI+CjxyZWN0IGlkPSJCb3VuZGluZyBib3giIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0iI0Q5RDlEOSIvPgo8L21hc2s+CjxnIG1hc2s9InVybCgjbWFzazBfMF83NSkiPgo8cGF0aCBpZD0iZXhwYW5kX21vcmUiIGQ9Ik0xMi4wMDA4IDE0Ljk1MDRDMTEuODY3NCAxNC45NTA0IDExLjc0MjQgMTQuOTI5NiAxMS42MjU4IDE0Ljg4NzlDMTEuNTA5MSAxNC44NDYyIDExLjQwMDggMTQuNzc1NCAxMS4zMDA4IDE0LjY3NTRMNi43MDA3OCAxMC4wNzU0QzYuNTE3NDUgOS44OTIwNiA2LjQyNTc4IDkuNjU4NzIgNi40MjU3OCA5LjM3NTM5QzYuNDI1NzggOS4wOTIwNiA2LjUxNzQ1IDguODU4NzIgNi43MDA3OCA4LjY3NTM5QzYuODg0MTEgOC40OTIwNiA3LjExNzQ1IDguNDAwMzkgNy40MDA3OCA4LjQwMDM5QzcuNjg0MTEgOC40MDAzOSA3LjkxNzQ1IDguNDkyMDYgOC4xMDA3OCA4LjY3NTM5TDEyLjAwMDggMTIuNTc1NEwxNS45MDA4IDguNjc1MzlDMTYuMDg0MSA4LjQ5MjA2IDE2LjMxNzQgOC40MDAzOSAxNi42MDA4IDguNDAwMzlDMTYuODg0MSA4LjQwMDM5IDE3LjExNzQgOC40OTIwNiAxNy4zMDA4IDguNjc1MzlDMTcuNDg0MSA4Ljg1ODcyIDE3LjU3NTggOS4wOTIwNiAxNy41NzU4IDkuMzc1MzlDMTcuNTc1OCA5LjY1ODcyIDE3LjQ4NDEgOS44OTIwNiAxNy4zMDA4IDEwLjA3NTRMMTIuNzAwOCAxNC42NzU0QzEyLjYwMDggMTQuNzc1NCAxMi40OTI0IDE0Ljg0NjIgMTIuMzc1OCAxNC44ODc5QzEyLjI1OTEgMTQuOTI5NiAxMi4xMzQxIDE0Ljk1MDQgMTIuMDAwOCAxNC45NTA0WiIgZmlsbD0iI0UwRTBFMCIvPgo8L2c+CjwvZz4KPC9zdmc+Cg==',
-  chevUp:'data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJpY29uIj4KPG1hc2sgaWQ9Im1hc2swXzBfNjIiIHN0eWxlPSJtYXNrLXR5cGU6YWxwaGEiIG1hc2tVbml0cz0idXNlclNwYWNlT25Vc2UiIHg9IjAiIHk9IjAiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCI+CjxyZWN0IGlkPSJCb3VuZGluZyBib3giIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0iI0Q5RDlEOSIvPgo8L21hc2s+CjxnIG1hc2s9InVybCgjbWFzazBfMF82MikiPgo8cGF0aCBpZD0iZXhwYW5kX2xlc3MiIGQ9Ik0xMi4wMDA4IDEwLjc3NTRMOC4xMDA3OCAxNC42NzU0QzcuOTE3NDUgMTQuODU4NyA3LjY4NDExIDE0Ljk1MDQgNy40MDA3OCAxNC45NTA0QzcuMTE3NDUgMTQuOTUwNCA2Ljg4NDExIDE0Ljg1ODcgNi43MDA3OCAxNC42NzU0QzYuNTE3NDUgMTQuNDkyMSA2LjQyNTc4IDE0LjI1ODcgNi40MjU3OCAxMy45NzU0QzYuNDI1NzggMTMuNjkyMSA2LjUxNzQ1IDEzLjQ1ODcgNi43MDA3OCAxMy4yNzU0TDExLjMwMDggOC42NzUzOUMxMS40MDA4IDguNTc1MzkgMTEuNTA5MSA4LjUwNDU2IDExLjYyNTggOC40NjI4OUMxMS43NDI0IDguNDIxMjIgMTEuODY3NCA4LjQwMDM5IDEyLjAwMDggOC40MDAzOUMxMi4xMzQxIDguNDAwMzkgMTIuMjU5MSA4LjQyMTIyIDEyLjM3NTggOC40NjI4OUMxMi40OTI0IDguNTA0NTYgMTIuNjAwOCA4LjU3NTM5IDEyLjcwMDggOC42NzUzOUwxNy4zMDA4IDEzLjI3NTRDMTcuNDg0MSAxMy40NTg3IDE3LjU3NTggMTMuNjkyMSAxNy41NzU4IDEzLjk3NTRDMTcuNTc1OCAxNC4yNTg3IDE3LjQ4NDEgMTQuNDkyMSAxNy4zMDA4IDE0LjY3NTRDMTcuMTE3NCAxNC44NTg3IDE2Ljg4NDEgMTQuOTUwNCAxNi42MDA4IDE0Ljk1MDRDMTYuMzE3NCAxNC45NTA0IDE2LjA4NDEgMTQuODU4NyAxNS45MDA4IDE0LjY3NTRMMTIuMDAwOCAxMC43NzU0WiIgZmlsbD0iI0UwRTBFMCIvPgo8L2c+CjwvZz4KPC9zdmc+Cg==',
-  secMask:'data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjkiIGhlaWdodD0iMjgiIHZpZXdCb3g9IjAgMCA5IDI4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBpZD0ibWFzayIgZD0iTTkgMFYyOEgwTDkgMFoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo='
-};
-
-/* 其他 SENSE 模組（本原型範圍外） */
-const OTHER_MODULES_BEFORE = [
-  { label:'商品SENSE', c:'#99C7FB' },
-  { label:'行銷SENSE', c:'#B6E6E4' },
-  { label:'策略SENSE', c:'#FFB080' }
-];
-const OTHER_MODULES_AFTER = [
-  { label:'財務SENSE', c:'#FFDD80' }
-];
-const SECTIONS = [
-  { group:'me',    c:'#49BFBB', line:'#DBF2F1', strong:'#2E8F8B' },
-  { group:'admin', c:'#BDBDBD', line:'#EEEEEE', strong:'#424242' }
-];
-
-const visible = (k) => !!PAGES[k];
-
-/* ═════════ Render: Sidebar ═════════ */
-function renderSidebar(){
-  document.getElementById('sb-user-name').textContent = ME.name;
-
-  const inertMod = m => `
-    <div class="sb-mod inert" data-inert role="button" tabindex="0" aria-disabled="true">
-      <div class="sb-mod-head">
-        <span class="sb-blocker" style="--c:${m.c}"></span>
-        <span class="sb-mod-label">${m.label}</span>
-        <span class="sb-chev"><img src="${ASSET.chevDown}" alt=""></span>
-      </div>
-    </div>`;
-
-  let h = `
-    <button class="sb-logo" data-pr-home aria-label="SENSE 首頁">
-      <span class="sb-logo-mark"><img src="${ASSET.illustration}" alt=""></span>
-      <span class="sb-wordmark">SENSE</span>
-    </button>
-    <button class="sb-cta" data-inert>
-      <img class="cta-bg" src="${ASSET.whiteBackground}" alt="">
-      <img class="cta-line" src="${ASSET.whiteLine}" alt="">
-      <span class="cta-icon"><span><img src="${ASSET.ionic}" alt=""></span></span>
-      <span class="cta-text">找商務合作</span>
-    </button>`;
-
-  h += OTHER_MODULES_BEFORE.map(inertMod).join('');
-
-  // 公關 SENSE：點文字 → 進一覽並展開；點箭頭 → 只展開／收合
-  const subs = Object.entries(PAGES).filter(([,p]) => p.group==='pr' && p.sub);
-  h += `
-    <div class="sb-mod${state.route==='overview'?' is-current':''}">
-      <div class="sb-mod-head">
-        <span class="sb-blocker" style="--c:#B6BDFF"></span>
-        <button class="sb-mod-label" data-pr-home aria-current="${state.route==='overview'?'page':'false'}">公關SENSE</button>
-        <button class="sb-chev" data-toggle-pr aria-expanded="${state.prOpen}" aria-controls="pr-sub" aria-label="${state.prOpen?'收合':'展開'}公關 SENSE">
-          <img src="${state.prOpen?ASSET.chevUp:ASSET.chevDown}" alt="">
-        </button>
-      </div>
-      <div class="sb-sub" id="pr-sub"${state.prOpen?'':' hidden'}>
-        ${subs.map(([k,p]) => `<button class="sb-sub-item${state.route===k?' active':''}" data-go="${k}"${state.route===k?' aria-current="page"':''}><span>${p.label}</span></button>`).join('')}
-      </div>
-    </div>`;
-
-  h += OTHER_MODULES_AFTER.map(inertMod).join('');
-
-  SECTIONS.forEach(s => {
-    h += `<div class="sb-sec" style="--c:${s.c}"><span>${GROUP_LABEL[s.group]}</span><img src="${ASSET.secMask}" alt=""></div>`;
-    Object.entries(PAGES).filter(([,p]) => p.group===s.group).forEach(([k,p]) => {
-      h += `<button class="sb-link${state.route===k?' active':''}" style="--c:${s.c};--line:${s.line};--strong:${s.strong}" data-go="${k}"${state.route===k?' aria-current="page"':''}>${p.label}</button>`;
-    });
-  });
-
-  document.getElementById('nav').innerHTML = h;
-}
-
-/* ═════════ Render: Header ═════════ */
-function renderHeader(){
-  const p = PAGES[state.route];
-  // 公關 SENSE 的上層可點回一覽；我的專屬內容／後台管理沒有上層頁面
-  const root = p.group==='pr' && state.route!=='overview'
-    ? `<button data-pr-home>${GROUP_LABEL.pr}</button>` : `<span>${GROUP_LABEL[p.group]}</span>`;
-  document.getElementById('crumbs').innerHTML = `${root}<span class="sep">/</span><span class="cur">${p.label}</span>`;
-}
-
-/* ═════════ 示意資料（內部原型，名稱取自 2027 公關 SENSE 規劃與 SENSE 簡報） ═════════ */
-const TODAY = '2026-10-12';  // 示意資料的基準日（畫面不顯示）
+/* ═════════ 示意資料（沿用 pr-sense.html，內部原型用） ═════════ */
+const TODAY = '2026-10-16';
 const WEEK = ['日','一','二','三','四','五','六'];
-
+const ME = { companyId:'aidai' };
 const COMPANIES = [
-  { id:'stockfeel', name:'股感媒體科技', short:'股感',   ind:'金融科技', tint:'#1E40AF' },
-  { id:'anqian',    name:'安錢感',       short:'安錢',   ind:'金融科技', tint:'#0F766E' },
-  { id:'baoxian',   name:'保險感',       short:'保險',   ind:'金融科技', tint:'#3F3AA9' },
-  { id:'robbins',   name:'羅賓斯保代',   short:'羅賓',   ind:'金融科技', tint:'#334155' },
-  { id:'abc',       name:'Asia Bankers Club', short:'ABC', ind:'金融科技', tint:'#7C2D12' },
-  { id:'innomy',    name:'英諾美生技',   short:'英諾',   ind:'大健康',   tint:'#C2185B' },
-  { id:'aidai',     name:'愛戴眼鏡',     short:'愛戴',   ind:'零售',     tint:'#B45309', brand:'愛戴 iDai' },
-  { id:'kumi',      name:'酷覓星',       short:'酷覓',   ind:'零售',     tint:'#BE185D', joined:'2026-10-05' },
-  { id:'zocha',     name:'摩拓旅程 ZOCHA', short:'ZO',   ind:'區域經濟', tint:'#1FA67A' },
-  { id:'lvdian',    name:'旅電',         short:'旅電',   ind:'區域經濟', tint:'#0E7490' },
-  { id:'lizhang',   name:'里長伯',       short:'里長',   ind:'區域經濟', tint:'#65A30D' },
-  { id:'loop',      name:'LOOP',         short:'LO',     ind:'區域經濟', tint:'#0891B2', joined:'2026-10-08' },
-  { id:'juli',      name:'硬是愛數據 揪里嗨', short:'揪', ind:'區域經濟', tint:'#EA580C' },
-  { id:'fanggan',   name:'房感不動產科技', short:'房感', ind:'房產生活', tint:'#B45309' },
-  { id:'jiangren',  name:'匠人部落',     short:'匠人',   ind:'房產生活', tint:'#78350F' },
-  { id:'haiyue',    name:'海悅國際',     short:'海悅',   ind:'房產生活', tint:'#155E75' },
-  { id:'abcclub',   name:'ABC club',     short:'AC',     ind:'房產生活', tint:'#9A3412' },
-  { id:'lensense',  name:'聯想感',       short:'聯想',   ind:'行銷科技', tint:'#4338CA' },
-  { id:'shangshu',  name:'尚書思鹿',     short:'尚書',   ind:'行銷科技', tint:'#6D28D9' },
-  { id:'sfinfo',    name:'股感資訊',     short:'資訊',   ind:'行銷科技', tint:'#1D4ED8' },
-  { id:'citizen',   name:'市民永續',     short:'市民',   ind:'ESG',      tint:'#15803D' },
-  { id:'fengcha',   name:'奉茶行動',     short:'奉茶',   ind:'ESG',      tint:'#166534' },
-  { id:'xingya',    name:'星芽',         short:'星芽',   ind:'ESG',      tint:'#4D7C0F', joined:'2026-10-02' },
-  { id:'chongzi',   name:'寵資',         short:'寵資',   ind:'毛孩經濟', tint:'#A16207' },
-  { id:'golface',   name:'綠夾克 Golface', short:'GF',   ind:'其他',     tint:'#14532D' },
-  { id:'popworld',  name:'popworld',     short:'PW',     ind:'其他',     tint:'#DB2777' },
-  { id:'hele',      name:'禾樂映像',     short:'禾樂',   ind:'其他',     tint:'#525252' }
+  { id:'stockfeel', name:'股感媒體科技', short:'股', ind:'金融科技', tint:'#1E40AF' }, { id:'anqian', name:'安錢感', short:'安', ind:'金融科技', tint:'#0F766E' },
+  { id:'baoxian', name:'保險感', short:'保', ind:'金融科技', tint:'#3F3AA9' }, { id:'robbins', name:'羅賓斯保代', short:'羅', ind:'金融科技', tint:'#334155' },
+  { id:'abc', name:'Asia Bankers Club', short:'A', ind:'金融科技', tint:'#7C2D12' }, { id:'innomy', name:'英諾美生技', short:'英', ind:'大健康', tint:'#C2185B' },
+  { id:'aidai', name:'愛戴眼鏡', short:'愛', ind:'零售', tint:'#B45309', brand:'愛戴 iDai' }, { id:'kumi', name:'酷覓星', short:'酷', ind:'零售', tint:'#BE185D' },
+  { id:'zocha', name:'摩拓旅程 ZOCHA', short:'Z', ind:'區域經濟', tint:'#1FA67A' }, { id:'lvdian', name:'旅電', short:'旅', ind:'區域經濟', tint:'#0E7490' },
+  { id:'lizhang', name:'里長伯', short:'里', ind:'區域經濟', tint:'#65A30D' }, { id:'loop', name:'LOOP', short:'L', ind:'區域經濟', tint:'#0891B2' },
+  { id:'juli', name:'硬是愛數據 揪里嗨', short:'揪', ind:'區域經濟', tint:'#EA580C' }, { id:'fanggan', name:'房感不動產科技', short:'房', ind:'房產生活', tint:'#B45309' },
+  { id:'jiangren', name:'匠人部落', short:'匠', ind:'房產生活', tint:'#78350F' }, { id:'haiyue', name:'海悅國際', short:'海', ind:'房產生活', tint:'#155E75' },
+  { id:'lensense', name:'聯想感', short:'聯', ind:'行銷科技', tint:'#4338CA' }, { id:'shangshu', name:'尚書思鹿', short:'尚', ind:'行銷科技', tint:'#6D28D9' },
+  { id:'sfinfo', name:'股感資訊', short:'資', ind:'行銷科技', tint:'#1D4ED8' }, { id:'citizen', name:'市民永續', short:'市', ind:'ESG', tint:'#15803D' },
+  { id:'fengcha', name:'奉茶行動', short:'奉', ind:'ESG', tint:'#166534' }, { id:'xingya', name:'星芽', short:'星', ind:'ESG', tint:'#4D7C0F' },
+  { id:'chongzi', name:'寵資', short:'寵', ind:'毛孩經濟', tint:'#A16207' }, { id:'golface', name:'綠夾克 Golface', short:'G', ind:'其他', tint:'#14532D' },
+  { id:'popworld', name:'popworld', short:'P', ind:'其他', tint:'#DB2777' }, { id:'hele', name:'禾樂映像', short:'禾', ind:'其他', tint:'#525252' }
 ];
-const coById = id => COMPANIES.find(c => c.id===id);
-
-/* 我的公司：KYC 公開層 */
+const coById = (id) => COMPANIES.find(c => c.id === id);
 const MY_PROFILE = {
   intro:'以會員經營機制驅動回購的眼鏡零售品牌，強調名單再行銷與分眾溝通。',
-  facts:['零售','51–200 人','北部・南部','成立 2015'],
-  offer:['全台 18 間門市，可作為合作品牌的體驗與取貨據點','會員 CRM 再行銷實務經驗，可分享分眾溝通做法','門市活動空間，可承接 20 人以內的小型聚會'],
-  need:['大健康產業的異業聯名夥伴','企業員工福利通路（驗光到府）','社群聲量與媒體曝光'],
+  facts:['零售', '51–200 人', '北部・南部', '成立 2015'],
+  offer:['全台 18 間門市，可作為合作品牌的體驗與取貨據點', '會員 CRM 再行銷實務經驗，可分享分眾溝通做法', '門市活動空間，可承接 20 人以內的小型聚會'],
+  need:['大健康產業的異業聯名夥伴', '企業員工福利通路（驗光到府）', '社群聲量與媒體曝光'],
   meet:'企業福委會或人資主管，以及健康檢查、保險相關品牌的行銷負責人。',
   stats:{ events:3, clubs:2, met:18 }
 };
-
-/* 近期活動（2027 公關 SENSE 規劃 p5–p7：SENSE INSIGHT 學院每月第 2 週二，中午／晚上輪替；SENSE DAY 週六） */
 const SLOT = { noon:'中午 12:00–14:00', night:'晚上 19:00–21:00', day:'週六 半日' };
-const EV_TYPE = { insight:['','學院講座'], day:['day','主題式交流聚會'] };
-const typeTag = t => `<span class="type ${EV_TYPE[t][0]}">${EV_TYPE[t][1]}</span>`;
+const EV_TYPE = { insight:'學院講座', day:'主題式交流聚會' };
 const EVENTS = [
-  { d:'2026-10-13', slot:'noon',  type:'insight', series:'SENSE INSIGHT 學院 EP04', title:'趨勢判斷｜關稅變局下的佈局抉擇', host:'經濟研究機構 首席經濟學家', cap:40, status:'joined' },
+  { d:'2026-10-20', slot:'noon',  type:'insight', series:'SENSE INSIGHT 學院 EP04', title:'趨勢判斷｜關稅變局下的佈局抉擇', host:'經濟研究機構 首席經濟學家', cap:40, status:'joined' },
   { d:'2026-11-10', slot:'night', type:'insight', series:'SENSE INSIGHT 學院 EP05', title:'成長策略｜成長停滯時，找出企業的第二條成長曲線', host:'知名零售品牌 行銷長', cap:40, status:'open' },
-  { d:'2026-11-21', slot:'day',   type:'day',     series:'SENSE DAY',               title:'運動社交日：高爾夫', host:'綠夾克 Golface', cap:32, status:'soon' },
+  { d:'2026-11-21', slot:'day',   type:'day',     series:'SENSE DAY', title:'運動社交日：高爾夫', host:'綠夾克 Golface', cap:32, status:'soon' },
   { d:'2026-12-08', slot:'noon',  type:'insight', series:'SENSE INSIGHT 學院 EP06', title:'資本布局｜併購是捷徑，還是陷阱', host:'會計師事務所 併購諮詢合夥人', cap:40, status:'soon' },
-  { d:'2027-01-12', slot:'night', type:'insight', series:'SENSE INSIGHT 學院 EP07', title:'AI 與數據｜資料沉睡，AI 也救不了', host:'國際管理顧問公司 數據策略合夥人', cap:40, status:'soon' },
-  { d:'2027-02-09', slot:'noon',  type:'insight', series:'SENSE INSIGHT 學院 EP08', title:'經營領導｜接班不是交棒，是重新創業', host:'傳產二代企業家 總經理', cap:40, status:'soon' }
+  { d:'2027-01-12', slot:'night', type:'insight', series:'SENSE INSIGHT 學院 EP07', title:'AI 與數據｜資料沉睡，AI 也救不了', host:'國際管理顧問公司 數據策略合夥人', cap:40, status:'soon' }
 ];
-const EV_STATUS = { joined:['pr-solid','✓ 已報名'], open:['pr','開放報名'], soon:['gray','即將開放'] };
-
-/* 活動回顧（示意：主題、內容、影片與照片皆為示意）
-   internal：內部營運數據，會員端不顯示（依 PO 回饋先隱藏） */
+const EV_STATUS = { joined:['joined', '✓ 已報名'], open:['open', '開放報名'], soon:['soon', '即將開放'] };
 const RECAPS = [
-  { d:'2026-09-19', type:'day', series:'SENSE DAY', title:'標竿場域參訪：走進生態圈夥伴的第一線', host:'popworld／禾樂映像',
-    summary:'走訪兩處生態圈夥伴的實體場域，從快閃店營運到影像製作現場，看見品牌體驗如何在第一線發生，下午於場內自由交流。',
-    points:['快閃店選址與檔期規劃的實務經驗','影像內容從企劃到拍攝的分工','參訪後的場內交流與合作洽談'],
-    photos:24, video:true, g:'linear-gradient(135deg,#FFB080,#FFDD80)',
-    internal:{ people:46, companies:24, deals:3, score:4.8 } },
-  { d:'2026-09-08', type:'insight', series:'SENSE INSIGHT 學院 EP03', title:'數位轉型｜導入新系統前，先問對三個問題', host:'上市科技公司 資訊長',
-    photos:16, video:true, g:'linear-gradient(135deg,#99C7FB,#B6BDFF)', internal:{ people:38, companies:26, deals:3, score:4.7 } },
-  { d:'2026-08-11', type:'insight', series:'SENSE INSIGHT 學院 EP02', title:'品牌經營｜小品牌如何在社群時代被記住', host:'設計顧問公司 創意總監',
-    photos:18, video:true, g:'linear-gradient(135deg,#B6E6E4,#99C7FB)', internal:{ people:40, companies:29, deals:2, score:4.6 } },
-  { d:'2026-07-14', type:'insight', series:'SENSE INSIGHT 學院 EP01', title:'市場展望｜2026 下半年，經營者該關注的五個訊號', host:'投資研究機構 首席分析師',
-    photos:21, video:false, g:'linear-gradient(135deg,#B6BDFF,#FFB080)', internal:{ people:42, companies:31, deals:2, score:4.5 } }
+  { d:'2026-09-19', type:'day', title:'標竿場域參訪：走進生態圈夥伴的第一線', host:'popworld／禾樂映像', photos:24, video:true, g:'linear-gradient(135deg,#FFB080,#FFDD80)' },
+  { d:'2026-09-08', type:'insight', title:'數位轉型｜導入新系統前，先問對三個問題', host:'上市科技公司 資訊長', photos:16, video:true, g:'linear-gradient(135deg,#99C7FB,#B6BDFF)' },
+  { d:'2026-08-11', type:'insight', title:'品牌經營｜小品牌如何在社群時代被記住', host:'設計顧問公司 創意總監', photos:18, video:true, g:'linear-gradient(135deg,#B6E6E4,#99C7FB)' },
+  { d:'2026-07-14', type:'insight', title:'市場展望｜2026 下半年，經營者該關注的五個訊號', host:'投資研究機構 首席分析師', photos:21, video:false, g:'linear-gradient(135deg,#B6BDFF,#FFB080)' }
 ];
-
-/* 俱樂部（社團類型依規劃 p9：校友社／需求社／興趣社）：透過公關 SENSE 連結的組織，成員分享第一手消息與合作優惠 */
 const CLUBS = [
-  { id:'martech', name:'MarTech 實務社', type:'需求社', icon:'◎', founder:'lensense',  members:8,  news:3, deals:1, joined:true },
-  { id:'golf',    name:'高爾夫社',       type:'興趣社', icon:'⛳', founder:'golface',   members:11, news:1, deals:2, joined:true },
-  { id:'adv',     name:'廣告主交流社',   type:'需求社', icon:'◈', founder:'stockfeel', members:9 },
-  { id:'sponsor', name:'贊助交流社',     type:'需求社', icon:'◇', founder:'shangshu',  members:6 },
-  { id:'nccu',    name:'政大校友社',     type:'校友社', icon:'◆', founder:'stockfeel', members:12 },
-  { id:'ntu',     name:'台大校友社',     type:'校友社', icon:'◆', founder:'fanggan',   members:10 },
-  { id:'charity', name:'公益社',         type:'興趣社', icon:'◉', founder:'citizen',   members:7 }
+  { id:'martech', name:'MarTech 實務社', type:'需求社', icon:'◎', founder:'lensense', members:8, news:3, deals:1, joined:true },
+  { id:'golf', name:'高爾夫社', type:'興趣社', icon:'⛳', founder:'golface', members:11, news:1, deals:2, joined:true },
+  { id:'adv', name:'廣告主交流社', type:'需求社', founder:'stockfeel', members:9 }, { id:'sponsor', name:'贊助交流社', type:'需求社', founder:'shangshu', members:6 },
+  { id:'nccu', name:'政大校友社', type:'校友社', founder:'stockfeel', members:12 }, { id:'ntu', name:'台大校友社', type:'校友社', founder:'fanggan', members:10 },
+  { id:'charity', name:'公益社', type:'興趣社', founder:'citizen', members:7 }
 ];
 const CLUB_FEED = [
-  { kind:'deal', co:'golface',  club:'golf',    at:'2 天前', text:'會員企業包場 9 折，11 月平日適用，可搭配 SENSE DAY 球敘。' },
+  { kind:'deal', co:'golface', club:'golf', at:'2 天前', text:'會員企業包場 9 折，11 月平日適用，可搭配 SENSE DAY 球敘。' },
   { kind:'news', co:'lensense', club:'martech', at:'3 天前', text:'第一方數據應用工作坊 11 月開放社員報名，限 15 家企業。' },
-  { kind:'deal', co:'zocha',    club:'golf',    at:'5 天前', text:'俱樂部成員的員工旅遊租車享 85 折，花東與離島據點適用。' },
-  { kind:'news', co:'fanggan',  club:'martech', at:'1 週前', text:'Q4 會員分眾報告釋出，社員可索取首購族與換屋族兩份輪廓摘要。' }
+  { kind:'deal', co:'zocha', club:'golf', at:'5 天前', text:'俱樂部成員的員工旅遊租車享 85 折，花東與離島據點適用。' }
 ];
-const PLAY = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>`;
 
-/* ═════════ 一覽頁 ═════════ */
-const fmtMD = s => { const d = new Date(s+'T00:00:00+08:00'); return { y:d.getFullYear(), m:d.getMonth()+1, d:d.getDate(), w:WEEK[d.getDay()], md:`${d.getMonth()+1}/${d.getDate()}` }; };
-const daysFrom = s => Math.round((new Date(s+'T00:00:00+08:00') - new Date(TODAY+'T00:00:00+08:00')) / 864e5);
-/* 認證標記：藍勾勾（顏色沿用 Figma「已認證商家」標籤 #4DB8EE） */
-const VERIFIED = `<svg class="verified" viewBox="0 0 24 24" role="img" aria-label="已認證商家"><title>已認證商家</title><circle cx="12" cy="12" r="12" fill="#4DB8EE"/><path d="M6.8 12.4l3.4 3.4 7-7.2" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="square"/></svg>`;
-const chip = (cls, t) => `<span class="chip ${cls}">${t}</span>`;
-const logo = c => `<span class="logo-sq" style="background:${c.tint}" aria-hidden="true">${c.short}</span>`;
+const fmt = (s) => { const d = new Date(s + 'T00:00:00+08:00'); return { y:d.getFullYear(), m:d.getMonth() + 1, d:d.getDate(), w:WEEK[d.getDay()] }; };
+const VERIFIED = '<svg class="verified" viewBox="0 0 24 24" role="img" aria-label="已認證商家"><circle cx="12" cy="12" r="12" fill="#4DB8EE"/><path d="M6.8 12.4l3.4 3.4 7-7.2" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="square"/></svg>';
+const status = (k) => `<span class="status ${EV_STATUS[k][0]}">${EV_STATUS[k][1]}</span>`;
+const item = (label, html, wide) => `<div class="ro-item${wide ? ' span-2' : ''}"><span class="ro-label">${label}</span>${html}</div>`;
 
-function renderOverview(){
-  const me = coById(ME.companyId);
-  const P = MY_PROFILE;
+/* ═════════ 票券統計 ═════════ */
+document.getElementById('st-events').textContent = MY_PROFILE.stats.events;
+document.getElementById('st-met').textContent = MY_PROFILE.stats.met;
 
-  /* ① 我的公司 */
-  const myCard = `
-  <section class="ov-card span-12 me-card" aria-labelledby="me-h">
-    <div class="me-id">
-      <div class="me-top">
-        ${logo(me)}
-        <div>
-          <h2 class="me-name" id="me-h">${me.name}${VERIFIED}</h2>
-          <div class="me-brand">${me.brand||''}</div>
-        </div>
-      </div>
-      <p class="me-intro">${P.intro}</p>
-      <div class="me-facts">${P.facts.map(f=>chip('gray',f)).join('')}</div>
-      <div class="me-stats">
-        <div><b class="num">${P.stats.events}</b>參加活動</div>
-        <div><b class="num">${P.stats.clubs}</b>加入俱樂部</div>
-        <div><b class="num">${P.stats.met}</b>認識企業</div>
-      </div>
-    </div>
-    <div class="me-res">
-      <div class="res-col" style="--c:#49BFBB"><h3><i></i>我能提供</h3><ul>${P.offer.map(x=>`<li>${x}</li>`).join('')}</ul></div>
-      <div class="res-col" style="--c:#FF6100"><h3><i></i>我需要</h3><ul>${P.need.map(x=>`<li>${x}</li>`).join('')}</ul></div>
-      <div class="res-col" style="--c:#B6BDFF"><h3><i></i>想認識</h3><p>${P.meet}</p></div>
-      <div class="me-actions">
-        <button class="btn2" data-go="directory">在名冊中檢視</button>
-        <button class="btn2" data-go="profile">編輯公司資料</button>
-      </div>
-    </div>
-  </section>`;
+/* ═════════ 我的公司（唯讀卡片） ═════════ */
+const me = coById(ME.companyId), P = MY_PROFILE;
+document.getElementById('me-card').innerHTML = `
+  <div class="form-group-title"><h2>${esc(me.name)}${VERIFIED}</h2><button type="button" class="edit-link" data-toast="公司資料編輯頁尚未製作">編輯</button></div>
+  <div class="ro-grid">
+    ${item('公司簡介', `<p class="ro-value">${esc(P.intro)}</p>`, true)}
+    ${item('公司屬性', `<div class="ro-chips">${P.facts.map(f => `<span>${esc(f)}</span>`).join('')}</div>`, true)}
+    ${item('我能提供', `<ul class="ro-list">${P.offer.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`)}
+    ${item('我需要', `<ul class="ro-list">${P.need.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`)}
+    ${item('想認識', `<p class="ro-value">${esc(P.meet)}</p>`, true)}
+  </div>`;
 
-  /* ② 近期活動：下一場重點＋接下來的場次 */
-  const upcoming = EVENTS.filter(e => daysFrom(e.d) >= 0);
-  const nx = upcoming[0], n = fmtMD(nx.d);
-  const later = upcoming.slice(1, 5);
-  let lastKey = '';
-  const listEv = later.map(e => { const f = fmtMD(e.d), st = EV_STATUS[e.status];
-    const key = `${f.y}-${f.m}`, head = key!==lastKey ? `<div class="ev-month">${f.y!==fmtMD(TODAY).y?`${f.y} 年 `:''}${f.m} 月</div>` : '';
-    lastKey = key;
-    return head + `<button class="ev-row" data-go="academy">
-      <span class="ev-d num">${f.md}<small>週${f.w}</small></span>
-      <span style="min-width:0"><span class="ev-t">${e.title}</span><span class="ev-s">${typeTag(e.type)}<span>${e.host}</span></span></span>
-      ${chip(st[0], st[1])}
-    </button>`; }).join('');
-  const acCard = `
-  <section class="ov-card span-8" aria-labelledby="ac-h">
-    <div class="card-h"><h2 id="ac-h">近期活動</h2><button class="more" data-go="academy">查看全部活動 →</button></div>
-    <div class="ac-body">
-      <article class="next" aria-label="下一場活動">
-        <div class="next-when">
-          <div class="datebox"><small>${n.m} 月</small><b class="num">${n.d}</b></div>
-          <div class="next-meta"><span>週${n.w}・${SLOT[nx.slot]}</span><span>${nx.series}</span></div>
-        </div>
-        <div>${typeTag(nx.type)}</div>
-        <h3>${nx.title}</h3>
-        <div class="next-meta"><span>講者：${nx.host}</span></div>
-        <div class="seat-h"><span>活動名額 <b class="num">${nx.cap}</b> 人</span>${chip(EV_STATUS[nx.status][0], EV_STATUS[nx.status][1])}</div>
-        ${nx.status==='joined' ? `<p class="tip"><span aria-hidden="true">💡</span><span><b>行前提醒</b>　講後開放會員交流，歡迎提前準備想認識的對象。</span></p>` : ''}
-        <div class="next-foot">
-          <button class="btn2 primary" data-go="academy">活動詳情</button>
-        </div>
-      </article>
-      <div class="ev-list">${listEv}</div>
-    </div>
-  </section>`;
-
-  /* ③ 公司名冊：不顯示統計數字（依 PO 回饋） */
-  const inds = [...new Set(COMPANIES.map(c => c.ind))].sort((a,b) => (a==='其他') - (b==='其他'));
-  const wall = COMPANIES.filter(c => c.id!==ME.companyId).slice(0, 10);
-  const dirCard = `
-  <section class="ov-card span-4" aria-labelledby="dir-h">
-    <div class="card-h"><h2 id="dir-h">公司名冊</h2><button class="more" data-go="directory">查看全部 →</button></div>
-    <p class="dir-lead">認識 SENSE 平台上的會員企業，依產業找到想合作的夥伴。</p>
-    <div class="sub-h">依產業篩選</div>
-    <div class="ind-grid">${inds.map(k => `<button class="ind-btn" data-go="directory">${k}</button>`).join('')}</div>
-    <div class="sub-h">會員企業</div>
-    <div class="logo-wall">${wall.map(c => `<button data-go="directory" title="${c.name}" aria-label="${c.name}">${logo(c)}</button>`).join('')}</div>
-  </section>`;
-
-  /* ④ 活動回顧：概要、精華影片、照片（不顯示營運數據） */
-  const [lr, ...older] = RECAPS, lf = fmtMD(lr.d);
-  const rpCard = `
-  <section class="ov-card span-7" aria-labelledby="rp-h">
-    <div class="card-h"><h2 id="rp-h">活動回顧</h2><button class="more" data-go="reports">查看所有回顧 →</button></div>
-    <article class="recap">
-      <div class="media" style="--g:${lr.g}">
-        <span class="mock">示意圖</span>
-        ${lr.video ? `<button class="play" data-toast="精華影片尚未上傳（示意）" aria-label="播放精華影片">${PLAY}</button>` : ''}
-        <span class="count">照片 ${lr.photos} 張</span>
-      </div>
-      <div class="recap-txt">
-        <span class="r-meta">${typeTag(lr.type)}<span class="num">${lf.y}/${lf.m}/${lf.d}（${lf.w}）</span></span>
-        <h3>${lr.title}</h3>
-        <p>${lr.summary}</p>
-        <ul>${lr.points.map(x=>`<li>${x}</li>`).join('')}</ul>
-        <div class="recap-btns">
-          ${lr.video ? `<button class="btn2" data-toast="精華影片尚未上傳（示意）">觀看精華影片</button>` : ''}
-          <button class="btn2" data-go="reports">查看照片</button>
-        </div>
-      </div>
-    </article>
-    <div class="sub-h">更多回顧</div>
-    <div class="thumbs">
-      ${older.slice(0,3).map(r => { const f = fmtMD(r.d); return `<button class="thumb" data-go="reports">
-        <span class="media" style="--g:${r.g}"><span class="mock">示意圖</span>${r.video?`<span class="play" aria-hidden="true">${PLAY}</span>`:''}</span>
-        <b>${r.title}</b><small class="num">${f.md}・${EV_TYPE[r.type][1]}</small>
-      </button>`; }).join('')}
-    </div>
-  </section>`;
-
-  /* ⑤ 俱樂部 */
-  const mine = CLUBS.filter(c => c.joined), others = CLUBS.filter(c => !c.joined);
-  const clubCard = `
-  <section class="ov-card span-5" aria-labelledby="cl-h">
-    <div class="card-h"><h2 id="cl-h">俱樂部<small>我加入的 ${mine.length} 個</small></h2><button class="more" data-go="clubs">查看全部 →</button></div>
-    ${mine.map(c => `
-      <button class="club" data-go="clubs">
-        <span class="club-top"><span class="club-ic" aria-hidden="true">${c.icon}</span>
-          <span style="flex:1;min-width:0"><span class="club-name"><b>${c.name}</b>${chip('gray', c.type)}</span><small>${c.members} 家成員・發起：${coById(c.founder).name}</small></span></span>
-        <span class="club-new">${chip('pr',`新消息 ${c.news}`)}${chip('orange',`新優惠 ${c.deals}`)}</span>
-      </button>`).join('')}
-    <div class="sub-h">最新消息與優惠</div>
-    <div class="feed">
-      ${CLUB_FEED.slice(0,3).map(f => { const c = coById(f.co), cl = CLUBS.find(x=>x.id===f.club);
-        return `<div class="feed-item">${f.kind==='deal'?chip('orange','優惠'):chip('pr','消息')}<div><p><b>${c.name}</b>　${f.text}</p><small>${cl.name}・${f.at}</small></div></div>`; }).join('')}
-    </div>
-    <button class="more" style="align-self:flex-start" data-go="clubs">還有 ${others.length} 個俱樂部可以加入 →</button>
-  </section>`;
-
-  return `
-  <div class="ov">
-    <div class="ov-head">
-      <div>
-        <div class="ov-eyebrow">PR SENSE</div>
-        <h1>公關 SENSE</h1>
-        <p>透過 SENSE INSIGHT 學院、SENSE DAY 與社團，認識高端人脈圈層裡的企業，找到下一個合作機會。</p>
-      </div>
-    </div>
-    <div class="ov-grid">
-      ${myCard}
-      ${acCard}
-      ${dirCard}
-      ${rpCard}
-      ${clubCard}
+/* ═════════ 近期活動 ═════════ */
+const upcoming = EVENTS.filter(e => e.d >= TODAY);
+const nx = upcoming[0], n = fmt(nx.d);
+document.getElementById('next-event').innerHTML = `
+  <div class="form-group-title"><h2>下一場活動</h2></div>
+  <div class="next-event">
+    <div class="date-box"><small>${n.m} 月</small><b>${n.d}</b><small>週${n.w}</small></div>
+    <div class="stack" style="display:flex;flex-direction:column;gap:10px;min-width:0">
+      <div class="meta-line"><span class="status open">${EV_TYPE[nx.type]}</span><span>${esc(nx.series)}</span></div>
+      <h3 class="next-title">${esc(nx.title)}</h3>
+      <div class="meta-line"><span>時間：${SLOT[nx.slot]}</span><span>講者：${esc(nx.host)}</span><span>名額 ${nx.cap} 人</span>${status(nx.status)}</div>
+      ${nx.status === 'joined' ? '<p class="tip">行前提醒：講後開放會員交流，歡迎提前準備想認識的對象。</p>' : ''}
+      <div><button type="button" class="btn btn-primary" data-toast="活動詳情頁尚未製作">活動詳情</button></div>
     </div>
   </div>`;
-}
+document.getElementById('ev-table').innerHTML = `<thead><tr><th>日期</th><th>活動</th><th>類型</th><th>狀態</th></tr></thead><tbody>${
+  upcoming.slice(1).map(e => { const f = fmt(e.d); return `<tr><td style="white-space:nowrap">${f.m}/${f.d}（${f.w}）</td><td>${esc(e.title)}<br><small style="color:var(--black-500)">${esc(e.host)}</small></td><td style="white-space:nowrap">${EV_TYPE[e.type]}</td><td>${status(e.status)}</td></tr>`; }).join('')}</tbody>`;
 
-/* ═════════ Render: Content（一覽頁以外先放佔位） ═════════ */
-function renderContent(){
-  const p = PAGES[state.route];
-  if (state.route==='overview') { document.getElementById('content').innerHTML = renderOverview(); return; }
-  document.getElementById('content').innerHTML = `
-    <div class="page-head"><h1>${p.label}</h1><p>${p.desc}</p></div>
-    <div class="placeholder">
-      <div class="ph-icon">${svg(p.icon)}</div>
-      <b>此頁內容待規劃</b>
-      <span>範圍確認後再實作</span>
-      ${p.src ? `<span class="src">對應規劃：2027 公關 SENSE 規劃 · ${p.src}</span>` : ''}
-    </div>`;
-}
+/* ═════════ 公司名冊：依產業篩選 ═════════ */
+const INDS = ['全部', ...new Set(COMPANIES.map(c => c.ind))].sort((a, b) => (a === '全部' ? -1 : b === '全部' ? 1 : (a === '其他') - (b === '其他')));
+let ind = '全部';
+const chipsEl = document.getElementById('ind-chips');
+const drawDir = () => {
+  chipsEl.innerHTML = SenseUI.chips(INDS.map(k => ({ key:k, label:k })), ind);
+  const list = COMPANIES.filter(c => c.id !== ME.companyId && (ind === '全部' || c.ind === ind));
+  document.getElementById('co-grid').innerHTML = list.map(c => `
+    <button type="button" class="co-tile" data-toast="${esc(c.name)} 的公司頁尚未製作">
+      ${SenseUI.orgLogo({ name:c.short, color:c.tint })}<span><b>${esc(c.name)}</b><small>${esc(c.ind)}</small></span>
+    </button>`).join('');
+};
+chipsEl.addEventListener('click', (e) => { const b = e.target.closest('[data-chip]'); if (b){ ind = b.dataset.chip; drawDir(); } });
+drawDir();
 
-/* ═════════ Router ═════════ */
-function render(){
-  if (!PAGES[state.route] || !visible(state.route)) state.route = 'overview';
-  renderSidebar(); renderHeader(); renderContent();
-}
-function go(route){
-  state.route = route;
-  if (location.hash.slice(1) !== route) history.replaceState(null,'','#'+route);
-  document.getElementById('app').classList.remove('nav-open');
-  render();
-  window.scrollTo(0,0);
-}
+/* ═════════ 活動回顧：沿用商品卡元件，主圖用漸層示意 ═════════ */
+// 只放最近 3 場，剛好排滿一列；其餘從「查看所有回顧」進入
+document.getElementById('more-recaps').textContent = `查看所有回顧（共 ${RECAPS.length} 場）`;
+document.getElementById('recap-grid').innerHTML = RECAPS.slice(0, 3).map((r, i) => { const f = fmt(r.d);
+  return SenseUI.resourceCard({ id:'r' + i, title:r.title, org:{ name:r.host, color:'#9E9E9E' },
+    metrics:[{ label:'日期', value:`${f.y}/${f.m}/${f.d}` }, { label:r.video ? '照片・影片' : '照片', value:`${r.photos} 張${r.video ? '＋精華' : ''}` }] })
+    .replace('<span class="r-card-img"></span>', `<span class="r-card-img" style="background:${r.g}"></span>`); }).join('');
+document.getElementById('recap-grid').addEventListener('click', (e) => { if (e.target.closest('[data-card]')) SenseShell.toast('活動回顧詳情尚未製作'); });
 
-/* ═════════ Events ═════════ */
-let toastTimer;
-function toast(msg){
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
-}
-document.addEventListener('click', e => {
-  const el = e.target.closest('[data-go],[data-inert],[data-toast],[data-toggle-pr],[data-pr-home]');
-  if (!el) return;
-  if (el.hasAttribute('data-toggle-pr')) { state.prOpen = !state.prOpen; renderSidebar(); }
-  else if (el.hasAttribute('data-pr-home')) { state.prOpen = true; go('overview'); }
-  else if (el.dataset.go) go(el.dataset.go);
-  else if (el.hasAttribute('data-inert')) toast('此模組不在公關 SENSE 原型範圍內');
-  else toast(el.dataset.toast);
-});
-document.addEventListener('keydown', e => {
-  if ((e.key==='Enter'||e.key===' ') && e.target.matches('.sb-mod.inert')) { e.preventDefault(); e.target.click(); }
-});
-document.getElementById('hamburger').onclick = () => document.getElementById('app').classList.add('nav-open');
-document.getElementById('backdrop').onclick = () => document.getElementById('app').classList.remove('nav-open');
-window.addEventListener('hashchange', () => { const r = location.hash.slice(1); if (r && r!==state.route) go(r); });
+/* ═════════ 俱樂部 ═════════ */
+const mine = CLUBS.filter(c => c.joined), others = CLUBS.filter(c => !c.joined);
+document.getElementById('club-grid').innerHTML = mine.map(c => `
+  <section class="form-card form-group" aria-label="${esc(c.name)}">
+    <div class="club-head"><span class="club-icon" aria-hidden="true">${c.icon}</span><div style="flex:1;min-width:0"><div class="club-name">${esc(c.name)}</div><span class="field-help">${c.members} 家成員・發起：${esc(coById(c.founder).name)}</span></div></div>
+    <div class="ro-chips"><span>${c.type}</span></div>
+    <div class="meta-line"><span class="status news">新消息 ${c.news}</span><span class="status deal">新優惠 ${c.deals}</span></div>
+  </section>`).join('');
+document.getElementById('club-feed').innerHTML = CLUB_FEED.map(f => { const c = coById(f.co), cl = CLUBS.find(x => x.id === f.club);
+  return `<div class="feed-item"><span class="status ${f.kind}">${f.kind === 'deal' ? '優惠' : '消息'}</span><div><p><b>${esc(c.name)}</b>　${esc(f.text)}</p><small>${esc(cl.name)}・${f.at}</small></div></div>`; }).join('');
+const moreClubs = document.getElementById('more-clubs');
+moreClubs.textContent = `還有 ${others.length} 個俱樂部可以加入`;
+moreClubs.dataset.toast = '俱樂部列表頁尚未製作';
 
-state.route = location.hash.slice(1) || 'overview';
-render();
+// 頁面上的 data-toast 由 shell.js 統一處理
 </script>
 </body>
 </html>

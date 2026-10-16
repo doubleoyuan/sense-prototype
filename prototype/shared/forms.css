@@ -1,0 +1,277 @@
+/* SENSE 表單元件
+   依 Figma：Sense - Master File · node 4040:419（新增商品）、4042:871（步驟條狀態）。
+   稿上沒畫到的欄位型態（多行文字、重複列、SKU、帶單位數字、錯誤提示、頁尾按鈕）依同一套樣式推導，標註「推導」。
+   需搭配 tokens.css、components.css 使用。 */
+
+:root{
+  --danger:#FF1E00; --danger-bg:#FFF4F2;
+  --link-blue:#338FF7;
+  --step-current:#4D9DF8; --step-done:#E6F1FE; --step-highlight:#F2F8FF; --step-upcoming:#F0F0F0; --step-muted:#CCCCCC; --step-line:#D6D6D6;
+}
+
+/* ═════════ 步驟條 ═════════ */
+.stepper{width:100%;margin:0;padding:14px 16px;list-style:none;display:flex;align-items:flex-start;justify-content:center;gap:8px;
+  background:var(--white);border-radius:var(--r-16)}  /* 依 Figma 4040:558：無外框、無陰影，上下 14、左右 16，總高 100 */
+.step{display:flex;flex-direction:column;align-items:center;gap:0;font-size:16px;font-weight:500;line-height:32px;letter-spacing:var(--tracking-ultra);
+  color:var(--step-muted);white-space:nowrap}
+.step-label{font-size:14px}  /* 步驟名稱 14px，數字維持 16px（Figma 4042:783） */
+/* 目前步驟的名稱底下墊一個淡藍橢圓（Figma 4042:1313：64×20，從文字頂端往下 15px）。
+   寬度跟著文字走；right 扣掉瀏覽器加在最後一字的 3.2px 字距 */
+.step-label{position:relative;z-index:0}
+.step[aria-current="step"] .step-label::before{content:"";position:absolute;z-index:-1;left:0;right:3.2px;top:15px;height:20px;border-radius:50%;background:var(--step-highlight)}
+.step-num{position:relative;width:40px;height:40px;display:grid;place-items:center;font-weight:700;color:var(--step-muted)}
+/* 平行四邊形色塊：形狀取自 Figma 素材（step-block.svg），以內嵌 SVG 繪製後依狀態換色。
+   不用 CSS 遮罩圖片——直接以 file:// 開啟時 Chrome 會因跨來源限制擋掉遮罩，色塊整個消失。 */
+.step-shape{position:absolute;left:-3.88px;top:0;width:47.76px;height:40px;overflow:visible}
+.step-shape path{fill:var(--step-upcoming)}
+.step-num > .n{position:relative;margin-right:-3.2px}
+.step-check{position:absolute;left:24px;top:24px;width:24px;height:24px;border-radius:50%;background:var(--step-current);display:none;place-items:center}
+.step-check img{width:18px;height:18px}
+/* 步驟名稱：目前步驟 Bold，已完成／未到 Medium；數字一律 Bold（依 Figma 4042:783、4042:871） */
+.step[aria-current="step"]{color:var(--black-700);font-weight:700}
+.step[aria-current="step"] .step-num{color:var(--white)}
+.step[aria-current="step"] .step-shape path{fill:var(--step-current)}
+.step.done .step-num{color:var(--step-current)}
+.step.done .step-shape path{fill:var(--step-done)}
+.step.done .step-check{display:grid}
+button.step{cursor:pointer}
+button.step:hover{color:var(--black-600)}
+.step-line{flex:none;width:60px;height:1px;margin-top:24px;background:var(--step-line)}
+
+/* ═════════ 表單卡片與分組 ═════════ */
+/* ═════════ 分段標籤（Figma 4061:1442）：捲到頂端時停在 header 下方，點擊跳到對應卡片 ═════════ */
+:root{--tabs-h:52px}   /* 標籤 28 + 停住時上下各 12 */
+.section-tabs{position:sticky;top:var(--header-h);z-index:20;width:100%;margin:-12px 0;padding:12px 0;background:var(--white);
+  display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;transition:box-shadow .15s}
+.section-tabs::-webkit-scrollbar{display:none}
+.section-tabs.is-stuck{box-shadow:0 1px 0 0 var(--black-200)}   /* 停住時才出現分隔線（推導） */
+.section-tab{flex:none;height:28px;padding:4px 8px;border-radius:41px;background:var(--step-done);color:var(--step-current);
+  font-size:14px;font-weight:700;line-height:20px;letter-spacing:var(--tracking-ultra);white-space:nowrap;text-decoration:none;transition:background .15s,color .15s}
+.section-tab span{margin-right:-3.2px}
+.section-tab:hover{background:#D6E8FD}
+.section-tab[aria-current="true"]{background:var(--step-current);color:var(--white);box-shadow:0 4px 0 0 var(--step-done)}
+
+/* 表單：每個分組各自一張卡片，卡片之間 40px（Figma 4040:419） */
+.form-stack{width:100%;display:flex;flex-direction:column;gap:40px}
+.form-card{width:100%;padding:20px;  /* Figma 4042:1235：四邊 20 */
+  border:1px solid var(--black-300);border-radius:var(--r-16);background:var(--white);box-shadow:0 4px 0 0 var(--black-200)}
+.form-group{width:100%;display:flex;flex-direction:column;gap:20px;scroll-margin-top:calc(var(--header-h) + var(--tabs-h) + 16px)}
+/* 表單內的分組標題：8×6 小平行四邊形（Figma 4042:1204，素材 title-mark.svg）；入口頁的區塊標題維持方塊 */
+.form-group-title{display:flex;align-items:center;gap:10px;padding:0;border-bottom:1px solid var(--black-300)}  /* 上下無內距，高 33（Figma 4042:1204） */
+.form-group-title::before{content:"";width:8px;height:6px;flex:none;background:url(assets/title-mark.svg) center/7.23px 6px no-repeat}
+.form-group-title h2{font-size:18px;font-weight:700;line-height:32px;letter-spacing:var(--tracking-ultra)}
+/* 分組標題維持滿版，標題底下的欄位左右各內縮 --group-indent（目前試 16px） */
+.form-group{--group-indent:16px}
+.form-group > :not(.form-group-title){padding-left:var(--group-indent);padding-right:var(--group-indent)}
+.form-row{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+
+/* ═════════ 欄位 ═════════ */
+.field{width:100%;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:10px;scroll-margin-top:calc(var(--header-h) + var(--tabs-h) + 24px)}
+.field-label{display:block;font-size:16px;font-weight:500;line-height:24px;letter-spacing:var(--tracking-ultra);color:var(--black-800)}
+.field-label .req{font-size:14px;color:var(--danger);margin-left:.8px}  /* 稿上間距 4px，扣掉瀏覽器多加在最後一字的 3.2px 字距 */
+/* 欄位說明：放在欄位名稱正下方（名稱→說明 10px、說明→輸入 12px），Figma 4061:1467 */
+.field-help{margin-bottom:2px;font-size:14px;font-weight:400;line-height:24px;letter-spacing:1.6px;color:var(--black-700)}
+.field-error{display:none;align-items:center;gap:6px;font-size:12px;font-weight:600;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--danger)}  /* 推導 */
+.field.has-error .field-error{display:flex}
+.field-error::before{content:"!";width:14px;height:14px;flex:none;border-radius:50%;background:var(--danger);color:var(--white);
+  display:grid;place-items:center;font-size:10px;font-weight:700;line-height:1}
+
+.input,.textarea,.select{width:100%;min-width:0;border:1px solid var(--black-200);border-radius:var(--r-10);background:var(--white);
+  font-size:14px;font-weight:400;line-height:24px;letter-spacing:var(--tracking-ultra);color:var(--black-800);transition:border-color .15s,box-shadow .15s}
+.input,.select{height:46px;padding:10px 20px}
+.textarea{min-height:140px;padding:10px 20px;resize:vertical}
+.textarea.short{min-height:94px}
+.input::placeholder,.textarea::placeholder{color:var(--black-400)}
+.input:hover,.textarea:hover,.select:hover{border-color:var(--black-300)}
+.input:focus,.textarea:focus,.select:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px rgba(77,157,248,.16)}
+.input.is-invalid,.textarea.is-invalid,.select.is-invalid{border-color:var(--danger);background:var(--danger-bg)}
+/* 下拉：用 Figma 的 expand_more 圖示 */
+.select{appearance:none;-webkit-appearance:none;padding-right:54px;cursor:pointer;
+  background:var(--white) url(assets/ic-select-chevron.svg) right 20px center/24px 24px no-repeat}
+.select:invalid{color:var(--black-400)}
+/* 數字：去掉瀏覽器內建箭頭；可加前置單位（推導） */
+.input[type=number]{-moz-appearance:textfield}
+.input[type=number]::-webkit-inner-spin-button,.input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.input-affix{position:relative;width:100%;display:flex;align-items:center}
+.input-affix .input{padding-left:62px}
+.input-affix .affix{position:absolute;left:20px;font-size:14px;font-weight:500;letter-spacing:var(--tracking-wider);color:var(--black-500);pointer-events:none}
+/* 後置單位（例：%） */
+.input-affix.suffix .input{padding-left:20px;padding-right:48px}
+.input-affix.suffix .affix{left:auto;right:20px}
+
+/* ═════════ 滑桿（推導）：模組藍填滿、白色圓鈕，右側顯示數值 ═════════ */
+.range-field{width:100%;display:flex;align-items:center;gap:24px}
+.range{--fill:0%;flex:1;min-width:0;height:24px;margin:0;background:transparent;-webkit-appearance:none;appearance:none;cursor:pointer}
+.range::-webkit-slider-runnable-track{height:6px;border-radius:6px;background:linear-gradient(var(--accent),var(--accent)) 0/var(--fill) 100% no-repeat,var(--black-200)}
+.range::-moz-range-track{height:6px;border-radius:6px;background:var(--black-200)}
+.range::-moz-range-progress{height:6px;border-radius:6px;background:var(--accent)}
+.range::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;margin-top:-8px;border-radius:50%;background:var(--white);border:1px solid var(--black-400);box-shadow:0 2px 0 var(--black-200)}
+.range::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--white);border:1px solid var(--black-400);box-shadow:0 2px 0 var(--black-200)}
+.range:focus-visible{outline:0}
+.range:focus-visible::-webkit-slider-thumb{border-color:var(--accent);box-shadow:0 0 0 4px rgba(77,157,248,.2)}
+.range:focus-visible::-moz-range-thumb{border-color:var(--accent);box-shadow:0 0 0 4px rgba(77,157,248,.2)}
+.range-value{flex:none;min-width:64px;text-align:right;font-size:14px;font-weight:500;letter-spacing:var(--tracking-super);color:var(--black-700);white-space:nowrap}
+.range-value b{font-size:24px;font-weight:700;font-style:italic;letter-spacing:0;color:var(--accent-border);margin-right:4px}
+
+/* ═════════ 圖片上傳 ═════════ */
+.upload{display:flex;flex-direction:column;align-items:flex-start;gap:12px;width:100%}
+.upload-preview{width:240px;height:240px;padding:40px;display:grid;place-items:center;border:1px solid var(--black-200);border-radius:24px;background:var(--white);overflow:hidden;
+  position:relative;transition:border-color .15s,background .15s}
+.upload-preview > img.placeholder{width:160px;height:160px}
+.upload-preview.has-image{padding:0}
+.upload-preview.has-image > img.cover-img{width:100%;height:100%;object-fit:cover}
+.upload-preview.dragover{border-color:var(--accent);background:#F5F9FF}
+.upload-preview .cover-tag{position:absolute;left:12px;top:12px;padding:0 10px;border-radius:20px;background:var(--black-800);color:var(--white);
+  font-size:10px;font-weight:600;line-height:20px;letter-spacing:var(--tracking-wider)}
+/* 多張時的縮圖列（推導）：點縮圖設為封面，右上角移除 */
+.upload-thumbs{display:flex;flex-wrap:wrap;gap:8px}
+.upload-thumbs:empty{display:none}
+.upload-thumb{position:relative;width:56px;height:56px;border-radius:12px;border:1px solid var(--black-200);overflow:hidden;background:var(--black-50)}
+.upload-thumb img{width:100%;height:100%;object-fit:cover}
+.upload-thumb.is-cover{border:2px solid var(--accent)}
+.upload-thumb .set-cover{position:absolute;inset:0}
+.upload-thumb .remove{position:absolute;right:2px;top:2px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;
+  background:rgba(255,255,255,.92);border:1px solid var(--black-200);color:var(--black-600)}
+.upload-thumb .remove svg{width:10px;height:10px}
+.upload-bar{display:flex;align-items:center;gap:10px;max-width:100%}
+.upload-path{width:360px;max-width:100%;height:40px;padding:8px 16px;border:1px solid var(--black-200);border-radius:12px;background:var(--white);
+  display:flex;align-items:center;font-size:14px;line-height:24px;letter-spacing:var(--tracking-ultra);color:var(--black-400);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.upload-path.filled{color:var(--black-700)}
+.btn-outline{height:40px;padding:8px 40px;flex:none;border:1px solid var(--black-200);border-radius:var(--r-8);background:var(--white);
+  font-size:14px;font-weight:500;line-height:24px;letter-spacing:var(--tracking-ultra);color:var(--black-500);transition:background .15s,border-color .15s,color .15s}
+/* 預設灰字（Figma 4042:1308），hover／鍵盤聚焦時轉為藍字 */
+.btn-outline:hover,.btn-outline:focus-visible{color:var(--link-blue);background:#F5F9FF;border-color:#CFE3FD}
+.btn-outline[disabled]{color:var(--black-400);background:var(--white);border-color:var(--black-200);cursor:not-allowed}
+.has-error .upload-preview,.has-error .upload-path{border-color:var(--danger)}
+
+/* ═════════ 重複列、文字按鈕（推導） ═════════ */
+.add-link{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:500;line-height:24px;letter-spacing:var(--tracking-ultra);color:var(--link-blue)}
+.add-link::before{content:"+";font-size:18px;font-weight:400;line-height:1}
+.add-link:hover{text-decoration:underline;text-underline-offset:4px}
+.add-link[disabled]{color:var(--black-400);cursor:not-allowed;text-decoration:none}
+.remove-btn{width:36px;height:46px;flex:none;border-radius:var(--r-10);display:grid;place-items:center;color:var(--black-400);transition:background .15s,color .15s}
+.remove-btn:hover{background:var(--black-100);color:var(--danger)}
+.remove-btn svg{width:14px;height:14px}
+.repeater{display:flex;flex-direction:column;gap:10px;width:100%}
+.repeater:empty{display:none}
+.rep-row{width:100%;display:flex;align-items:flex-start;gap:10px}
+.rep-row > .input{flex:1}
+.rep-row > .input.key{flex:0 0 30%}
+.sku-head,.sku-row{width:100%;display:grid;grid-template-columns:minmax(0,1fr) 140px 140px 120px 36px;gap:10px;align-items:center}
+.sku-head{font-size:12px;font-weight:500;line-height:20px;letter-spacing:var(--tracking-super);color:var(--black-500)}
+
+/* ═════════ 頁尾動作（沿用上一版） ═════════ */
+.form-actions{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.actions-group{display:flex;gap:12px}
+.btn{min-width:120px;height:44px;padding:0 24px;display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:var(--r-30);
+  font-size:14px;font-weight:700;letter-spacing:var(--tracking-ultra);text-decoration:none;transition:filter .15s,background .15s}
+.btn-primary{background:var(--accent);border:2px solid var(--accent-border);color:var(--white);filter:drop-shadow(0 4px 0 var(--black-200))}
+.btn-primary:hover{filter:drop-shadow(0 4px 0 var(--black-200)) brightness(1.06)}
+.btn-secondary{background:var(--white);border:1px solid var(--black-200);color:var(--black-700);filter:drop-shadow(0 4px 0 var(--black-200))}
+.btn-secondary:hover{background:var(--black-50)}
+
+/* ═════════ 第 3 步：唯讀確認＋商品頁示意（推導） ═════════ */
+.review-layout{width:100%;display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:40px;align-items:start}
+.review-main{display:flex;flex-direction:column;gap:40px;min-width:0}
+/* 唯讀卡片：沿用表單卡片；標題列右側放「編輯」 */
+.review-card{transition:border-color .15s}
+.review-card:hover,.review-card:focus-within{border-color:var(--accent)}
+.review-card .form-group-title{justify-content:flex-start}
+.review-card .form-group-title h2{flex:1}
+.edit-link{font-size:14px;font-weight:500;line-height:24px;letter-spacing:var(--tracking-super);color:var(--link-blue);margin-right:-2.4px}
+.edit-link:hover{text-decoration:underline;text-underline-offset:4px}
+.ro-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.ro-item{display:flex;flex-direction:column;gap:6px;min-width:0}
+.ro-item.span-2{grid-column:1/-1}
+.ro-label{font-size:14px;font-weight:500;line-height:24px;letter-spacing:var(--tracking-ultra);color:var(--black-500)}
+.ro-value{font-size:16px;font-weight:400;line-height:26px;letter-spacing:1.6px;color:var(--black-800);white-space:pre-wrap;overflow-wrap:anywhere}
+.ro-value.empty{color:var(--black-400)}
+.ro-value.clamp{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.ro-more{align-self:flex-start;font-size:13px;font-weight:500;letter-spacing:var(--tracking-wider);color:var(--link-blue)}
+.ro-imgs{display:flex;flex-wrap:wrap;gap:8px}
+.ro-imgs img{width:72px;height:72px;border-radius:12px;border:1px solid var(--black-200);object-fit:cover}
+.ro-imgs img:first-child{border:2px solid var(--accent)}
+.ro-chips{display:flex;flex-wrap:wrap;gap:8px}
+.ro-chips span{padding:2px 12px;border-radius:20px;background:var(--metric-bg);font-size:13px;line-height:22px;letter-spacing:var(--tracking-wider);color:#E0702A}
+.ro-pairs{display:grid;grid-template-columns:minmax(0,30%) minmax(0,1fr);gap:8px 16px;margin:0}
+.ro-pairs dt{font-size:14px;font-weight:500;line-height:24px;letter-spacing:1.6px;color:var(--black-600)}
+.ro-pairs dd{margin:0;font-size:15px;line-height:24px;letter-spacing:1.6px;color:var(--black-800)}
+.ro-table{width:100%;border-collapse:collapse;font-size:14px;letter-spacing:1.6px}
+.ro-table th{padding:6px 10px;text-align:left;font-weight:500;color:var(--black-500);border-bottom:1px solid var(--black-200);white-space:nowrap}
+.ro-table td{padding:8px 10px;color:var(--black-800);border-bottom:1px solid var(--black-100)}
+.ro-table .num{text-align:right;white-space:nowrap}
+.ro-table .was{color:var(--black-400);text-decoration:line-through}
+
+/* 商品頁示意：通用骨架。滑到左側卡片時，對應 data-region 的區塊加藍框淡藍底，其他變淡 */
+.preview{position:sticky;top:calc(var(--header-h) + 20px);display:flex;flex-direction:column;gap:12px}
+/* 示意圖超過可用高度時，由 JS 等比例縮小（--pv-scale），外框高度同步縮，避免下方留白 */
+.preview-fit{position:relative}
+.preview-head h2{font-size:16px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-ultra);color:var(--black-800)}
+.preview-head p{font-size:12px;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+.preview-page{position:relative;transform-origin:top left;padding:12px;border:1px solid var(--black-300);border-radius:24px;background:var(--white);box-shadow:0 4px 0 0 var(--black-200);
+  display:flex;flex-direction:column;gap:8px}
+.pv-region{position:relative;padding:8px;border:1.5px dashed transparent;border-radius:12px;display:flex;flex-direction:column;gap:6px;transition:opacity .2s,border-color .2s,background .2s}
+.pv-tag{position:absolute;right:8px;top:-9px;padding:0 8px;border-radius:10px;background:var(--accent);color:var(--white);font-size:10px;font-weight:600;line-height:18px;letter-spacing:var(--tracking-wider);
+  opacity:0;transform:translateY(2px);transition:opacity .2s,transform .2s;pointer-events:none}
+.pv-main{aspect-ratio:4/3;border-radius:12px;background:var(--black-100)}
+.pv-thumbs{display:flex;gap:6px}
+.pv-thumbs i{width:36px;height:36px;border-radius:8px;background:var(--black-100)}
+.pv-line{height:10px;border-radius:6px;background:var(--black-100)}
+.pv-line.h14{height:14px;background:var(--black-200)}
+.w40{width:40%}.w60{width:60%}.w70{width:70%}.w75{width:75%}.w80{width:80%}.w90{width:90%}.w100{width:100%}
+.pv-chips{display:flex;gap:6px}
+.pv-chips i{width:52px;height:16px;border-radius:10px;background:var(--metric-bg)}
+.pv-price{display:flex;align-items:center;gap:8px}
+.pv-price .now{width:84px;height:18px;border-radius:6px;background:var(--black-300)}
+.pv-price .was{width:52px;height:10px;border-radius:6px;background:var(--black-100)}
+.pv-select{height:30px;border:1px solid var(--black-200);border-radius:8px}
+.pv-buy{height:34px;margin:0 10px;border-radius:20px;background:var(--black-300)}
+.pv-box{border:1.5px solid var(--black-200)}
+.pv-acc{height:28px;border-bottom:1px solid var(--black-200);position:relative}
+.pv-acc::after{content:"";position:absolute;left:0;top:9px;width:38%;height:10px;border-radius:6px;background:var(--black-100)}
+.pv-note{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;font-size:14px;font-weight:600;line-height:24px;letter-spacing:var(--tracking-super);
+  color:var(--black-700);opacity:0;transition:opacity .2s;pointer-events:none}
+/* 亮起：對應區塊 */
+.preview-page[data-active] .pv-region,.preview-page[data-active] .pv-buy{opacity:.35}
+.preview-page[data-active="basic"] [data-region="basic"],
+.preview-page[data-active="desc"] [data-region="desc"],
+.preview-page[data-active="spec"] [data-region="spec"],
+.preview-page[data-active="logistics"] [data-region="logistics"]{opacity:1;border:1.5px solid var(--accent);background:var(--step-highlight)}
+.preview-page[data-active="basic"] [data-region="basic"] .pv-tag,
+.preview-page[data-active="desc"] [data-region="desc"] .pv-tag,
+.preview-page[data-active="spec"] [data-region="spec"] .pv-tag,
+.preview-page[data-active="logistics"] [data-region="logistics"] .pv-tag{opacity:1;transform:none}
+/* 分潤與招募：商品頁上沒有，整頁變淡並顯示說明 */
+.preview-page[data-active="terms"] .pv-region,.preview-page[data-active="terms"] .pv-buy{opacity:.15}
+.preview-page[data-active="terms"] .pv-note{opacity:1}
+@media (max-width:1199px){
+  .review-layout{grid-template-columns:minmax(0,1fr)}
+  .preview{display:none}
+}
+@media (max-width:767px){ .ro-grid{grid-template-columns:minmax(0,1fr)} .ro-table{font-size:13px} }
+
+/* 尚未製作的步驟（示意） */
+.step-placeholder{width:100%;padding:60px 20px;border:1px dashed var(--black-300);border-radius:var(--r-20);text-align:center;
+  font-size:14px;line-height:1.8;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+
+/* ═════════ Responsive ═════════ */
+@media (max-width:767px){
+  .stepper{gap:4px;padding:16px 8px}
+  .step,.step-label{font-size:12px;letter-spacing:var(--tracking-wider);line-height:20px}
+  .step[aria-current="step"] .step-label::before{right:.8px;top:9px;height:14px}
+  .step-line{width:24px}
+  .form-card{padding:16px 12px}
+  .form-row{grid-template-columns:minmax(0,1fr)}
+  .rep-row{flex-wrap:wrap}
+  .rep-row > .input.key{flex:1 1 100%}
+  .rep-row > .input{flex:1 1 calc(100% - 46px)}
+  .sku-head{display:none}
+  .sku-row{grid-template-columns:repeat(3,minmax(0,1fr)) 36px}
+  .sku-row .sku-name{grid-column:1/-1}
+  .upload-bar{flex-wrap:wrap}
+  .upload-path{flex:1 1 100%;width:auto}
+  .btn-outline{padding:8px 24px}
+  /* 第 2 步底部有三顆按鈕，手機上取消最小寬度避免橫向捲動 */
+  .form-actions .btn{min-width:0;padding:0 16px}
+  .actions-group{gap:8px}
+}
