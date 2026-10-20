@@ -19,14 +19,10 @@ img{display:block}
 .sidebar{scrollbar-width:none;-ms-overflow-style:none}
 .sidebar::-webkit-scrollbar{display:none}
 .sidebar button{text-align:left}
-.sb-card{background:var(--white);border-radius:var(--r-20);padding:10px 20px 20px;display:flex;flex-direction:column;align-items:flex-start;gap:20px;flex:none}
+.sb-card{background:var(--white);border-radius:var(--r-20);padding:20px;display:flex;flex-direction:column;align-items:flex-start;gap:20px;flex:none}
 
 .sb-logo{display:flex;align-items:center;text-decoration:none}
-.sb-logo-mark{position:relative;width:40px;height:40px;overflow:hidden;flex:none}
-.sb-logo-mark img{position:absolute;left:25%;right:25%;top:9.38%;bottom:8.26%;width:50%;height:82.36%}
-.sb-wordmark{font-size:24px;font-weight:600;line-height:24px;
-  background:linear-gradient(90deg,#0073F5 3.85%,#42D6CD 34.82%,#FABF32 69.95%,#FF5024 99.99%);
-  -webkit-background-clip:text;background-clip:text;color:transparent}
+.sb-logotype{display:block;height:40px;width:auto;max-width:100%}  /* Figma 4118:740：固定高 40px（598×185 等比 ≈ 129px 寬） */
 
 /* 找商務合作 */
 .sb-cta{position:relative;display:flex;align-items:center;gap:40px;padding:10px 20px;border:2px solid var(--cta-orange);border-radius:40px;
@@ -42,7 +38,10 @@ img{display:block}
 
 /* 模組卡片（可展開） */
 .sb-mod{width:100%;border:1px solid var(--black-200);border-radius:var(--r-10);box-shadow:0 1px 0 0 var(--black-200);padding:10px 20px;
-  display:flex;flex-direction:column;gap:10px;background:var(--white)}
+  display:flex;flex-direction:column;gap:10px;background:var(--white);position:relative}
+/* 整張模組卡都可點（推導）；箭頭與子選單疊在上層 */
+.sb-mod-head .sb-mod-label::after{content:"";position:absolute;inset:0;border-radius:inherit}
+.sb-chev,.sb-sub{position:relative;z-index:1}
 .sb-mod-head{display:flex;align-items:center;gap:10px;min-height:24px}
 .sb-blocker{width:4px;align-self:stretch;min-height:24px;background:var(--c);flex:none}
 .sb-mod-label{flex:1;min-width:0;font-size:14px;font-weight:600;line-height:24px;text-decoration:none;color:var(--black-800)}
@@ -162,22 +161,39 @@ a.title-tab:hover .tab-shape .body{filter:brightness(.97)}
 .ticket-close:hover{background:var(--white);color:var(--black-700)}
 .ticket-close svg{width:12px;height:12px}
 
-/* CtaButton：上方帶圓形圖示的主按鈕 */
-.cta-section{display:flex;gap:20px;padding-top:18px}
-.cta-btn{position:relative;text-decoration:none;width:160px;padding:10px 20px;display:flex;justify-content:center;
+/* CtaButton：左側帶漸層圓框圖示的主按鈕（Figma 4104:661） */
+.cta-section{display:flex;gap:20px}
+.cta-btn{position:relative;text-decoration:none;display:flex;align-items:center;padding:10px 40px 10px 60px;
   background:var(--accent);border:2px solid var(--accent-border);border-radius:var(--r-30);
   filter:drop-shadow(0 4px 0 var(--black-200)) drop-shadow(0 2px 0 var(--black-200));
-  color:var(--white);font-size:14px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-ultra);transition:filter .15s}
+  color:var(--white);font-size:14px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-ultra);white-space:nowrap;transition:filter .15s}
 .cta-btn:hover{filter:drop-shadow(0 4px 0 var(--black-200)) drop-shadow(0 2px 0 var(--black-200)) brightness(1.06)}
-.cta-btn .cta-label{width:100px;text-align:center}
-.cta-btn .round-icon{position:absolute;left:62px;top:-24px;width:32px;height:32px;padding:4px;border-radius:31px;border:2px solid transparent;
+.cta-btn .cta-label{margin-right:calc(-1 * var(--tracking-ultra))}  /* 抵銷最後一字的字距，讓左右留白對稱 */
+.cta-btn .round-icon{position:absolute;left:-2px;top:-2px;width:48px;height:48px;border-radius:50%;border:4px solid transparent;
   background:linear-gradient(var(--white),var(--white)) padding-box,var(--accent-ring) border-box}
-.cta-btn .round-icon img{position:absolute;left:50%;top:50%;width:20px;height:20px;transform:translate(-50%,-50%)}
+.cta-btn .round-icon img{position:absolute;left:50%;top:50%;width:28px;height:28px;transform:translate(-50%,-50%)}
 
-/* SectionTitle */
+/* SectionTitle：標題前的兩個斜角色塊（Figma 4104:681），顏色跟著模組 --accent */
 .section-title{scroll-margin-top:96px;width:100%;display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--black-300)}
-.section-title::before{content:"";width:12px;height:13px;background:var(--accent);flex:none}
-.section-title h2{font-size:16px;font-weight:700;line-height:32px;letter-spacing:var(--tracking-ultra)}
+/* 兩個色塊分開畫，才能各自做進場動畫：::before 小塊、::after 大塊（疊在同一個 15×14 位置） */
+.section-title::before,.section-title::after{content:"";width:15px;height:14px;background:var(--accent);flex:none;
+  animation:title-deco-in 2000ms cubic-bezier(.22,.61,.36,1) both}
+.section-title::before{order:-2;animation-delay:300ms;
+  clip-path:path("M0.781 7.752C0.906 6.751 1.757 6 2.766 6H3.734C4.937 6 5.868 7.054 5.719 8.248L5.219 12.248C5.094 13.249 4.243 14 3.234 14H2.266C1.063 14 0.132 12.946 0.281 11.752Z")}
+.section-title::after{order:-1;margin-left:-25px;
+  clip-path:path("M8.499 1.757C8.622 0.754 9.474 0 10.484 0H12.74C13.941 0 14.871 1.051 14.725 2.243L13.501 12.243C13.378 13.246 12.526 14 11.516 14H9.26C8.059 14 7.129 12.949 7.275 11.757Z")}
+@keyframes title-deco-in{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){ .section-title::before,.section-title::after{animation:none} }
+.section-title h2{flex:1;min-width:0;font-size:16px;font-weight:700;line-height:32px;letter-spacing:var(--tracking-ultra)}
+
+/* TitleButton：放在區塊標題右側的主要操作（Figma 4107:690） */
+.title-btn{flex:none;display:inline-flex;align-items:center;gap:4px;padding:6px 20px 6px 16px;text-decoration:none;
+  background:var(--accent);border:2px solid var(--accent-border);border-radius:var(--r-30);
+  filter:drop-shadow(0 4px 0 var(--black-200)) drop-shadow(0 2px 0 var(--black-200));
+  color:var(--white);font-size:14px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-ultra);white-space:nowrap;transition:filter .15s}
+.title-btn:hover{filter:drop-shadow(0 4px 0 var(--black-200)) drop-shadow(0 2px 0 var(--black-200)) brightness(1.06)}
+.title-btn img{width:24px;height:24px;flex:none}
+.title-btn span{margin-right:calc(-1 * var(--tracking-ultra))}
 
 /* ListToolbar：左邊分類 chips，右邊搜尋（展開輸入框）＋排序（下拉） */
 .list-toolbar{width:100%;display:flex;align-items:flex-start;gap:20px}
@@ -296,6 +312,9 @@ a.title-tab:hover .tab-shape .body{filter:brightness(.97)}
   .ticket-stats{width:100%}
 }
 @media (max-width:559px){
+  .title-btn{padding:6px;gap:0}
+  .title-btn span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
   .card-grid{--cols:1}
   .list-toolbar{flex-direction:column-reverse;align-items:stretch;gap:12px}
   .search-box.open{max-width:calc(100vw - 98px)}

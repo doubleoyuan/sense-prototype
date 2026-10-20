@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>新增商品｜商品 SENSE</title>
+<link rel="icon" type="image/svg+xml" href="shared/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="shared/tokens.css?v=20261020a">
+<link rel="stylesheet" href="shared/components.css?v=20261020a">
+<link rel="stylesheet" href="shared/forms.css?v=20261020a">
+</head>
+<body>
+<!-- 僅供內部使用，非經許可不得外流。依 Figma 4040:419（新增商品）與 4042:871（步驟條狀態）；稿上沒畫的欄位依同樣式推導。只做前端示意，不串接資料。 -->
+<div class="app" data-module="product" data-page="new">
+  <aside class="sidebar" id="sidebar" aria-label="主選單"></aside>
+  <div class="main">
+    <header class="header" id="header"></header>
+
+    <main class="content">
+      <nav class="breadcrumb" aria-label="麵包屑">
+        <span class="root">SENSE</span><span class="sep">/</span>
+        <a class="root" href="product-sense.html">商品SENSE</a><span class="sep">/</span>
+        <span class="cur" aria-current="page">新增商品</span>
+      </nav>
+
+      <ol class="stepper" id="stepper" aria-label="上架步驟"></ol>
+
+      <!-- 第 1 步：商品資料 -->
+      <form id="product-form" class="form-stack" novalidate>
+        <nav class="section-tabs" id="section-tabs" aria-label="表單分段">
+          <a class="section-tab" href="#sec-basic"><span>基本資訊</span></a>
+          <a class="section-tab" href="#sec-desc"><span>商品描述</span></a>
+          <a class="section-tab" href="#sec-spec"><span>規格明細</span></a>
+          <a class="section-tab" href="#sec-logistics"><span>物流</span></a>
+        </nav>
+
+          <!-- 基本資訊 -->
+          <section class="form-card form-group" id="sec-basic" aria-labelledby="g-basic">
+            <div class="form-group-title"><h2 id="g-basic">基本資訊</h2></div>
+            <div class="form-row">
+              <div class="field" id="f-name">
+                <label class="field-label" for="name">商品名稱<span class="req" aria-hidden="true">*</span></label>
+                <input class="input" id="name" name="name" required placeholder="iPhone 17">
+              </div>
+              <div class="field" id="f-brand">
+                <label class="field-label" for="brand">品牌名稱<span class="req" aria-hidden="true">*</span></label>
+                <input class="input" id="brand" name="brand" required placeholder="Apple">
+              </div>
+            </div>
+            <div class="field" id="f-images">
+              <span class="field-label" id="images-label">商品圖<span class="req" aria-hidden="true">*</span></span>
+              <p class="field-help" id="images-help">JPG / PNG / WebP，單檔 ≤ 5MB，最多 6 張（至少一張）。</p>
+              <div class="upload" id="images" role="group" aria-labelledby="images-label" aria-describedby="images-help"></div>
+            </div>
+            <div class="field" id="f-promos">
+              <span class="field-label">促銷標語</span>
+              <div class="repeater" id="promos"></div>
+              <button type="button" class="add-link" id="add-promo">新增促銷標語</button>
+            </div>
+            <div class="field" id="f-slogan">
+              <label class="field-label" for="slogan">宣傳語</label>
+              <input class="input" id="slogan" name="slogan" placeholder="為效能而生，史上最強 iPhone">
+            </div>
+          </section>
+
+          <!-- 商品描述 -->
+          <section class="form-card form-group" id="sec-desc" aria-labelledby="g-desc">
+            <div class="form-group-title"><h2 id="g-desc">商品描述</h2></div>
+            <div class="field" id="f-copy">
+              <label class="field-label" for="copy">商品文案<span class="req" aria-hidden="true">*</span></label>
+              <textarea class="textarea" id="copy" name="copy" required placeholder="商品主體行銷文案，可分段描述特點、適用情境與賣點。例：搭載 A19 Pro 晶片與鈦金屬機身，主打專業級攝影與遊戲效能…"></textarea>
+            </div>
+            <div class="form-row">
+              <div class="field" id="f-shipping">
+                <label class="field-label" for="shipping">配送說明<span class="req" aria-hidden="true">*</span></label>
+                <textarea class="textarea short" id="shipping" name="shipping" required placeholder="下單後 2–3 個工作日出貨，本島宅配到府；外島另計運費。"></textarea>
+              </div>
+              <div class="field" id="f-returns">
+                <label class="field-label" for="returns">退貨政策<span class="req" aria-hidden="true">*</span></label>
+                <textarea class="textarea short" id="returns" name="returns" required placeholder="到貨後 7 天鑑賞期，商品保持全新可退換；客製品恕不退換。"></textarea>
+              </div>
+            </div>
+          </section>
+
+          <!-- 規格明細 -->
+          <section class="form-card form-group" id="sec-spec" aria-labelledby="g-spec">
+            <div class="form-group-title"><h2 id="g-spec">規格明細</h2></div>
+            <div class="field" id="f-features">
+              <span class="field-label" id="features-label">商品特色<span class="req" aria-hidden="true">*</span></span>
+              <p class="field-help" id="features-help">呈現於商品頁（至少一項）</p>
+              <div class="repeater" id="features"></div>
+              <button type="button" class="add-link" id="add-feature">新增特色</button>
+            </div>
+            <div class="field" id="f-specs">
+              <span class="field-label" id="specs-label">規格說明<span class="req" aria-hidden="true">*</span></span>
+              <p class="field-help" id="specs-help">商品規格（至少一項）</p>
+              <div class="repeater" id="specs"></div>
+              <button type="button" class="add-link" id="add-spec">新增規格</button>
+            </div>
+            <div class="field" id="f-skus">
+              <span class="field-label" id="skus-label">SKU<span class="req" aria-hidden="true">*</span></span>
+              <p class="field-help" id="skus-help">客人實際下單的品項，含售價／原始定價／庫存（至少一組）</p>
+              <div class="sku-head" aria-hidden="true"><span>SKU 名稱</span><span>售價</span><span>原始定價</span><span>庫存</span><span></span></div>
+              <div class="repeater" id="skus"></div>
+              <button type="button" class="add-link" id="add-sku">新增 SKU</button>
+            </div>
+          </section>
+
+          <!-- 物流 -->
+          <section class="form-card form-group" id="sec-logistics" aria-labelledby="g-logistics">
+            <div class="form-group-title"><h2 id="g-logistics">物流</h2></div>
+            <div class="form-row">
+              <div class="field" id="f-fee">
+                <label class="field-label" for="fee">運費<span class="req" aria-hidden="true">*</span></label>
+                <div class="input-affix"><span class="affix">NT$</span><input class="input" id="fee" name="fee" type="number" inputmode="numeric" min="0" step="1" required placeholder="60"></div>
+              </div>
+              <div class="field" id="f-free">
+                <label class="field-label" for="free">免運門檻<span class="req" aria-hidden="true">*</span></label>
+                <div class="input-affix"><span class="affix">NT$</span><input class="input" id="free" name="free" type="number" inputmode="numeric" min="0" step="1" required placeholder="1000"></div>
+              </div>
+            </div>
+          </section>
+
+        <div class="form-actions">
+          <a class="btn btn-secondary" href="product-sense.html">取消</a>
+          <button type="submit" class="btn btn-primary">下一步</button>
+        </div>
+      </form>
+
+      <!-- 第 2 步：合作條件與招募（依現行頁面欄位，用第 1 步樣式組裝；分潤改單一值，拿掉實名限制與推薦提示） -->
+      <form id="terms-form" class="form-stack" hidden novalidate>
+        <section class="form-card form-group" id="sec-terms" aria-labelledby="g-terms">
+          <div class="form-group-title"><h2 id="g-terms">分潤與招募</h2></div>
+          <div class="form-row">
+            <div class="field" id="f-share">
+              <label class="field-label" for="share">分潤比例<span class="req" aria-hidden="true">*</span></label>
+              <p class="field-help" id="share-help">夥伴成功導購後可獲得的分潤，以成交金額計算（1–100%）。</p>
+              <div class="input-affix suffix"><input class="input" id="share" name="share" type="number" inputmode="decimal" min="1" max="100" step="0.5" required placeholder="10" aria-describedby="share-help"><span class="affix">%</span></div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field" id="f-limit">
+              <label class="field-label" for="limit">合作商家上限<span class="req" aria-hidden="true">*</span></label>
+              <p class="field-help" id="limit-help">達上限後自動標記「名額已滿」，可隨時於我的上架調整。</p>
+              <div class="range-field">
+                <input class="range" id="limit" name="limit" type="range" min="1" max="20" step="1" value="6" aria-describedby="limit-help" aria-valuetext="6 家">
+                <output class="range-value" for="limit" id="limit-value"><b>6</b> 家</output>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="form-actions">
+          <div class="actions-group">
+            <button type="button" class="btn btn-secondary" data-go-step="1">上一步</button>
+          </div>
+          <button type="submit" class="btn btn-primary">下一步</button>
+        </div>
+      </form>
+
+      <!-- 第 3 步：送出審核。左：唯讀確認卡片；右：通用商品頁示意，滑到左側卡片時對應區塊發亮 -->
+      <section class="content-section" id="step-3" hidden aria-label="送出審核">
+        <div class="review-layout">
+          <div class="review-main" id="review-cards"></div>
+
+          <aside class="preview" aria-label="商品頁示意：顯示資料會出現在商品頁的哪個位置">
+            <div class="preview-head">
+              <h2>商品頁示意</h2>
+              <p>滑到左側卡片，對應的區塊會標示出來</p>
+            </div>
+            <div class="preview-fit" id="preview-fit">
+            <div class="preview-page" id="preview-page" aria-hidden="true">
+              <div class="pv-region pv-media" data-region="basic"><span class="pv-tag">商品圖</span>
+                <div class="pv-main"></div>
+                <div class="pv-thumbs"><i></i><i></i><i></i><i></i></div>
+              </div>
+              <div class="pv-region" data-region="basic"><span class="pv-tag">名稱・標語</span>
+                <div class="pv-chips"><i></i><i></i></div>
+                <div class="pv-line w90 h14"></div><div class="pv-line w60 h14"></div>
+                <div class="pv-line w75"></div>
+              </div>
+              <div class="pv-region" data-region="spec"><span class="pv-tag">售價・選擇規格</span>
+                <div class="pv-price"><i class="now"></i><i class="was"></i></div>
+                <div class="pv-select"></div>
+              </div>
+              <div class="pv-buy"></div>
+              <div class="pv-region pv-box" data-region="logistics"><span class="pv-tag">運費規則</span>
+                <div class="pv-line w40"></div><div class="pv-line w70"></div>
+              </div>
+              <div class="pv-region" data-region="spec"><span class="pv-tag">特色・規格</span>
+                <div class="pv-acc"></div><div class="pv-acc"></div>
+              </div>
+              <div class="pv-region" data-region="desc"><span class="pv-tag">配送・退貨</span>
+                <div class="pv-acc"></div><div class="pv-acc"></div>
+              </div>
+              <div class="pv-region" data-region="desc"><span class="pv-tag">商品描述</span>
+                <div class="pv-line w100"></div><div class="pv-line w100"></div><div class="pv-line w80"></div>
+              </div>
+              <p class="pv-note">此區僅供合作夥伴參考，<br>不會出現在商品頁</p>
+            </div>
+            </div>
+          </aside>
+        </div>
+
+        <p class="field-help">送出後將進入平台審核，審核通過即上架。你也可以先儲存草稿，稍後再送出。</p>
+        <div class="form-actions">
+          <div class="actions-group">
+            <button type="button" class="btn btn-secondary" data-go-step="2">上一步</button>
+          </div>
+          <div class="actions-group">
+            <button type="button" class="btn btn-secondary" data-toast-msg="已儲存草稿（示意，未實際儲存）">儲存草稿</button>
+            <button type="button" class="btn btn-primary" data-toast-msg="已送出審核（示意，未實際送出）">送出審核</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script src="shared/shell.js?v=20261020a"></script>
+<script src="shared/components.js?v=20261020a"></script>
+<script src="shared/forms.js?v=20261020a"></script>
+<script>
+SenseShell.mount();
+
+/* ═════════ 步驟條 ═════════ */
+const STEPS = [ { label:'商品資料' }, { label:'合作條件與招募' }, { label:'送出審核' } ];
+const stepperEl = document.getElementById('stepper');
+function goStep(n){
+  SenseForm.stepper(stepperEl, STEPS, n, { check:'shared/assets/ic-check.svg', onGo:goStep });
+  document.getElementById('product-form').hidden = n !== 1;
+  document.getElementById('terms-form').hidden = n !== 2;
+  document.getElementById('step-3').hidden = n !== 3;
+  if (n === 3){ renderReview(); fitPreview(); }
+  try { const u = new URL(location.href); n === 1 ? u.searchParams.delete('step') : u.searchParams.set('step', n); history.replaceState(null, '', u); } catch (e) {}   // 打包版在內嵌頁面中無法改網址，略過
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+document.addEventListener('click', (e) => { const b = e.target.closest('[data-go-step]'); if (b) goStep(+b.dataset.goStep); });
+SenseForm.sectionTabs(document.getElementById('section-tabs'));
+const { X_ICON, setError, clearError, repeater, upload } = SenseForm;
+const removeBtn = (label) => `<button type="button" class="remove-btn" data-remove aria-label="移除這${label}">${X_ICON}</button>`;
+
+/* ═════════ 重複列 ═════════ */
+repeater(document.getElementById('promos'), document.getElementById('add-promo'),
+  (i) => `<div class="rep-row"><input class="input" name="promo" aria-label="促銷標語 ${i + 1}" placeholder="例：限時 9 折、滿千送百">${removeBtn('筆標語')}</div>`,
+  { min:0, max:5, initial:0 });
+
+repeater(document.getElementById('features'), document.getElementById('add-feature'),
+  (i) => `<div class="rep-row">
+    <input class="input key" name="featureKey" aria-label="特色標題 ${i + 1}" placeholder="例：A19 Pro 晶片">
+    <input class="input" name="featureVal" aria-label="特色說明 ${i + 1}" placeholder="例：效能較前代提升 20%，能效更佳">
+    ${removeBtn('項特色')}</div>`, { min:1, max:10 });
+
+repeater(document.getElementById('specs'), document.getElementById('add-spec'),
+  (i) => `<div class="rep-row">
+    <input class="input key" name="specKey" aria-label="規格項目 ${i + 1}" placeholder="例：螢幕">
+    <input class="input" name="specVal" aria-label="規格內容 ${i + 1}" placeholder="例：6.3 吋 OLED ProMotion">
+    ${removeBtn('項規格')}</div>`, { min:1, max:20 });
+
+repeater(document.getElementById('skus'), document.getElementById('add-sku'),
+  (i) => `<div class="sku-row">
+    <input class="input sku-name" name="skuName" aria-label="SKU ${i + 1} 名稱" placeholder="例：256GB 原色鈦金屬">
+    <input class="input" name="skuPrice" type="number" inputmode="numeric" min="0" aria-label="SKU ${i + 1} 售價" placeholder="售價">
+    <input class="input" name="skuList" type="number" inputmode="numeric" min="0" aria-label="SKU ${i + 1} 原始定價" placeholder="原始定價">
+    <input class="input" name="skuStock" type="number" inputmode="numeric" min="0" aria-label="SKU ${i + 1} 庫存" placeholder="庫存">
+    ${removeBtn('組 SKU')}</div>`, { min:1, max:30 });
+
+/* ═════════ 圖片 ═════════ */
+const images = upload(document.getElementById('images'), {
+  placeholder: 'shared/assets/img-placeholder.svg',
+  onChange: (n) => { if (n) clearError(document.getElementById('f-images')); },
+  onReject: (msgs) => SenseShell.toast(msgs[0] + (msgs.length > 1 ? `（另有 ${msgs.length - 1} 張未加入）` : ''))
+});
+
+/* ═════════ 驗證（只在前端示意） ═════════ */
+const form = document.getElementById('product-form');
+const val = (el) => el.value.trim();
+const filledPairs = (list, a, b) => [...list.querySelectorAll('.rep-row')].filter(r => val(r.querySelector(`[name=${a}]`)) && val(r.querySelector(`[name=${b}]`))).length;
+
+function validate(){
+  const errors = [];
+  const req = (id, msg) => { const el = document.getElementById(id); if (!val(el)) errors.push([`f-${id}`, msg]); };
+  req('name', '請填寫商品名稱'); req('brand', '請填寫品牌名稱');
+  if (!images.count()) errors.push(['f-images', '請至少上傳一張商品圖']);
+  req('copy', '請填寫商品文案'); req('shipping', '請填寫配送說明'); req('returns', '請填寫退貨政策');
+  if (!filledPairs(document.getElementById('features'), 'featureKey', 'featureVal')) errors.push(['f-features', '請至少完整填寫一項特色（標題與說明）']);
+  if (!filledPairs(document.getElementById('specs'), 'specKey', 'specVal')) errors.push(['f-specs', '請至少完整填寫一項規格（項目與內容）']);
+
+  const skuRows = [...document.querySelectorAll('#skus .sku-row')];
+  const skuOk = skuRows.some(r => val(r.querySelector('[name=skuName]')) && val(r.querySelector('[name=skuPrice]')) && val(r.querySelector('[name=skuStock]')));
+  const badList = skuRows.find(r => { const p = +val(r.querySelector('[name=skuPrice]')), l = val(r.querySelector('[name=skuList]')); return l && +l < p; });
+  if (!skuOk) errors.push(['f-skus', '請至少完整填寫一組 SKU（名稱、售價、庫存）']);
+  else if (badList) errors.push(['f-skus', '原始定價不能低於售價']);
+
+  const num = (id, msg) => { const el = document.getElementById(id); if (val(el) === '' || +el.value < 0) errors.push([`f-${id}`, msg]); };
+  num('fee', '請填寫運費（0 以上的整數）'); num('free', '請填寫免運門檻（0 以上的整數）');
+  return errors;
+}
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  form.querySelectorAll('.field.has-error').forEach(clearError);
+  const errors = validate();
+  if (errors.length){
+    errors.forEach(([id, msg]) => setError(document.getElementById(id), msg));
+    const first = document.getElementById(errors[0][0]);
+    first.scrollIntoView({ behavior:'smooth', block:'start' });
+    const focusable = first.querySelector('input:not([type=file]), textarea, button');
+    if (focusable) focusable.focus({ preventScroll:true });
+    SenseShell.toast(`還有 ${errors.length} 個欄位需要填寫`);
+    return;
+  }
+  goStep(2);
+});
+
+/* ═════════ 第 2 步：合作條件與招募 ═════════ */
+const termsForm = document.getElementById('terms-form');
+const limit = document.getElementById('limit'), limitValue = document.getElementById('limit-value');
+const syncLimit = () => {
+  limitValue.querySelector('b').textContent = limit.value;
+  limit.setAttribute('aria-valuetext', limit.value + ' 家');
+  limit.style.setProperty('--fill', ((limit.value - limit.min) / (limit.max - limit.min) * 100) + '%');
+};
+limit.addEventListener('input', syncLimit); syncLimit();
+
+termsForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  termsForm.querySelectorAll('.field.has-error').forEach(clearError);
+  const share = document.getElementById('share'), v = parseFloat(share.value);
+  if (share.value.trim() === '' || isNaN(v) || v < 1 || v > 100){
+    setError(document.getElementById('f-share'), share.value.trim() === '' ? '請填寫分潤比例' : '分潤比例需介於 1–100%');
+    document.getElementById('f-share').scrollIntoView({ behavior:'smooth', block:'start' });
+    share.focus({ preventScroll:true });
+    return;
+  }
+  goStep(3);
+});
+termsForm.addEventListener('input', (e) => { const f = e.target.closest('.field'); if (f && f.classList.contains('has-error')) clearError(f); });
+
+/* ═════════ 第 3 步：唯讀確認＋商品頁示意 ═════════ */
+const esc = SenseUI.esc;
+const fv = (id) => document.getElementById(id).value.trim();   // 讀欄位值（第 3 步用）
+const money = (v) => v === '' ? '' : 'NT$' + Number(v).toLocaleString('en-US');
+const empty = '<span class="ro-value empty">未填寫</span>';
+const item = (label, html, wide) => `<div class="ro-item${wide ? ' span-2' : ''}"><span class="ro-label">${label}</span>${html}</div>`;
+const text = (v, clamp) => v ? `<p class="ro-value${clamp ? ' clamp' : ''}">${esc(v)}</p>${clamp ? '<button type="button" class="ro-more" data-ro-more hidden>展開全文</button>' : ''}` : empty;
+const pairs = (list, a, b) => {
+  const rows = [...document.querySelectorAll(`#${list} .rep-row`)].map(r => [r.querySelector(`[name=${a}]`).value.trim(), r.querySelector(`[name=${b}]`).value.trim()]).filter(([k, v]) => k || v);
+  return rows.length ? `<dl class="ro-pairs">${rows.map(([k, v]) => `<dt>${esc(k) || '—'}</dt><dd>${esc(v) || '—'}</dd>`).join('')}</dl>` : empty;
+};
+const card = (key, title, step, target, body) => `
+  <section class="form-card form-group review-card" data-preview="${key}" aria-labelledby="rv-${key}">
+    <div class="form-group-title"><h2 id="rv-${key}">${title}</h2>
+      <button type="button" class="edit-link" data-edit-step="${step}" data-edit-target="${target}" aria-label="編輯${title}">編輯</button></div>
+    <div class="ro-grid">${body}</div>
+  </section>`;
+
+function renderReview(){
+  const imgs = images.list();
+  const promos = [...document.querySelectorAll('#promos [name=promo]')].map(i => i.value.trim()).filter(Boolean);
+  const skus = [...document.querySelectorAll('#skus .sku-row')].map(r => ['skuName', 'skuPrice', 'skuList', 'skuStock'].map(n => r.querySelector(`[name=${n}]`).value.trim())).filter(r => r.some(Boolean));
+  document.getElementById('review-cards').innerHTML =
+    card('basic', '基本資訊', 1, 'sec-basic',
+      item('商品名稱', text(fv('name'))) + item('品牌名稱', text(fv('brand'))) +
+      item('商品圖', imgs.length ? `<div class="ro-imgs">${imgs.map((f, i) => `<img src="${esc(f.url)}" alt="${i === 0 ? '封面：' : ''}${esc(f.name)}">`).join('')}</div>` : empty, true) +
+      item('促銷標語', promos.length ? `<div class="ro-chips">${promos.map(p => `<span>${esc(p)}</span>`).join('')}</div>` : empty, true) +
+      item('宣傳語', text(fv('slogan')), true)) +
+    card('desc', '商品描述', 1, 'sec-desc',
+      item('商品文案', text(fv('copy'), true), true) + item('配送說明', text(fv('shipping'))) + item('退貨政策', text(fv('returns')))) +
+    card('spec', '規格明細', 1, 'sec-spec',
+      item('商品特色', pairs('features', 'featureKey', 'featureVal'), true) +
+      item('規格說明', pairs('specs', 'specKey', 'specVal'), true) +
+      item('SKU', skus.length ? `<table class="ro-table"><thead><tr><th>SKU 名稱</th><th class="num">售價</th><th class="num">原始定價</th><th class="num">庫存</th></tr></thead><tbody>${
+        skus.map(([n, p, l, st]) => `<tr><td>${esc(n) || '—'}</td><td class="num">${money(p) || '—'}</td><td class="num was">${money(l) || '—'}</td><td class="num">${st || '—'}</td></tr>`).join('')}</tbody></table>` : empty, true)) +
+    card('logistics', '物流', 1, 'sec-logistics',
+      item('運費', text(money(fv('fee')))) + item('免運門檻', text(money(fv('free'))))) +
+    card('terms', '分潤與招募', 2, 'sec-terms',
+      item('分潤比例', text(fv('share') && fv('share') + '%')) + item('合作商家上限', text(fv('limit') + ' 家')));
+  // 文案超過四行才顯示「展開全文」
+  document.querySelectorAll('#review-cards .ro-value.clamp').forEach(p => { if (p.scrollHeight > p.clientHeight + 2) p.nextElementSibling.hidden = false; });
+}
+
+// 示意圖要整張留在畫面內：可用高度 = 視窗 − header − 上下留白 − 標題列
+function fitPreview(){
+  const fit = document.getElementById('preview-fit'), page = document.getElementById('preview-page');
+  if (!fit.offsetParent) return;
+  page.style.transform = ''; fit.style.height = '';
+  const headH = document.querySelector('.preview-head').offsetHeight + 12;
+  const avail = window.innerHeight - parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) - 40 - headH;
+  const k = Math.min(1, avail / page.offsetHeight);
+  if (k < 1){ page.style.transform = `scale(${k})`; page.style.width = (100 / k) + '%'; fit.style.height = (page.offsetHeight * k) + 'px'; }
+  else page.style.width = '';
+}
+window.addEventListener('resize', fitPreview);
+
+// 左側卡片 → 右側示意區塊發亮（滑鼠移入或鍵盤聚焦）
+const previewPage = document.getElementById('preview-page'), reviewCards = document.getElementById('review-cards');
+const setPreview = (key) => key ? previewPage.dataset.active = key : delete previewPage.dataset.active;
+reviewCards.addEventListener('mouseover', (e) => { const c = e.target.closest('.review-card'); setPreview(c && c.dataset.preview); });
+reviewCards.addEventListener('mouseleave', () => setPreview(reviewCards.contains(document.activeElement) ? document.activeElement.closest('.review-card').dataset.preview : null));
+reviewCards.addEventListener('focusin', (e) => { const c = e.target.closest('.review-card'); setPreview(c && c.dataset.preview); });
+reviewCards.addEventListener('focusout', (e) => { if (!reviewCards.contains(e.relatedTarget)) setPreview(null); });
+reviewCards.addEventListener('click', (e) => {
+  const more = e.target.closest('[data-ro-more]');
+  if (more){ const p = more.previousElementSibling; p.classList.toggle('clamp'); more.textContent = p.classList.contains('clamp') ? '展開全文' : '收合'; }
+  const edit = e.target.closest('[data-edit-step]');
+  if (edit){ goStep(+edit.dataset.editStep); setTimeout(() => document.getElementById(edit.dataset.editTarget).scrollIntoView({ block:'start' }), 60); }
+});
+document.addEventListener('click', (e) => { const b = e.target.closest('[data-toast-msg]'); if (b) SenseShell.toast(b.dataset.toastMsg); });
+
+/* 示意資料：直接以 ?step=3 打開且表單是空的時候帶入，方便看確認頁 */
+function fillDemo(){
+  const set = (el, v) => { el.value = v; el.dispatchEvent(new Event('input', { bubbles:true })); };
+  const $ = (sel) => document.querySelector(sel);
+  set($('#name'), 'iPhone 17 Pro'); set($('#brand'), 'Apple'); set($('#slogan'), '為效能而生，史上最強 iPhone');
+  images.addUrl('新手爸媽必修課.png', 'shared/assets/sample-product.png');
+  document.getElementById('add-promo').click(); set($('#promos .rep-row:last-child [name=promo]'), '限時 9 折');
+  document.getElementById('add-promo').click(); set($('#promos .rep-row:last-child [name=promo]'), '滿千送百');
+  set($('#copy'), '搭載 A19 Pro 晶片與鈦金屬機身，主打專業級攝影與遊戲效能。\n全新 4800 萬畫素三鏡頭系統，暗光拍攝更清晰；ProMotion 自適應更新率讓滑動與遊戲都更順暢。\n電池續航較前代提升，一整天重度使用也安心。\n支援 USB-C 高速傳輸與 MagSafe 無線充電，搭配 iOS 最新功能，工作與娛樂一次到位。');
+  set($('#shipping'), '下單後 2–3 個工作日出貨，本島宅配到府；外島另計運費。'); set($('#returns'), '到貨後 7 天鑑賞期，商品保持全新可退換。');
+  set($('#features [name=featureKey]'), 'A19 Pro 晶片'); set($('#features [name=featureVal]'), '效能較前代提升 20%，能效更佳');
+  set($('#specs [name=specKey]'), '螢幕'); set($('#specs [name=specVal]'), '6.3 吋 OLED ProMotion');
+  document.getElementById('add-spec').click(); set($('#specs .rep-row:last-child [name=specKey]'), '容量'); set($('#specs .rep-row:last-child [name=specVal]'), '256GB／512GB');
+  const sku = (n, p, l, st) => { const r = $('#skus .sku-row:last-child'); set(r.querySelector('[name=skuName]'), n); set(r.querySelector('[name=skuPrice]'), p); set(r.querySelector('[name=skuList]'), l); set(r.querySelector('[name=skuStock]'), st); };
+  sku('256GB 原色鈦金屬', '36900', '39900', '50');
+  document.getElementById('add-sku').click(); sku('512GB 黑色鈦金屬', '43900', '46900', '20');
+  set($('#fee'), '60'); set($('#free'), '1000'); set($('#share'), '12'); 
+  document.activeElement.blur();
+}
+
+// 修正後即時清除該欄位的錯誤
+form.addEventListener('input', (e) => { const f = e.target.closest('.field'); if (f && f.classList.contains('has-error')) clearError(f); });
+
+// 網址帶 ?step=2 或 ?step=3 可直接打開該步（示意用，不檢查前面的步驟；第 3 步會帶入示意資料）
+const startStep = Math.min(3, Math.max(1, parseInt(new URLSearchParams(location.search).get('step'), 10) || 1));
+if (startStep === 3 && !fv('name')) fillDemo();
+goStep(startStep);
+</script>
+</body>
+</html>

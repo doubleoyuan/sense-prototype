@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>商品 SENSE</title>
+<link rel="icon" type="image/svg+xml" href="shared/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="shared/tokens.css?v=20261020a">
+<link rel="stylesheet" href="shared/components.css?v=20261020a">
+</head>
+<body>
+<!-- 僅供內部使用，非經許可不得外流。頁面中的公司、商品與數據皆為示意。 -->
+<div class="app" data-module="product" data-page="home">
+  <aside class="sidebar" id="sidebar" aria-label="主選單"></aside>
+  <div class="main">
+    <header class="header" id="header"></header>
+
+    <main class="content">
+      <nav class="breadcrumb" aria-label="麵包屑">
+        <span class="root">SENSE</span><span class="sep">/</span><span class="cur" aria-current="page">商品SENSE</span>
+      </nav>
+
+      <!-- 區塊：商品列表 -->
+      <section class="content-section" aria-labelledby="browse-title">
+        <div class="section-title" id="browse">
+          <h2 id="browse-title">瀏覽商品</h2>
+          <a class="title-btn" href="product-sense-add-product.html"><img src="shared/assets/ic-plus-white.svg" alt=""><span>新增商品</span></a>
+        </div>
+
+        <div class="list-toolbar">
+          <div class="chips" id="chips" role="group" aria-label="商品分類"></div>
+          <div class="list-actions" id="list-actions"></div>
+        </div>
+        <div class="card-grid" id="grid" aria-live="polite"></div>
+        <div class="pager" id="pager"></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script src="shared/shell.js?v=20261020a"></script>
+<script src="shared/components.js?v=20261020a"></script>
+<script>
+/* ═════════ 示意資料（虛構公司，僅供原型展示） ═════════ */
+const ORGS = {
+  sf:  { name:'股感媒體科技股份有限公司', mark:'stockfeel' },
+  qc:  { name:'晴川旅行社股份有限公司',   color:'#5AB0D6' },
+  sh:  { name:'森和不動產顧問有限公司',   color:'#7A9E7E' },
+  hr:  { name:'好日子生活百貨股份有限公司', color:'#E89A5B' },
+  xs:  { name:'小樹親子教育股份有限公司', color:'#8DC26F' },
+  wy:  { name:'穩盈保險經紀人股份有限公司', color:'#6F7FD8' },
+  qy:  { name:'青嶼精品旅宿股份有限公司', color:'#4FB7A8' },
+  ax:  { name:'安心理財顧問股份有限公司', color:'#C98BB9' }
+};
+
+const CATEGORIES = [
+  { key:'all',     label:'ALL' },
+  { key:'finance', label:'金融理財' },
+  { key:'realty',  label:'房產置業' },
+  { key:'family',  label:'親子教育' },
+  { key:'travel',  label:'旅遊住宿' },
+  { key:'life',    label:'生活消費' }
+];
+
+// [標題, 公司, 分類, 單價, 分潤]
+const RAW = [
+  ['新手爸媽必修課線上課程', 'sf', 'family', 29999, '20~30%'],
+  ['ETF 存股入門 8 週直播班', 'sf', 'finance', 4980, '25%'],
+  ['退休現金流規劃一對一諮詢', 'ax', 'finance', 3600, '30%'],
+  ['海外房產投資說明會 VIP 席位', 'sh', 'realty', 1200, '30%'],
+  ['首購族看屋陪同顧問方案', 'sh', 'realty', 12000, '15~20%'],
+  ['北海道親子冬季 6 日遊', 'qc', 'travel', 68800, '8%'],
+  ['京都紅葉自由行機加酒', 'qc', 'travel', 32900, '6~8%'],
+  ['花東秘境精品旅宿雙人住宿券', 'qy', 'travel', 8800, '12%'],
+  ['金門海景套房平日住宿', 'qy', 'travel', 5200, '12%'],
+  ['兒童理財桌遊組', 'xs', 'family', 1680, '20%'],
+  ['小學生程式邏輯寒假營', 'xs', 'family', 15800, '15%'],
+  ['親子共讀繪本年度訂閱', 'xs', 'family', 3990, '18%'],
+  ['家庭保障健檢諮詢方案', 'wy', 'finance', 1500, '25%'],
+  ['旅平險線上投保方案', 'wy', 'travel', 299, '25%'],
+  ['長照規劃講座＋保單健檢', 'wy', 'finance', 990, '30%'],
+  ['質感家電季節禮盒', 'hr', 'life', 6880, '10%'],
+  ['在地小農蔬果箱月訂', 'hr', 'life', 1280, '12~15%'],
+  ['精品咖啡豆三入組', 'hr', 'life', 1450, '15%'],
+  ['美股投資實戰課程', 'sf', 'finance', 7800, '25~30%'],
+  ['財報閱讀速成工作坊', 'sf', 'finance', 3200, '25%'],
+  ['小資族理財規劃諮詢', 'ax', 'finance', 1800, '30%'],
+  ['新婚家庭財務健檢', 'ax', 'family', 2400, '30%'],
+  ['預售屋選購顧問一對一', 'sh', 'realty', 6800, '20%'],
+  ['換屋貸款規劃顧問服務', 'sh', 'realty', 2500, '20~25%'],
+  ['沖繩海島家庭 5 日遊', 'qc', 'travel', 42900, '7%'],
+  ['澎湖花火節機加酒', 'qc', 'travel', 13800, '8~10%'],
+  ['山林系溫泉會館雙人行', 'qy', 'travel', 9600, '12%'],
+  ['居家收納整理顧問服務', 'hr', 'life', 3800, '18%'],
+  ['寵物友善生活用品組', 'hr', 'life', 2280, '15%'],
+  ['職人保養品體驗禮盒', 'hr', 'life', 1980, '20%'],
+  ['國中數理線上家教月方案', 'xs', 'family', 5600, '15~20%'],
+  ['孩子的第一個證券戶陪跑課', 'sf', 'family', 1980, '30%'],
+  ['債券 ETF 配置講座', 'sf', 'finance', 600, '30%'],
+  ['房產稅務與傳承講座', 'sh', 'realty', 1500, '20%'],
+  ['企業員工旅遊包團方案', 'qc', 'travel', 18800, '6%'],
+  ['節慶禮品企業採購方案', 'hr', 'life', 50000, '8~10%']
+];
+
+// 瀏覽數：依商品 id 產生固定的亂數，重新整理不會跳動
+function seeded(n){ let t = (n * 2654435761) >>> 0; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }
+
+const PRODUCTS = RAW.map(([title, org, cat, price, share], i) => ({
+  id: 'p' + (i + 1),
+  title, org: ORGS[org], orgKey: org, cat, price, share,
+  views: Math.round(30 + Math.pow(seeded(i + 7), 2.2) * 24000),
+  order: RAW.length - i,  // 越前面越新
+  image: i === 0 ? 'shared/assets/sample-product.png' : null
+}));
+
+const SORTS = [
+  { key:'popular',   label:'熱門瀏覽' },
+  { key:'newest',    label:'最新上架' },
+  { key:'priceAsc',  label:'單價：低到高' },
+  { key:'priceDesc', label:'單價：高到低' }
+];
+const PER_PAGE = 12;
+
+/* ═════════ 狀態與渲染 ═════════ */
+const state = { cat:'all', query:'', sort:'popular', page:1 };
+const fmtPrice = (p) => 'NT$' + p.toLocaleString('en-US');
+
+function filtered(){
+  const q = state.query.toLowerCase();
+  let list = PRODUCTS.filter(p => (state.cat === 'all' || p.cat === state.cat)
+    && (!q || p.title.toLowerCase().includes(q) || p.org.name.toLowerCase().includes(q)));
+  const by = {
+    popular:   (a, b) => b.views - a.views,
+    newest:    (a, b) => b.order - a.order,
+    priceAsc:  (a, b) => a.price - b.price,
+    priceDesc: (a, b) => b.price - a.price
+  }[state.sort];
+  return list.sort(by);
+}
+
+function renderList(){
+  const list = filtered();
+  const pages = Math.max(1, Math.ceil(list.length / PER_PAGE));
+  state.page = Math.min(state.page, pages);
+  const slice = list.slice((state.page - 1) * PER_PAGE, state.page * PER_PAGE);
+
+  document.getElementById('grid').innerHTML = slice.length
+    ? slice.map(p => SenseUI.resourceCard({
+        id:p.id, title:p.title, image:p.image, views:p.views, org:p.org,
+        metrics:[ { label:'單價', value:fmtPrice(p.price) }, { label:'合作分潤', value:p.share } ]
+      })).join('')
+    : `<p class="empty" style="grid-column:1/-1">找不到符合「${SenseUI.esc(state.query || CATEGORIES.find(c => c.key === state.cat).label)}」的商品<br>換個關鍵字或分類試試看</p>`;
+  document.getElementById('pager').innerHTML = SenseUI.pagination(state.page, pages);
+}
+
+function renderChips(){
+  document.getElementById('chips').innerHTML = SenseUI.chips(CATEGORIES, state.cat);
+}
+
+
+SenseShell.mount();
+
+const actions = document.getElementById('list-actions');
+actions.innerHTML = SenseUI.listActions({ sorts:SORTS, sort:state.sort, placeholder:'搜尋商品或公司' });
+SenseUI.bindListActions(actions, {
+  onQuery: (q) => { state.query = q; state.page = 1; renderList(); },
+  onSort:  (k) => { state.sort = k; state.page = 1; renderList(); }
+});
+
+document.getElementById('chips').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-chip]'); if (!b) return;
+  state.cat = b.dataset.chip; state.page = 1; renderChips(); renderList();
+});
+document.getElementById('pager').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-page]'); if (!b || b.disabled) return;
+  state.page = +b.dataset.page; renderList();
+  document.getElementById('browse').scrollIntoView({ behavior:'smooth', block:'start' });
+});
+document.getElementById('grid').addEventListener('click', (e) => {
+  if (e.target.closest('[data-card]')) SenseShell.notYet('商品詳情頁');
+});
+
+renderChips();
+renderList();
+</script>
+</body>
+</html>

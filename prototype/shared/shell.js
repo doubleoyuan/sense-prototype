@@ -10,6 +10,9 @@
   // 打包成單一檔案時，素材由頁面提供的 window.SENSE_ASSETS（data URI）取代
   const A = (f) => (window.SENSE_ASSETS && window.SENSE_ASSETS[f]) || BASE + 'assets/' + f;
 
+  // 側欄模組暫不提供下拉子選單（2026-10-19）；改回 true 即恢復展開箭頭與子選單
+  const SHOW_SUBS = false;
+
   // 模組清單：subs 有內容的才能展開；href 為 null 表示尚未製作
   const MODULES = [
     { key:'product',   label:'商品SENSE', c:'var(--mod-product)',   strong:'var(--mod-product-strong)',   href:'product-sense.html',
@@ -62,7 +65,7 @@
     let h = `
       <div class="sb-card">
         <a class="sb-logo" href="../index.html" aria-label="SENSE 原型首頁">
-          <span class="sb-logo-mark"><img src="${A('logo.svg')}" alt=""></span><span class="sb-wordmark">SENSE</span>
+          <img class="sb-logotype" src="${A('sense-logotype.svg')}" alt="SENSE">
         </a>
         <button class="sb-cta" data-todo="找商務合作">
           <img class="cta-bg" src="${A('cta-white-bg.svg')}" alt="">
@@ -72,19 +75,21 @@
         </button>`;
 
     MODULES.forEach(m => {
-      const isOpen = m.subs.length && open.has(m.key);
+      const hasSubs = SHOW_SUBS && m.subs.length;
+      const isOpen = hasSubs && open.has(m.key);
       const isCur = m.key === mod;
       const label = m.href
         ? `<a class="sb-mod-label" href="${m.href}"${isCur && page === 'home' ? ' aria-current="page"' : ''}>${m.label}</a>`
         : `<button class="sb-mod-label" data-todo="${m.label}">${m.label}</button>`;
-      const chev = m.subs.length
+      const chev = !SHOW_SUBS ? ''
+        : m.subs.length
         ? `<button class="sb-chev" data-toggle="${m.key}" aria-expanded="${!!isOpen}" aria-controls="sub-${m.key}" aria-label="${isOpen?'收合':'展開'} ${m.label}">
              <img src="${A(isOpen ? 'ic-chevron-up.svg' : 'ic-chevron-down.svg')}" alt=""></button>`
         : `<button class="sb-chev" data-todo="${m.label}" aria-label="${m.label}（尚未製作）"><img src="${A('ic-chevron-down.svg')}" alt=""></button>`;
       h += `
         <div class="sb-mod${isCur ? ' is-current' : ''}" style="--c:${m.c};--strong:${m.strong}">
           <div class="sb-mod-head"><span class="sb-blocker"></span>${label}${chev}</div>
-          ${m.subs.length ? `<div class="sb-sub" id="sub-${m.key}"${isOpen ? '' : ' hidden'}>
+          ${hasSubs ? `<div class="sb-sub" id="sub-${m.key}"${isOpen ? '' : ' hidden'}>
             ${m.subs.map(s => {
               const active = isCur && s.key === page;
               return s.href
