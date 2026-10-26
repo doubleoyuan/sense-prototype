@@ -1,0 +1,1344 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>財務 SENSE</title>
+<link rel="icon" type="image/svg+xml" href="shared/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="shared/tokens.css?v=20261026g">
+<link rel="stylesheet" href="shared/components.css?v=20261026e">
+<link rel="stylesheet" href="shared/forms.css?v=20261026g">
+<style>
+  /* ── 財務 SENSE 頁內元件（推導）：UI Library 尚未收錄，需求確認後再決定是否抽到 shared/ ── */
+  .fs-view{width:100%;display:flex;flex-direction:column;gap:40px}
+  .fs-lead{font-size:14px;line-height:24px;letter-spacing:1.6px;color:var(--black-600)}
+  .fs-note{font-size:12px;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+  .fs-muted{color:var(--black-500)}
+  .section-title .fs-aside{flex:none;display:flex;align-items:center;gap:8px}
+  .btn-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .btn.btn-sm{min-width:0;height:32px;padding:0 16px;font-size:12px;letter-spacing:var(--tracking-wider);filter:drop-shadow(0 2px 0 var(--black-200))}
+  .btn.danger{color:var(--danger)}
+  .btn[disabled]{opacity:.45;cursor:not-allowed;filter:none}
+  .btn.block{width:100%}
+  .fs-link{font-size:13px;font-weight:600;letter-spacing:var(--tracking-wider);color:var(--link-blue)}
+  .fs-link:hover{text-decoration:underline;text-underline-offset:4px}
+  .fs-spacer{flex:1}
+
+  /* 狀態標籤 */
+  .fs-tag{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:20px;font-size:12px;font-weight:600;
+    letter-spacing:var(--tracking-wider);white-space:nowrap;background:var(--black-100);color:var(--black-600)}
+  .fs-tag.blue{background:var(--mod-product-tint);color:var(--accent-border)}
+  .fs-tag.green{background:#E7F6EE;color:#1F8A57}
+  .fs-tag.orange{background:var(--metric-bg);color:#C25E1F}
+  .fs-tag.gold{background:#FFF6DB;color:var(--mod-finance-strong)}
+  .fs-tag.dark{background:var(--black-800);color:var(--white)}
+  .fs-tag .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+
+  /* 卡片：沿用 form-card 外框 */
+  .fs-card{width:100%;padding:20px;border:1px solid var(--black-300);border-radius:var(--r-16);background:var(--white);box-shadow:0 4px 0 0 var(--black-200)}
+  .fs-card h3{font-size:16px;font-weight:700;line-height:28px;letter-spacing:var(--tracking-super)}
+  .fs-card-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--black-200)}
+  .fs-card-head h3{flex:1;min-width:0}
+
+  /* 頭像：首字色塊（不使用照片、不放金融機構 Logo） */
+  .fs-avatar{width:40px;height:40px;flex:none;border-radius:12px;display:grid;place-items:center;background:var(--av,#9E9E9E);color:var(--white);font-size:16px;font-weight:700;letter-spacing:0}
+  .fs-avatar.round{border-radius:50%}
+  .fs-avatar.lg{width:72px;height:72px;border-radius:20px;font-size:28px}
+  .fs-avatar.anon{background:var(--black-200);color:var(--black-600)}
+
+  /* 我的檔案進度列（整合在入口與瀏覽頁上方） */
+  .fs-profilebar{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) auto;gap:24px;align-items:center}
+  .fs-id{display:flex;align-items:center;gap:14px;min-width:0}
+  .fs-id h3{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .fs-progress{height:8px;border-radius:8px;background:var(--black-200);overflow:hidden;margin:6px 0}
+  .fs-progress i{display:block;height:100%;background:var(--accent);border-radius:8px}
+  .fs-progress-meta{display:flex;justify-content:space-between;gap:12px;font-size:13px;letter-spacing:var(--tracking-wider)}
+
+  /* 指標 */
+  .fs-picker{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+  .fs-picker > span{font-size:12px;font-weight:600;letter-spacing:var(--tracking-wider);color:var(--black-500);margin-right:4px}
+
+  /* 首頁票券：撐滿內容寬度（沿用公關 SENSE 入場券的做法） */
+  .fs-hero-ticket{width:100%}
+  .fs-hero-ticket .ticket-body{flex:1}
+  /* 首頁：募資／融資／併購三條路徑卡（外框沿用 ResourceCard） */
+  .fs-paths{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+  .fs-path-card{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:20px;border:1px solid var(--line-soft);border-radius:var(--r-30);background:var(--white);transition:border-color .15s}
+  .fs-path-card:hover{border-color:var(--hover-teal)}
+  .fs-path-card h3{font-size:18px;font-weight:700;line-height:28px;letter-spacing:var(--tracking-ultra)}
+  .fs-path-card p{flex:1;font-size:14px;line-height:24px;letter-spacing:1.6px;color:var(--black-600)}
+  .fs-path-card .count{font-size:13px;font-weight:600;letter-spacing:var(--tracking-wider);color:var(--black-500);margin-bottom:6px}
+  /* 首頁：專屬顧問卡（推導自公關 SENSE 的客戶服務經理卡） */
+  .fs-avatar.round.lg{border-radius:50%}
+  .fs-advisor{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+  .fs-advisor .info{flex:1;min-width:240px;display:flex;flex-direction:column;gap:4px}
+  .fs-advisor .info b{font-size:16px;letter-spacing:var(--tracking-super)}
+  .fs-advisor .info p{margin-top:4px;font-size:14px;line-height:24px;letter-spacing:1.6px;color:var(--black-700)}
+
+  /* 動態列表 */
+  .fs-activity{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--black-100)}
+  .fs-activity:last-child{border-bottom:0}
+  .fs-activity .ic{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:var(--black-100);font-size:14px;font-weight:700;color:var(--black-700)}
+  .fs-activity b{display:block;font-size:14px;font-weight:600;line-height:22px;letter-spacing:1.6px}
+  .fs-activity small{font-size:12px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+
+  /* 列表＋篩選 */
+  .fs-split{width:100%;display:grid;grid-template-columns:260px minmax(0,1fr);gap:20px;align-items:start}
+  .fs-filters{display:flex;flex-direction:column;gap:18px;position:sticky;top:calc(var(--header-h) + 20px)}
+  .fs-filters > summary{display:none}
+  .fs-fgroup{display:flex;flex-direction:column;gap:8px}
+  .fs-flabel{font-size:13px;font-weight:700;letter-spacing:var(--tracking-wider);color:var(--black-700)}
+  .fs-check{display:flex;align-items:center;gap:8px;font-size:13px;letter-spacing:var(--tracking-wider);color:var(--black-700);cursor:pointer}
+  .fs-check input{width:16px;height:16px;flex:none;accent-color:var(--accent-border);margin:0}
+  .fs-listbar{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:36px;font-size:13px;letter-spacing:var(--tracking-wider);color:var(--black-600)}
+  .fs-listbar b{color:var(--black-800)}
+  .fs-cards{width:100%;display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+
+  /* 資訊卡（企業／投資人／項目／融資方案）：外框沿用 ResourceCard */
+  .fs-entity{display:flex;flex-direction:column;gap:12px;padding:20px;background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r-30);transition:border-color .15s;min-width:0}
+  .fs-entity:hover{border-color:var(--hover-teal)}
+  .fs-entity-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .fs-entity h3{font-size:16px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-super)}
+  .fs-entity .sub{font-size:13px;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+  .fs-entity-head{display:flex;align-items:center;gap:12px;min-width:0}
+  .fs-match{margin-left:auto;font-size:12px;font-weight:700;letter-spacing:var(--tracking-wider);color:var(--accent-border);white-space:nowrap}
+  .fs-match:hover{text-decoration:underline;text-underline-offset:4px}
+  .fs-entity .r-card-metrics{padding:10px 16px}
+  .fs-entity .r-card-metrics .metric b{font-size:13px;letter-spacing:var(--tracking-wider);white-space:normal;line-height:20px}
+  .fs-path{font-size:12px;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--black-600);padding:6px 10px;border-radius:10px;background:var(--black-50)}
+  .fs-path::before{content:"⌘ ";color:var(--black-400)}
+  .fs-more summary{cursor:pointer;font-size:12px;font-weight:600;letter-spacing:var(--tracking-wider);color:var(--black-500);list-style:none}
+  .fs-more summary::-webkit-details-marker{display:none}
+  .fs-more summary::after{content:" ＋"}
+  .fs-more[open] summary::after{content:" －"}
+  .fs-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;margin-top:10px}
+  .fs-fact span{display:block;font-size:12px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+  .fs-fact b{font-size:13px;font-weight:500;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--black-800)}
+  .fs-fact.span-2{grid-column:1/-1}
+  .fs-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:4px}
+  .fs-follow[aria-pressed="true"]{border-color:var(--hover-teal);color:#2E8F8B}
+  .fs-amount{font-size:22px;font-weight:500;font-style:italic;letter-spacing:var(--tracking-wider);color:var(--black-800)}
+
+  /* 我的檔案 */
+  .fs-hero{display:flex;flex-direction:column;gap:20px}
+  .fs-hero-main{display:grid;grid-template-columns:auto minmax(0,1fr) 260px;gap:24px;align-items:start}
+  .fs-hero h1{font-size:22px;font-weight:700;line-height:32px;letter-spacing:var(--tracking-super);margin:6px 0 4px}
+  .fs-hero .headline{font-size:14px;line-height:24px;letter-spacing:1.6px;color:var(--black-700)}
+  .fs-hero .meta{font-size:13px;letter-spacing:var(--tracking-wider);color:var(--black-500);margin-top:4px}
+  .fs-aff{display:flex;flex-direction:column;gap:10px;padding:14px 16px;border-radius:var(--r-16);background:var(--black-50)}
+  .fs-aff div span{display:block;font-size:12px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+  .fs-aff div b{font-size:14px;font-weight:600;letter-spacing:var(--tracking-wider)}
+  .fs-layout{width:100%;display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;align-items:start}
+  .fs-stack{display:flex;flex-direction:column;gap:20px;min-width:0;width:100%}
+  .fs-prose{font-size:14px;line-height:26px;letter-spacing:1.6px;color:var(--black-800)}
+  .fs-about{display:flex;flex-direction:column;gap:14px}
+  .fs-about b{font-size:14px;letter-spacing:var(--tracking-wider)}
+  .fs-member{display:grid;grid-template-columns:minmax(0,1fr);gap:2px;padding:10px 0;border-bottom:1px solid var(--black-100)}
+  .fs-member:last-child{border-bottom:0}
+  .fs-member b{font-size:14px;letter-spacing:var(--tracking-wider)}
+  .fs-member span{font-size:12px;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--black-600)}
+
+  /* 外包與技術資源（10/13 週會新增） */
+  .fs-tech-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:14px}
+  .fs-tech-sum div{padding:12px 14px;border-radius:var(--r-16);background:var(--metric-bg)}
+  .fs-tech-sum span{display:block;font-size:12px;font-weight:600;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+  .fs-tech-sum b{font-size:15px;font-weight:600;letter-spacing:var(--tracking-wider)}
+
+  /* 動態 */
+  .fs-composer{display:flex;flex-direction:column;gap:12px}
+  .fs-composer .row{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+  .fs-composer .select{width:200px;height:40px;padding:6px 48px 6px 16px}
+  .fs-group-label{font-size:12px;font-weight:700;letter-spacing:var(--tracking-wider);color:var(--black-500);padding:12px 0 4px}
+  .fs-post{display:flex;flex-direction:column;gap:8px;padding:14px 0;border-bottom:1px solid var(--black-100)}
+  .fs-post:last-child{border-bottom:0}
+  .fs-post-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .fs-post-head b{font-size:14px;letter-spacing:var(--tracking-wider)}
+  .fs-post-head small{display:block;font-size:12px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+  .fs-post p{font-size:14px;line-height:24px;letter-spacing:1.6px}
+  .fs-post .ops{display:flex;gap:16px}
+
+  /* 誰看過我、連結請求 */
+  .fs-viewrow{display:grid;grid-template-columns:40px minmax(0,1fr) 60px auto;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--black-100)}
+  .fs-viewrow b{display:block;font-size:14px;letter-spacing:var(--tracking-wider)}
+  .fs-viewrow span,.fs-viewrow time{font-size:12px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+  .fs-repeat{font-size:12px;font-weight:700;color:var(--cta-orange)!important;margin-right:8px}
+  .fs-request{display:flex;flex-direction:column;gap:12px}
+  .fs-request-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .fs-request-head > div{flex:1;min-width:200px}
+  .fs-request-head b{display:block;font-size:15px;letter-spacing:var(--tracking-wider)}
+  .fs-request-head span{font-size:12px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+  .fs-reqmeta{display:flex;flex-wrap:wrap;gap:8px 24px;font-size:12px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+  .fs-reqmeta b{display:block;font-size:13px;font-weight:600;color:var(--black-800)}
+  .fs-quote{margin:0;padding:14px 16px;border-radius:var(--r-16);background:var(--black-50);font-size:14px;line-height:24px;letter-spacing:1.6px;color:var(--black-800)}
+  .fs-request-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .fs-request-foot time{font-size:12px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+
+  /* 表格 */
+  .fs-table-wrap{width:100%;overflow-x:auto}
+  .fs-table-wrap .ro-table td{vertical-align:middle}
+  .fs-file{display:flex;align-items:center;gap:10px}
+  .fs-fileicon{width:36px;height:24px;flex:none;border-radius:6px;display:grid;place-items:center;background:var(--black-100);font-size:10px;font-weight:700;letter-spacing:0;color:var(--black-600)}
+  .fs-switch{position:relative;display:inline-block;width:40px;height:22px;vertical-align:middle}
+  .fs-switch input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer;z-index:1}
+  .fs-switch i{position:absolute;inset:0;border-radius:22px;background:var(--black-300);transition:background .15s;pointer-events:none}
+  .fs-switch i::after{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:var(--white);transition:transform .15s}
+  .fs-switch input:checked + i{background:var(--accent)}
+  .fs-switch input:checked + i::after{transform:translateX(18px)}
+  .fs-switch input:focus-visible + i{outline:2px solid var(--accent-border);outline-offset:2px}
+  .fs-audit{display:grid;grid-template-columns:150px 140px 90px minmax(0,1fr);gap:12px;padding:8px 0;border-bottom:1px solid var(--black-100);font-size:13px;letter-spacing:var(--tracking-wider)}
+  .fs-banner{width:100%;display:flex;flex-direction:column;gap:2px;padding:14px 18px;border-radius:var(--r-16);background:#E7F6EE;color:#1F8A57;font-size:13px;line-height:22px;letter-spacing:var(--tracking-wider)}
+  .fs-banner b{font-size:14px}
+  .fs-banner.warn{background:var(--metric-bg);color:#C25E1F}
+
+  /* 訊息 */
+  .fs-msg{display:grid;grid-template-columns:300px minmax(0,1fr);min-height:520px;padding:0;overflow:hidden}
+  .fs-threads{border-right:1px solid var(--black-200);display:flex;flex-direction:column}
+  .fs-threads .chips{padding:14px;min-height:0;border-bottom:1px solid var(--black-200)}
+  .fs-thread{display:flex;flex-direction:column;gap:6px;padding:14px;border-bottom:1px solid var(--black-100);text-align:left}
+  .fs-thread:hover{background:var(--black-50)}
+  .fs-thread[aria-current="true"]{background:var(--mod-product-tint)}
+  .fs-thread .top{display:flex;justify-content:space-between;gap:8px;font-size:13px;letter-spacing:var(--tracking-wider)}
+  .fs-thread .top time{font-size:12px;color:var(--black-500)}
+  .fs-thread p{font-size:12px;letter-spacing:var(--tracking-wider);color:var(--black-600);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .fs-chat{display:flex;flex-direction:column;min-width:0}
+  .fs-chat-head{padding:14px 20px;border-bottom:1px solid var(--black-200);font-size:14px;letter-spacing:var(--tracking-wider)}
+  .fs-chat-head small{display:block;font-size:12px;color:var(--black-500)}
+  .fs-chat-body{flex:1;padding:20px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+  .fs-bubble{max-width:72%;padding:10px 14px;border-radius:16px 16px 16px 4px;background:var(--black-100);font-size:14px;line-height:22px;letter-spacing:1.6px;align-self:flex-start}
+  .fs-bubble.me{align-self:flex-end;border-radius:16px 16px 4px 16px;background:var(--mod-product-tint)}
+  .fs-bubble time{display:block;margin-top:4px;font-size:11px;color:var(--black-500)}
+  .fs-composer-bar{display:flex;gap:10px;padding:14px 20px;border-top:1px solid var(--black-200)}
+
+  /* 融資診斷 */
+  .fs-narrow{width:100%;max-width:760px;margin:0 auto}
+  .fs-q{font-size:18px;font-weight:700;line-height:30px;letter-spacing:var(--tracking-super);margin:4px 0 16px}
+  .fs-opts{display:grid;gap:10px}
+  .fs-opt{display:flex;align-items:center;gap:12px;padding:14px 18px;border:1px solid var(--black-200);border-radius:var(--r-16);font-size:14px;letter-spacing:var(--tracking-wider);transition:border-color .15s,background .15s}
+  .fs-opt:hover{border-color:var(--accent)}
+  .fs-opt .rd{width:18px;height:18px;flex:none;border-radius:50%;border:2px solid var(--black-300)}
+  .fs-opt[aria-pressed="true"]{border-color:var(--accent);background:var(--step-highlight)}
+  .fs-opt[aria-pressed="true"] .rd{border:5px solid var(--accent)}
+  .fs-result{font-size:22px;font-weight:700;letter-spacing:var(--tracking-super);margin:6px 0 8px}
+  .fs-ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:24px;letter-spacing:1.6px;color:var(--black-700)}
+  .fs-disclosure{border-top:1px solid var(--black-200);padding-top:14px}
+  .fs-card.fs-disclosure{border-top:1px solid var(--black-300);padding-top:20px}
+  .fs-disclosure > summary{cursor:pointer;font-size:14px;font-weight:600;letter-spacing:var(--tracking-wider);color:var(--black-700)}
+  .fs-disclosure[open] > summary{margin-bottom:14px}
+
+  /* 併購 */
+  .fs-needs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+  .fs-needs div{padding:14px 16px;border-radius:var(--r-16);background:var(--black-50);font-size:14px;line-height:22px;letter-spacing:var(--tracking-wider)}
+  .fs-flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:16px}
+  .fs-flow div{padding:12px;border-radius:var(--r-16);background:var(--mod-product-tint)}
+  .fs-flow small{font-size:11px;font-weight:700;letter-spacing:var(--tracking-wider);color:var(--accent-border)}
+  .fs-flow b{display:block;font-size:14px;letter-spacing:var(--tracking-wider)}
+  .fs-flow span{font-size:12px;letter-spacing:var(--tracking-wider);color:var(--black-600)}
+  .fs-stage{display:grid;grid-template-columns:36px minmax(0,1fr);gap:12px;padding:12px 0;border-bottom:1px solid var(--black-100)}
+  .fs-stage .n{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:var(--black-100);font-weight:700}
+  .fs-phase{font-size:12px;font-weight:700;letter-spacing:var(--tracking-super);color:var(--black-500);padding-top:12px}
+  .fs-tri{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;font-size:13px;letter-spacing:var(--tracking-wider)}
+  .fs-tri .h{padding:8px 10px;font-weight:700;text-align:center;border-radius:10px;background:var(--black-100)}
+  .fs-tri .h.c{background:#FFF6DB}
+  .fs-tri .c{min-height:36px;padding:8px 10px;border-radius:10px;border:1px solid var(--black-200);text-align:center}
+  .fs-tri .c.empty{border-style:dashed;border-color:var(--black-100)}
+  .fs-tri .c.mid{background:#FFFBEF}
+  .fs-tri .c.key{border-color:var(--mod-finance);background:#FFF6DB;font-weight:600}
+  .fs-tri .full{grid-column:1/-1}
+
+  /* 企業詳情 */
+  .fs-detail{width:100%;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start}
+  .fs-section{display:flex;flex-direction:column;gap:12px;padding:18px 0;border-top:1px solid var(--black-200)}
+  .fs-section:first-child{border-top:0;padding-top:0}
+  .fs-section:last-child{padding-bottom:0}
+  .fs-section h3{font-size:15px;font-weight:700;letter-spacing:var(--tracking-super)}
+  .fs-datagrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+  .fs-datum{padding:12px 14px;border-radius:var(--r-16);background:var(--black-50)}
+  .fs-datum span{display:block;font-size:12px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+  .fs-datum b{font-size:14px;font-weight:600;letter-spacing:var(--tracking-wider)}
+  .fs-locked{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .fs-locked div{padding:16px;border:1px dashed var(--black-300);border-radius:var(--r-16);font-size:13px;letter-spacing:var(--tracking-wider);color:var(--black-600)}
+  .fs-locked small{display:block;color:var(--black-400)}
+  .fs-roomcall{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:16px 18px;border-radius:var(--r-16);background:var(--ticket)}
+  .fs-roomcall h3{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .fs-quota{display:flex;flex-direction:column;align-items:center;gap:2px;padding:14px;border-radius:var(--r-16);background:var(--metric-bg);margin-bottom:12px}
+  .fs-quota span{font-size:12px;letter-spacing:var(--tracking-wider);color:var(--black-600)}
+  .fs-quota b{font-size:26px;font-weight:500;font-style:italic}
+  .fs-asidedata{margin-top:14px;display:flex;flex-direction:column}
+  .fs-asidedata p{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--black-100);font-size:13px;letter-spacing:var(--tracking-wider)}
+  .fs-asidedata span{color:var(--black-500)}
+
+  /* 對話框（推導）：外框沿用表單卡片，頁尾按鈕沿用 .btn */
+  .fs-dialog{width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 48px);padding:0;border:0;border-radius:24px;background:var(--white);color:var(--black-800);
+    box-shadow:0 20px 60px rgba(0,0,0,.18);letter-spacing:var(--tracking-ultra)}
+  .fs-dialog.wide{width:min(760px,calc(100vw - 32px))}
+  .fs-dialog::backdrop{background:rgba(0,0,0,.32)}
+  .fs-dialog form{display:flex;flex-direction:column;max-height:calc(100vh - 48px)}
+  .fs-dlg-head{display:flex;align-items:center;gap:12px;padding:18px 24px;border-bottom:1px solid var(--black-200)}
+  .fs-dlg-head h2{flex:1;font-size:17px;font-weight:700;letter-spacing:var(--tracking-super)}
+  .fs-dlg-x{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:20px;color:var(--black-500)}
+  .fs-dlg-x:hover{background:var(--black-100)}
+  .fs-dlg-body{padding:20px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;font-size:14px;line-height:24px;letter-spacing:1.6px}
+  .fs-dlg-foot{display:flex;justify-content:flex-end;gap:12px;padding:16px 24px;border-top:1px solid var(--black-200);flex-wrap:wrap}
+  .fs-dlg-body .form-row{gap:16px}
+  .fs-doc{padding:24px;border:1px solid var(--black-200);border-radius:var(--r-16);background:var(--black-50)}
+  .fs-doc h3{font-size:16px;font-weight:700;margin-bottom:6px}
+  .fs-docline{height:8px;margin:10px 0;border-radius:6px;background:var(--black-200)}
+  .fs-watermark{padding:6px 12px;border-radius:10px;background:var(--metric-bg);font-size:12px;color:#C25E1F;text-align:center}
+  .fs-sig{height:48px;max-width:170px;object-fit:contain;padding:4px;border:1px solid var(--black-200);border-radius:8px;background:var(--white)}
+  .fs-count-hint{align-self:flex-end;font-size:12px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+  .fs-count-hint.ok{color:#1F8A57}
+  .fs-optgrid{display:flex;flex-wrap:wrap;gap:8px 16px}
+
+  /* 原型示範用：視角切換（不是產品功能） */
+  .fs-demo{position:fixed;right:20px;bottom:20px;z-index:50;display:flex;align-items:center;gap:8px;padding:8px 10px 8px 14px;border-radius:30px;
+    background:var(--black-800);color:var(--white);box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:12px;letter-spacing:var(--tracking-wider)}
+  .fs-demo > span{font-weight:700;white-space:nowrap}
+  .fs-demo button{height:28px;padding:0 12px;border-radius:20px;color:var(--black-300);font-size:12px;font-weight:600;white-space:nowrap}
+  .fs-demo button:hover{color:var(--white)}
+  .fs-demo button[aria-pressed="true"]{background:var(--white);color:var(--black-800)}
+
+  @media (max-width:1279px){
+    .fs-layout,.fs-detail{grid-template-columns:minmax(0,1fr)}
+    .fs-hero-main{grid-template-columns:auto minmax(0,1fr)}
+    .fs-aff{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;gap:16px 32px}
+  }
+  @media (max-width:1023px){
+    .fs-split{grid-template-columns:minmax(0,1fr)}
+    .fs-filters{position:static}
+    .fs-filters > summary{display:block;cursor:pointer;font-size:14px;font-weight:700;letter-spacing:var(--tracking-wider)}
+    .fs-filters > .fs-card-head{display:none}
+    .fs-profilebar{grid-template-columns:minmax(0,1fr)}
+    .fs-paths,.fs-needs{grid-template-columns:minmax(0,1fr)}
+    .fs-flow{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+  @media (max-width:767px){
+    .fs-msg{grid-template-columns:minmax(0,1fr)}
+    .fs-threads{border-right:0;border-bottom:1px solid var(--black-200)}
+    .fs-datagrid,.fs-tech-sum{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .fs-cards{grid-template-columns:minmax(0,1fr)}
+    .fs-viewrow{grid-template-columns:40px minmax(0,1fr) auto}
+    .fs-viewrow time{display:none}
+    .fs-audit{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+    .fs-tri{font-size:12px}
+    .fs-demo{left:16px;right:16px;bottom:12px;justify-content:center}
+    .fs-demo > span{display:none}
+    .fs-hero-main{grid-template-columns:minmax(0,1fr)}
+    .content{padding-bottom:80px}
+  }
+</style>
+</head>
+<body>
+<!-- 僅供內部使用，非經許可不得外流。財務 SENSE：內容搬自 PO 的「財務SENSE_資本連結平台_Demo_v0.35」，改用 SENSE 共用元件，並依 2026-10-13 週會修改。公司、人名與數據皆為示意。 -->
+<div class="app" data-module="finance" data-page="home" data-role="company investor">
+  <aside class="sidebar" id="sidebar" aria-label="主選單"></aside>
+  <div class="main">
+    <header class="header" id="header"></header>
+    <main class="content" id="view"></main>
+  </div>
+</div>
+
+<!-- 原型示範用：切換企業／投資人視角（正式產品依帳號認證決定角色） -->
+<div class="fs-demo" role="group" aria-label="原型示範：切換視角">
+  <span>原型示範・視角</span>
+  <button type="button" data-demo-role="company">企業</button>
+  <button type="button" data-demo-role="investor">投資人</button>
+  <button type="button" data-demo-role="both">兩者</button>
+</div>
+
+<dialog class="fs-dialog" id="dlg" aria-labelledby="dlg-title"><form method="dialog" id="dlg-form"></form></dialog>
+
+<script src="shared/shell.js?v=20261026g"></script>
+<script src="shared/components.js?v=20261026g"></script>
+<script src="shared/forms.js?v=20261026g"></script>
+<script>
+const esc = SenseUI.esc;
+const toast = SenseShell.toast;
+
+/* ═════════ 示意資料（搬自 PO 版 v0.35；7–10 號企業與外包技術資源為依 10/13 週會補上） ═════════ */
+const TRACKS = { equity:'募資審視', loan:'融資審視', ma:'併購審視' };
+const companies = [
+  {id:1,track:'equity',industry:'企業軟體',label:'SaaS',years:4,people:'30–50 人',rev:'3,000 萬 – 5,000 萬',margin:'40% – 50%',growth:'40% – 60%',raise:'6,000 萬 – 8,000 萬',stage:'A+',use:'業務擴編、產品開發',lead:'無',verified:true,match:6,path:'與你投資過的一家公司，有共同股東',date:'2026.09.02',followed:false,status:'L2',tech:{team:'12 人',self:'核心平台自研',out:'3 項'}},
+  {id:2,track:'equity',industry:'醫療器材',label:'精準診斷',years:6,people:'20–30 人',rev:'8,000 萬 – 1.2 億',margin:'50% – 60%',growth:'20% – 40%',raise:'1.5 億 – 2 億',stage:'B 以上',use:'海外認證、通路拓展',lead:'有',verified:true,match:5,path:'與你投資組合中的醫材公司，共用一位顧問',date:'2026.08.28',followed:true,status:'L1',tech:{team:'8 人',self:'演算法自研',out:'2 項'}},
+  {id:3,track:'equity',industry:'消費品牌',label:'機能保養',years:3,people:'10–20 人',rev:'1,000 萬 – 3,000 萬',margin:'30% – 40%',growth:'60% 以上',raise:'3,000 萬 – 5,000 萬',stage:'Pre-A',use:'品牌行銷、通路拓展',lead:'無',verified:false,match:4,path:'尚無已知關係路徑',date:'2026.08.25',followed:false,status:'declined',tech:{team:'2 人',self:'電商站外包',out:'4 項'}},
+  {id:4,track:'equity',industry:'綠能',label:'儲能設備',years:8,people:'50–80 人',rev:'2 億 – 3 億',margin:'20% – 30%',growth:'20% – 40%',raise:'3 億 – 5 億',stage:'B 以上',use:'產線擴建、海外市場',lead:'有',verified:true,match:7,path:'你們的董事，曾任職於同一家公司',date:'2026.08.19',followed:false,status:'pending',tech:{team:'20 人',self:'電控系統自研',out:'1 項'}},
+  {id:5,track:'equity',industry:'餐飲科技',label:'智慧營運',years:2,people:'10–20 人',rev:'500 萬 – 1,000 萬',margin:'40% – 50%',growth:'60% 以上',raise:'2,000 萬 – 3,000 萬',stage:'種子',use:'產品開發、業務擴編',lead:'無',verified:false,match:3,path:'尚無已知關係路徑',date:'2026.08.12',followed:true,status:'expired',tech:{team:'5 人',self:'POS 串接自研',out:'2 項'}},
+  {id:6,track:'equity',industry:'物流',label:'物流 SaaS',years:5,people:'30–50 人',rev:'5,000 萬 – 8,000 萬',margin:'50% – 60%',growth:'40% – 60%',raise:'8,000 萬 – 1 億',stage:'A',use:'區域擴張、產品開發',lead:'無',verified:true,match:6,path:'與你投資過的一家公司，共同投資人 2 位',date:'2026.08.05',followed:true,status:null,tech:{team:'14 人',self:'路徑演算法自研',out:'1 項'}},
+  {id:7,track:'loan',industry:'精密製造',label:'零組件代工',years:12,people:'80–120 人',rev:'3 億 – 5 億',margin:'20% – 30%',growth:'0% – 20%',need:'5,000 萬 – 8,000 萬',use:'設備汰換、營運週轉',collateral:'廠房設備',verified:true,match:5,path:'尚無已知關係路徑',date:'2026.09.12',followed:false,status:null,tech:{team:'6 人',self:'製程參數自研',out:'2 項'}},
+  {id:8,track:'loan',industry:'連鎖零售',label:'生活選物',years:7,people:'50–80 人',rev:'1.2 億 – 2 億',margin:'30% – 40%',growth:'20% – 40%',need:'2,000 萬 – 3,000 萬',use:'展店、存貨週轉',collateral:'應收帳款、存貨',verified:false,match:4,path:'與你現有客戶有一位共同董事',date:'2026.09.08',followed:false,status:null,tech:{team:'3 人',self:'會員系統外包',out:'3 項'}},
+  {id:9,track:'ma',industry:'食品加工',label:'冷凍調理',years:18,people:'120–200 人',rev:'5 億 – 8 億',margin:'20% – 30%',growth:'0% – 20%',side:'出售方',deal:'8 億 – 12 億',reason:'創辦人規劃交棒，評估整體出售或引進策略股東',verified:true,match:4,path:'尚無已知關係路徑',date:'2026.09.15',followed:false,status:null,tech:{team:'4 人',self:'ERP 外包',out:'3 項'}},
+  {id:10,track:'ma',industry:'IT 服務',label:'系統整合',years:9,people:'50–80 人',rev:'2 億 – 3 億',margin:'30% – 40%',growth:'20% – 40%',side:'收購方',deal:'1 億 – 3 億',reason:'尋找資安或雲端維運團隊，擴大服務範圍',verified:true,match:6,path:'與你的顧問王志明有共同合作企業',date:'2026.09.03',followed:false,status:null,tech:{team:'35 人',self:'整合平台自研',out:'1 項'}}];
+// 投資人類型對應資料室角色（10/13 週會：創投、天使投資人、一般企業）
+const ROLE_GROUPS = { vc:'創投', angel:'天使投資人', corp:'一般企業' };
+const investors = [
+  {id:1,org:'元啟創投',name:'林承宇',level:'認證',type:'創投',group:'vc',deals:12,recent:4,focus:'企業軟體、金融科技',stage:'Pre-A、A、A+',ticket:'2,000 萬 – 5,000 萬',role:'董事席次',rate:68,days:3,match:6,path:'與你的股東陳文傑，共同投資過 2 件案子',followed:false,state:'L2'},
+  {id:2,org:'華誠資本',name:'陳品妤',level:'機構',type:'創投',group:'vc',deals:34,recent:5,focus:'跨產業',stage:'A、A+、B 以上',ticket:'5,000 萬 – 1.5 億',role:'純財務',rate:41,days:6,match:5,path:'與你的顧問王志明，同時投資過一家醫材公司',followed:false,state:'L1'},
+  {id:3,org:'個人投資人',name:'張維中',level:'認證',type:'個人',group:'angel',deals:5,recent:2,focus:'消費品牌',stage:'種子、Pre-A',ticket:'500 萬 – 2,000 萬',role:'深度營運參與',rate:90,days:1,match:3,path:'尚無已知關係路徑',followed:false,state:'declined'},
+  {id:4,org:'睿鋒投資',name:'吳建德',level:'認證',type:'創投',group:'vc',deals:9,recent:3,focus:'醫療、生技',stage:'Pre-A、A',ticket:'2,000 萬 – 5,000 萬',role:'董事席次',rate:55,days:4,match:4,path:'與你的董事共同參與生技公協會',followed:false,state:'pending'},
+  {id:5,org:'恆昌控股',name:'蔡佳穎',level:'機構',type:'CVC',group:'corp',deals:21,recent:3,focus:'製造、綠能',stage:'A+、B 以上',ticket:'5,000 萬 – 2 億',role:'策略合作',rate:33,days:9,match:5,path:'你們的董事，曾任職於同一家公司',followed:true,state:'following'},
+  {id:6,org:'明理家族辦公室',name:'李祐廷',level:'機構',type:'家族辦公室',group:'vc',deals:16,recent:4,focus:'消費、物流',stage:'種子、Pre-A、A',ticket:'1,000 萬 – 5,000 萬',role:'純財務',rate:72,days:2,match:4,path:'與你的股東有一位共同被投企業董事',followed:false,state:'hello'}];
+const projects = [
+  {id:1,title:'東南亞企業雲端通路合作',owner:'啟曜數位策略',type:'策略合作',industry:'企業軟體',region:'新加坡、馬來西亞',stage:'徵求合作夥伴',capital:'2,000 萬 – 4,000 萬',period:'18–24 個月',ret:'通路分潤＋策略入股',match:7,verified:true,path:'與你的顧問王志明有共同合作企業',followed:false},
+  {id:2,title:'智慧醫療設備共同開發計畫',owner:'新竹生醫聯盟',type:'共同開發',industry:'醫療器材',region:'台灣、日本',stage:'PoC 驗證中',capital:'3,000 萬 – 5,000 萬',period:'24–30 個月',ret:'技術授權＋里程碑付款',match:5,verified:true,path:'與你的董事共同參與生技公協會',followed:false},
+  {id:3,title:'低碳工廠能源管理導入',owner:'北區製造業聯盟',type:'專案投資',industry:'綠能',region:'桃園、新竹',stage:'已取得意向客戶',capital:'5,000 萬 – 8,000 萬',period:'36 個月',ret:'專案收益分成',match:6,verified:false,path:'你們曾服務其中 2 家製造企業',followed:true},
+  {id:4,title:'冷鏈物流區域整合計畫',owner:'亞太供應鏈協會',type:'策略合作',industry:'物流',region:'台灣、越南',stage:'合作方徵集中',capital:'8,000 萬 – 1.2 億',period:'30–42 個月',ret:'營運分潤＋優先認購權',match:4,verified:true,path:'與你現有客戶有一位共同董事',followed:false}];
+// 融資方案：依 10/13 週會可展示方案，但不顯示金融機構 Logo（僅文字）
+const financing = [
+  {id:1,title:'營運週轉額度',provider:'台灣產業資本',type:'企業信用貸款',use:'營運週轉',amount:'1,000 萬 – 3,000 萬',term:'12–24 個月',rate:'年利率 4.2% – 5.8%',repay:'按月本息攤還',collateral:'免擔保，負責人保證',speed:'約 7–10 個工作天',match:7,verified:true,followed:false},
+  {id:2,title:'應收帳款融資方案',provider:'華信融資服務',type:'應收帳款承購',use:'現金流調度',amount:'500 萬 – 5,000 萬',term:'單筆最長 180 天',rate:'承購費率依帳期',repay:'買方付款時清償',collateral:'以應收帳款為基礎',speed:'約 5 個工作天',match:6,verified:true,followed:false},
+  {id:3,title:'設備與軟體資本支出貸款',provider:'新創成長基金',type:'中期專案貸款',use:'設備與軟體採購',amount:'2,000 萬 – 8,000 萬',term:'24–48 個月',rate:'年利率 3.8% – 5.2%',repay:'最長 6 個月寬限期',collateral:'視授信條件議定',speed:'約 10–15 個工作天',match:5,verified:true,followed:true},
+  {id:4,title:'海外拓展循環額度',provider:'亞太成長金融',type:'循環信用額度',use:'海外市場拓展',amount:'3,000 萬 – 1 億',term:'12 個月，可續約',rate:'動用時計息',repay:'隨借隨還',collateral:'需提供營運與合約資料',speed:'約 15 個工作天',match:4,verified:false,followed:false}];
+const links = [{id:'C-2610',company:4,date:'2026.09.21',state:'pending',days:12},{id:'C-2609',company:6,date:'2026.09.20',state:'pending',days:11},{id:'C-2608',company:2,date:'2026.09.18',state:'L1',days:0},{id:'C-2607',company:1,date:'2026.09.09',state:'L2',days:0},{id:'C-2606',company:3,date:'2026.09.03',state:'declined',days:0},{id:'C-2605',company:5,date:'2026.08.22',state:'expired',days:0}];
+const requests = [
+  {id:1,investor:1,state:'L2',date:'2026.09.20',days:0,topics:'財務細節、客戶結構、團隊背景',scale:'2,000 萬 – 5,000 萬',role:'董事席次',text:'我們長期關注 B2B SaaS 在台灣中大型企業市場的滲透。貴公司的營收規模與毛利率結構符合基金目前配置方向，特別想了解客戶續約率與淨收入留存率，以及業務團隊的產能模型與擴編計畫。'},
+  {id:2,investor:2,state:'L1',date:'2026.09.17',days:0,topics:'技術／產品、股權結構',scale:'5,000 萬以上',role:'純財務投資',text:'團隊切入的數位轉型需求與我們近期研究方向一致，希望進一步理解產品差異化、客戶導入週期與募資後的市場拓展節奏。'},
+  {id:3,investor:4,state:'pending',date:'2026.09.20',days:11,topics:'財務細節、客戶結構、團隊背景',scale:'2,000 萬 – 5,000 萬',role:'董事席次',text:'我們看好具備可複製導入流程及穩定續約能力的企業軟體團隊，希望了解銷售效率、客戶流失率與核心管理團隊的擴張經驗。'},
+  {id:4,investor:3,state:'declined',date:'2026.09.12',days:0,topics:'退場規劃',scale:'500 萬以下',role:'純財務投資',text:'對企業服務領域有初步興趣，希望了解中長期資本市場規劃與股東退場安排。'}];
+const views = [['今天',1,'14:32',1],['今天',null,'11:08',1],['今天',4,'09:15',3],['昨天',2,'16:44',1],['昨天',null,'10:20',1],['本週一',5,'15:26',2],['本週一',6,'09:48',1]];
+const files = ['2023–2025 財務報表.pdf','財務模型 2026.xlsx','股權結構表.pdf','客戶集中度分析.pdf','前五大客戶合約摘要.pdf'];
+const FILE_KINDS = ['財務報表','財務模型','公司治理','營運資料','重大合約'];
+// 依角色的預設開放範本（10/13 週會：依創投、天使投資人、一般企業設定查閱權限）；完成 NDA 後先套範本，再逐份微調
+const roleTemplate = { vc:[true,true,false,true,false], angel:[true,false,false,false,false], corp:[true,false,false,true,false] };
+const perms = { '元啟創投':[true,true,false,true,false], '華誠資本':[false,false,false,false,false] };
+const permGroup = { '元啟創投':'vc', '華誠資本':'vc', '睿鋒投資':'vc' };
+const ndaRequests = [{id:1,org:'睿鋒投資',contact:'吳建德 · 投資經理',date:'2026.09.23',doc:'公版保密協議（NDA）',state:'pending'}];
+const audits = [['2026.09.23 14:32','元啟創投 林承宇','檢視','財務模型 2026'],['2026.09.23 14:18','元啟創投 林承宇','檢視','2023–2025 財務報表'],['2026.09.22 09:41','元啟創投 林承宇','進入','資料室'],['2026.09.21 16:05','你','開啟權限','客戶集中度分析 → 元啟創投'],['2026.09.21 15:58','你','確認 NDA','元啟創投']];
+const bios = {
+  company:{mode:'以少數股權與策略合作為主，重視共同治理與跨境市場對接；提案後約 4–6 週完成決策，投後提供財務與治理支持。',seeking:'尋找具備企業客戶資源、國際通路或供應鏈影響力的策略型投資人，優先考慮可協助海外市場拓展的夥伴。'},
+  investor:{mode:'以少數股權、董事觀察席位參與，決策週期約 4–6 週；投後提供財務治理、跨境市場對接與後續募資引介。',seeking:'正在尋找企業軟體、供應鏈科技領域，年營收 3,000 萬以上、毛利結構穩定的 Pre-A／A 輪成長型企業。'}};
+const identities = { company:{name:'黃文華 · 財務長',org:'翰森科技'}, investor:{name:'林承宇 · 投資經理',org:'元啟創投'} };
+const signatures = { company:null, investor:null };
+const investorPrefs = { focus:'企業軟體、金融科技', stage:'Pre-A、A、A+', ticket:'2,000 萬 – 5,000 萬', role:'董事席次' };
+// 外包與技術資源（10/13 週會新增：補充外包廠商與技術資源呈現，以利創投評估）
+const techItems = [
+  {kind:'自有',item:'核心平台開發',vendor:'內部技術團隊（12 人）',period:'2022 起',note:'資料整合引擎與流程自動化模組'},
+  {kind:'外包',item:'雲端維運',vendor:'某雲端代管服務商',period:'合作 3 年',note:'24 小時監控與備援'},
+  {kind:'外包',item:'資安檢測',vendor:'某資安顧問公司',period:'每年 1 次',note:'弱點掃描與滲透測試'},
+  {kind:'外包',item:'UI/UX 設計',vendor:'某設計顧問公司',period:'專案制',note:'新版客戶後台設計'},
+  {kind:'認證',item:'ISO 27001',vendor:'第三方驗證機構',period:'2025 取得',note:'資訊安全管理系統'}];
+let posts = [
+  {id:6,role:'investor',org:'元啟創投',author:'林承宇 · 投資經理',time:'2026.09.23 10:05',type:'徵求合作',pinned:true,text:'近期加碼佈局供應鏈科技與企業軟體，尋找 Pre-A／A 輪、年成長率 40% 以上的團隊，歡迎透過平台發送連結請求。'},
+  {id:5,role:'company',org:'翰森科技',author:'黃文華 · 財務長',time:'2026.09.23 09:40',type:'募資動態',pinned:true,text:'A+ 輪募資已完成 60%，感謝已加入的策略夥伴；持續歡迎具企業客戶資源的投資人洽談。'},
+  {id:4,role:'company',org:'翰森科技',author:'黃文華 · 財務長',time:'2026.09.18 17:20',type:'一般動態',pinned:false,text:'本月新增 2 位企業級客戶，續約率維持在 95% 以上，團隊持續擴編業務與產品開發人力。'},
+  {id:3,role:'investor',org:'元啟創投',author:'林承宇 · 投資經理',time:'2026.09.15 11:30',type:'一般動態',pinned:false,text:'剛完成一件物流科技領域的投資案，持續關注具規模化能力的供應鏈團隊。'},
+  {id:2,role:'company',org:'翰森科技',author:'黃文華 · 財務長',time:'2026.09.05 14:10',type:'一般動態',pinned:false,text:'產品完成新版導入流程優化，客戶上線時間由 6 週縮短至 3 週。'},
+  {id:1,role:'investor',org:'元啟創投',author:'林承宇 · 投資經理',time:'2026.08.29 09:15',type:'一般動態',pinned:false,text:'歡迎團隊透過平台先發送輕量打招呼，我們平均 3 天內會回應。'}];
+let postSeq = 6;
+const threads = {
+  company:[{id:'c1',org:'元啟創投',name:'林承宇',tag:'L2',msg:'財務模型的成長假設想請教一下……',time:'14:32'},{id:'c2',org:'睿鋒投資',name:'吳建德',tag:'hello',msg:'想請問你們在醫材通路這塊的佈局？',time:'昨天'},{id:'c3',org:'華誠資本',name:'陳品妤',tag:'L1',msg:'謝謝提供，我們內部先討論。',time:'09.20'}],
+  investor:[{id:'i1',org:'翰森科技',name:'黃文華',tag:'L2',msg:'已補充模型中的海外營收假設，請參考。',time:'14:32'},{id:'i2',org:'康曜醫材',name:'林映辰',tag:'L1',msg:'臨床驗證時程預計下週更新。',time:'昨天'},{id:'i3',org:'物流 SaaS 企業',name:'營運窗口',tag:'hello',msg:'謝謝關注，想先了解貴基金的投資階段。',time:'09.20'}]};
+const sent = {};   // 各對話自己送出的訊息
+const ME = { name:'黃文華', org:'翰森科技', tag:'財務長' };
+
+const FINQUIZ = [
+  {q:'這筆資金主要用途是？',label:'用途',opts:['營運週轉','設備或軟體採購','擴廠、展店或增聘人力','海外市場拓展']},
+  {q:'預計需要的金額？',label:'金額',opts:['500 萬以下','500 – 1,000 萬','1,000 – 3,000 萬','3,000 萬以上']},
+  {q:'目前可提供的擔保／抵押品？',label:'擔保品',opts:['不動產','應收帳款','設備或存貨','目前沒有明確的擔保品']},
+  {q:'與銀行或融資機構的往來狀況？',label:'銀行往來',opts:['已有多家穩定往來','僅有一家往來','尚無穩定往來關係']},
+  {q:'預計動用資金的時間？',label:'時程',opts:['1 個月內，較急迫','1–3 個月','3 個月以上，仍在規劃階段']}];
+const MA_STAGES = [
+  {phase:'啟動',title:'準備',helper:'釐清目標與可行性',bullets:['制定併購／出場策略，確定目標範圍','可行性研究與財務體質健檢','整理「投資人視角資料」與資訊備忘錄']},
+  {phase:'啟動',title:'媒合',helper:'找到對的對手方',bullets:['長名單／短名單提案，鎖定潛在買賣方','封閉專區揭露、簽署 NDA','接觸方式建議、向對手方提出邀約']},
+  {phase:'執行',title:'談判',helper:'談成交易條件',bullets:['企業估值試算、價格與條件協商','交易結構方案（股權／資產／換股…）','處理交易流程與日程安排']},
+  {phase:'執行',title:'執行',helper:'完成交割',bullets:['協助起草合約草案','支持盡職調查（DD）、Data Room 協作','支持起草其他交割文件']},
+  {phase:'整合',title:'一體化（PMI）',helper:'成交後整合與綜效',bullets:['支持合併後關係人計劃、整合委員會','投後監控與體質追蹤','接回跨 SENSE 資源，延伸更多合作']}];
+const MA_TRI = [
+  {seller:'個別諮詢'},{seller:'簽署顧問（委任）合約',key:true},{seller:'組成支援團隊．提供資料'},
+  {seller:'企業估值',buyer:'Teaser 說明．初步評估'},
+  {seller:'公司分析．產業研究（篩選潛在買方名單）',buyer:'簽署保密協議（NDA）',key:true},
+  {seller:'製作無名稱 Teaser（＋專家審閱）',buyer:'提交投資備忘錄檢視'},
+  {seller:'製作投資備忘錄（IM）',buyer:'簽署顧問（委任）合約'},
+  {buyer:'提供詳細資料'},
+  {center:'媒合 Matching'},{center:'高層面談．企業訪問'},{center:'條件協商（基本合意前）'},
+  {center:'簽署意向書／基本合意',key:true},{center:'盡職調查（DD、買方查核）'},
+  {seller:'出售後支援',center:'簽約．交割．揭露',buyer:'PMI 整合支援'}];
+
+/* ═════════ 狀態 ═════════ */
+const state = {
+  roles:['company','investor'], page:null, detailId:1,
+  companyQuota:8, investorQuota:3, helloQuota:2, anonymous:true, profileCompletion:72,
+  activeThread:'c1', threadFilter:'all',
+  finTab:'quiz', finStep:0, finAnswers:[], finDone:false,
+  browseTab:'all', browseQuery:'', browseSort:'updated', companyFilters:[], investorFilters:[], investorQuery:'', investorSort:'match', financingFilters:[],
+  homeFeed:'company', techFilled:false,
+  heroStats:{ company:['rev','margin','growth','raise'], investor:['deals','recent','days','rate'] }
+};
+const has = (r) => state.roles.includes(r);
+const pendingRequests = () => requests.filter(x => x.state === 'pending').length;
+const companyName = (c) => c.id === 1 ? '翰森科技股份有限公司' : c.id === 2 ? '康曜醫材股份有限公司' : c.industry + '成長企業';
+const unlockedName = (c) => c.id === 1 ? '翰森科技' : c.id === 2 ? '康曜醫材' : c.industry + ' · ' + c.label;
+
+/* ═════════ 小元件 ═════════ */
+const AV = ['#5AB0D6','#7A9E7E','#E89A5B','#8DC26F','#6F7FD8','#4FB7A8','#C98BB9','#D4A017'];
+function hashStr(s){ let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; }
+const avatar = (name, cls = '') => `<span class="fs-avatar ${cls}" style="--av:${AV[hashStr(name) % AV.length]}" aria-hidden="true">${esc(name[0])}</span>`;
+const tag = (color, text, dot) => `<span class="fs-tag ${color}">${dot ? '<i class="dot"></i>' : ''}${text}</span>`;
+const badge = (v) => v ? tag('dark', '✓ 已查核 · 2026.08') : tag('', '未經查核');
+function status(s){
+  const m = { pending:['orange','待回覆'], L1:['green','已連結 · L1'], L2:['blue','已連結 · L2'], nda:['orange','NDA 待對方簽署'], declined:['','已婉拒'], expired:['','逾期關閉'], following:['green','追蹤中'], hello:['orange','打招呼'] };
+  return tag(m[s][0], m[s][1], true);
+}
+const metrics = (list) => `<span class="r-card-metrics">${list.map(m => `<span class="metric"><small>${m[0]}</small><b>${m[1]}</b></span>`).join('<span class="divider"></span>')}</span>`;
+const facts = (list) => `<div class="fs-facts">${list.map(f => `<div class="fs-fact${f[2] ? ' span-2' : ''}"><span>${f[0]}</span><b>${f[1]}</b></div>`).join('')}</div>`;
+const sectionHead = (id, title, aside = '') => `<div class="section-title"><h2 id="${id}">${title}</h2>${aside ? `<span class="fs-aside">${aside}</span>` : ''}</div>`;
+const follow = (on, act, id, labels = ['＋ 追蹤', '✓ 追蹤中'], cls = '') => `<button type="button" class="btn btn-secondary btn-sm fs-follow ${cls}" aria-pressed="${on}" data-act="${act}" data-id="${id}">${on ? labels[1] : labels[0]}</button>`;
+const chipRow = (items, active, attr) => `<div class="chips" role="group">${items.map(([k, l]) => `<button type="button" class="chip" ${attr}="${k}" aria-pressed="${k === active}">${l}</button>`).join('')}</div>`;
+
+function picker(all, selected, attr){
+  return `<div class="fs-picker"><span>選擇要顯示的指標</span>${all.map(m => `<button type="button" class="chip" ${attr}="${m.key}" aria-pressed="${selected.includes(m.key)}">${m.label}</button>`).join('')}</div>`;
+}
+
+/* ═════════ 頁面 ═════════ */
+// 我的檔案進度列：整合在首頁與瀏覽投資上方（10/13 週會：首層整合「我的檔案」）。
+// 外包與技術資源是 10/13 新增欄位，還沒填時列為下一步
+function profileBar(){
+  const next = state.techFilled ? '補上客戶結構分析' : '補上外包與技術資源';
+  return `<div class="fs-card fs-profilebar">
+    <div class="fs-id">${avatar('翰森科技', 'lg')}<div><h3>翰森科技 ${badge(true)}</h3><span class="fs-note">企業軟體 · A+ 輪 · 檔案公開中</span></div></div>
+    <div><div class="fs-progress-meta"><b>檔案完成度 ${state.profileCompletion}%</b><span class="fs-muted">下一步：${next}</span></div>
+      <div class="fs-progress"><i style="width:${state.profileCompletion}%"></i></div><span class="fs-note">${state.techFilled ? '預估可提高 15% 曝光' : '創投評估時會看技術自主程度與外部依賴'}</span></div>
+    <a class="btn btn-primary" href="${state.techFilled ? '#settings' : '#set-tech'}">完善檔案</a></div>`;
+}
+
+/* ── 首頁：票券 → 募資／融資／併購入口 → 我的檔案 → 待處理事項 → 最近動態 → 專屬顧問（2026-10-26 使用者確認的大綱） ── */
+const trackCount = (t) => companies.filter(c => c.track === t).length;
+function pathCards(){
+  const cards = [
+    { tag:'募資審視', title:'募資', desc:'找到投資偏好相符的投資人，或瀏覽正在募資的企業。', count:`${trackCount('equity')} 家企業募資中`,
+      main:`<button type="button" class="btn btn-primary btn-sm" data-act="browse-track" data-id="equity">瀏覽募資企業</button>`, sub:`<a class="btn btn-secondary btn-sm" href="#investors">找投資人</a>` },
+    { tag:'融資審視', title:'融資', desc:'先用 5 題診斷釐清方向，再看融資方案或由專人規劃。', count:`${financing.length} 個融資方案`,
+      main:`<a class="btn btn-primary btn-sm" href="#financing">開始 5 題診斷</a>`, sub:`<button type="button" class="btn btn-secondary btn-sm" data-act="fin-plans">看融資方案</button>` },
+    { tag:'併購審視', title:'併購', desc:'出售、收購或引進策略股東，先與顧問一對一討論。', count:`${trackCount('ma')} 家企業評估中`,
+      main:`<button type="button" class="btn btn-primary btn-sm" data-act="ma-consult">預約併購顧問</button>`, sub:`<button type="button" class="btn btn-secondary btn-sm" data-act="browse-track" data-id="ma">瀏覽併購審視</button>` }];
+  return `<div class="fs-paths">${cards.map(c => `<div class="fs-path-card">
+      ${tag('gold', c.tag)}<h3>${c.title}</h3><p>${c.desc}</p><span class="count">${c.count}</span>
+      <div class="btn-row">${c.main}${c.sub}</div></div>`).join('')}</div>`;
+}
+// 待處理事項：把連結請求、NDA、資料室權限等散在各頁的待辦集中（取代 PO 版的指標卡）
+function todoItems(){
+  const list = [];
+  if (has('company')){
+    requests.filter(r => r.state === 'pending').forEach(r => { const i = investors.find(x => x.id === r.investor);
+      list.push({ ic:'連', title:`${i.org} · ${i.name} 送來連結請求`, sub:`想了解：${r.topics} · 剩 ${r.days} 天回應`, btn:`<a class="btn btn-primary btn-sm" href="#requests">處理</a>` }); });
+    ndaRequests.filter(r => r.state === 'pending').forEach(r =>
+      list.push({ ic:'簽', title:`${r.org} 已簽署${r.doc}，等你完成雙方簽署`, sub:`${r.contact} · ${r.date}`, btn:`<button type="button" class="btn btn-primary btn-sm" data-act="view-nda" data-id="${r.id}">檢視並簽署</button>` }));
+    requests.filter(r => r.state === 'L1').forEach(r => { const i = investors.find(x => x.id === r.investor);
+      if (!perms[i.org] || perms[i.org].every(v => !v)) list.push({ ic:'權', title:`${i.org} 已連結（L1），資料室尚未開放任何檔案`, sub:'完成 NDA 後可依角色套用預設權限', btn:`<a class="btn btn-secondary btn-sm" href="#roomadmin">設定權限</a>` }); });
+  }
+  if (has('investor')){
+    links.filter(l => l.state === 'L1').forEach(l => { const c = companies.find(x => x.id === l.company);
+      list.push({ ic:'簽', title:`${unlockedName(c)} 已開放 L1 具名資訊`, sub:'可申請線上簽署 NDA，進一步查看資料室', btn:`<a class="btn btn-primary btn-sm" href="#company-${c.id}">查看</a>` }); });
+    const waiting = links.filter(l => l.state === 'pending');
+    if (waiting.length) list.push({ ic:'等', title:`${waiting.length} 筆連結請求等待企業回覆`, sub:`最短剩 ${Math.min(...waiting.map(l => l.days))} 天`, btn:`<a class="btn btn-secondary btn-sm" href="#links">查看</a>` });
+  }
+  return list;
+}
+const activityRow = (a) => `<div class="fs-activity"><span class="ic">${a.ic}</span><div><b>${a.title}</b><small>${a.sub}</small></div>${a.btn}</div>`;
+const COMPANY_FEED = [
+  { ic:'檔', title:'元啟創投在資料室檢視了「財務模型 2026」', sub:'今天 14:32 · 已開放檔案', btn:`<a class="btn btn-secondary btn-sm" href="#roomadmin">紀錄</a>` },
+  { ic:'訊', title:'明理家族辦公室傳來一則招呼', sub:'昨天 · 尚未讀取', btn:`<a class="btn btn-secondary btn-sm" href="#messages">閱讀</a>` },
+  { ic:'＋', title:'恆昌控股開始追蹤你', sub:'09.21 · 製造、綠能', btn:`<a class="btn btn-secondary btn-sm" href="#investors">檔案</a>` }];
+const INVESTOR_FEED = [
+  { ic:'↗', title:'企業軟體 · SaaS', sub:'募資金額調整為 6,000 萬 – 8,000 萬', btn:`<a class="btn btn-secondary btn-sm" href="#company-1">查看</a>` },
+  { ic:'✓', title:'醫療器材 · 精準診斷', sub:'新增領投方', btn:`<a class="btn btn-secondary btn-sm" href="#company-2">查看</a>` },
+  { ic:'新', title:'IT 服務 · 系統整合', sub:'新上架併購審視檔案 · 收購方', btn:`<a class="btn btn-secondary btn-sm" href="#company-10">查看</a>` }];
+function homePage(){
+  const co = has('company'), inv = has('investor');
+  // 兩種角色都有時以企業內容為主；最近動態用頁籤切換，不整串往下疊
+  const feedTab = co && inv ? state.homeFeed : co ? 'company' : 'investor';
+  const pending = pendingRequests(), todos = todoItems();
+  const summary = co ? `${pending} 筆連結請求待回覆，${ndaRequests.filter(r => r.state === 'pending').length} 份文件等你簽署。` : '你追蹤的 3 家企業本週更新了募資需求、領投狀態或檔案完整度。';
+  const stats = co ? [[pending, '筆連結請求待回覆'], [12, '次本週檔案瀏覽']] : [[3, '家追蹤企業有更新'], [2, '筆連結已建立']];
+  return `
+    <section class="content-section" aria-label="今日摘要">
+      <section class="ticket fs-hero-ticket" aria-label="今日摘要">
+        <span class="ticket-paper left"></span>
+        <div class="ticket-body">
+          <div class="ticket-slogan"><h1>募資、融資、併購，從這裡開始</h1><p>${summary}</p></div>
+          <span class="ticket-perf" aria-hidden="true">
+            <span class="ticket-notch top"><span><img src="${SenseShell.asset('ticket-notch-top.svg')}" alt=""></span></span>
+            <span class="ticket-notch bottom"><span><img src="${SenseShell.asset('ticket-notch-bottom.svg')}" alt=""></span></span>
+          </span>
+          <div class="ticket-stats">${stats.map(s => `<p class="ticket-stat"><b>${s[0]}</b><span>${s[1]}</span></p>`).join('<hr>')}</div>
+        </div>
+        <span class="ticket-paper right"></span>
+      </section>
+    </section>
+    <section class="content-section" aria-labelledby="h-paths">${sectionHead('h-paths', '你想做什麼？')}${pathCards()}</section>
+    ${co ? `<section class="content-section" aria-labelledby="h-me">${sectionHead('h-me', '我的檔案')}${profileBar()}</section>` : ''}
+    <section class="content-section" aria-labelledby="h-todo">${sectionHead('h-todo', '待處理事項', todos.length ? tag('orange', todos.length + ' 項') : '')}
+      <div class="fs-card">${todos.length ? todos.map(activityRow).join('') : '<p class="fs-note">目前沒有待處理的事項。</p>'}</div></section>
+    <section class="content-section" aria-labelledby="h-act">${sectionHead('h-act', '最近動態')}
+      ${co && inv ? chipRow([['company', '最近互動'], ['investor', '追蹤更新']], feedTab, 'data-home-feed') : ''}
+      <div class="fs-card">${(feedTab === 'company' ? COMPANY_FEED : INVESTOR_FEED).map(activityRow).join('')}</div></section>
+    <section class="content-section" aria-labelledby="h-advisor">${sectionHead('h-advisor', '專屬顧問')}
+      <div class="fs-card fs-advisor">
+        <span class="fs-avatar round lg" style="--av:#7A9E7E" aria-hidden="true">陳</span>
+        <div class="info"><b>陳立安</b><span class="fs-note">財務 SENSE 專屬顧問（示意）</span>
+          <p>募資準備、融資方向或併購評估，都可以先約 30 分鐘聊聊，我會協助你找到下一步。</p></div>
+        <div class="btn-row"><button type="button" class="btn btn-secondary" data-act="toast" data-msg="預約功能尚未製作（示意）">預約 30 分鐘諮詢</button><button type="button" class="btn btn-secondary" data-act="toast" data-msg="聯絡信箱尚未提供（示意）">寄信聯絡</button></div>
+      </div></section>`;
+}
+
+/* ── 瀏覽投資（首層，以公司為單位，分募資／融資／併購審視；10/13 週會） ── */
+const INDUSTRIES = ['企業軟體','醫療器材','消費品牌','綠能','餐飲科技','物流','精密製造','連鎖零售','食品加工','IT 服務'];
+function filterPanel(kind){
+  const isCo = kind === 'companies';
+  const vals = isCo ? INDUSTRIES : ['企業軟體','醫療器材','消費品牌','綠能','餐飲科技','物流','金融科技'];
+  const sel = isCo ? state.companyFilters : state.investorFilters;
+  return `<details class="fs-card fs-filters" open><summary>篩選條件</summary>
+    <div class="fs-card-head" style="margin:0;padding-bottom:10px"><h3>篩選條件</h3><button type="button" class="fs-link" data-act="reset-filter" data-id="${kind}">重設</button></div>
+    <div class="fs-fgroup"><span class="fs-flabel">${isCo ? '產業' : '投資領域'}</span>${vals.map(v => `<label class="fs-check"><input type="checkbox" data-filter="${kind}" value="${v}" ${sel.includes(v) ? 'checked' : ''}>${v}</label>`).join('')}</div>
+    <div class="fs-fgroup"><span class="fs-flabel">${isCo ? '募資階段' : '投資階段'}</span>${['種子','Pre-A','A','A+','B 以上'].map(v => `<label class="fs-check"><input type="checkbox">${v}</label>`).join('')}</div>
+    <div class="fs-fgroup"><span class="fs-flabel">${isCo ? '金額' : '單筆投資區間'}</span><input type="range" class="range" min="0" max="100" value="60" style="--fill:60%" aria-label="金額區間"><span class="fs-note">${isCo ? '1,000 萬' : '500 萬'} – 5 億</span></div>
+    <div class="fs-fgroup"><span class="fs-flabel">${isCo ? '掛牌類型' : '參與程度'}</span><div class="chips">${(isCo ? ['全部','僅已查核'] : ['純財務','董事席次','深度營運']).map((v, i) => `<button type="button" class="chip" aria-pressed="${i === 0}" data-act="radio-chip">${v}</button>`).join('')}</div></div>
+    ${!isCo ? `<div class="fs-fgroup"><span class="fs-flabel">關係</span><div class="chips"><button type="button" class="chip" aria-pressed="true" data-act="radio-chip">全部</button><button type="button" class="chip" aria-pressed="false" data-act="radio-chip">與我有關係路徑</button></div></div>` : ''}
+  </details>`;
+}
+function browsePage(){
+  return `<section class="content-section" aria-labelledby="h-browse">
+      ${sectionHead('h-browse', '瀏覽投資', tag('blue', '連結請求 ' + state.investorQuota + ' / 5 剩餘'))}
+      <p class="fs-lead">以公司為單位，依需求分成募資、融資、併購三種審視；也可瀏覽合作項目。平台不推薦、不代為聯繫。</p>
+      ${has('company') ? profileBar() : ''}
+      <div class="list-toolbar"><div class="chips" id="browse-chips"></div><div class="list-actions" id="browse-actions"></div></div>
+      <div class="fs-split">${filterPanel('companies')}<div class="fs-stack" id="browse-list"></div></div>
+    </section>`;
+}
+function browseList(){
+  const t = state.browseTab, q = state.browseQuery.toLowerCase();
+  const match = (s) => !q || s.toLowerCase().includes(q);
+  const comps = t === 'project' ? [] : companies.filter(c => (t === 'all' || c.track === t)
+    && (!state.companyFilters.length || state.companyFilters.includes(c.industry)) && match(c.industry + c.label));
+  const projs = (t === 'all' || t === 'project') ? projects.filter(p => (!state.companyFilters.length || state.companyFilters.includes(p.industry)) && match(p.title + p.owner + p.industry)) : [];
+  comps.sort(state.browseSort === 'match' ? (a, b) => b.match - a.match : (a, b) => b.date.localeCompare(a.date));
+  const total = comps.length + projs.length;
+  document.getElementById('browse-chips').innerHTML = [['all','全部'],['equity','募資審視'],['loan','融資審視'],['ma','併購審視'],['project','合作項目']]
+    .map(([k, l]) => `<button type="button" class="chip" data-browse-tab="${k}" aria-pressed="${k === t}">${l}</button>`).join('');
+  document.getElementById('browse-list').innerHTML = `<div class="fs-listbar"><span>共 <b>${total}</b> 份公開檔案</span></div>
+    ${total ? `<div class="fs-cards">${comps.map(companyCard).join('')}${projs.map(projectCard).join('')}</div>` : `<p class="empty">找不到符合條件的檔案<br>換個關鍵字或篩選條件試試看</p>`}`;
+}
+function trackMetrics(c){
+  if (c.track === 'loan') return [['年營收', c.rev], ['融資需求', c.need], ['擔保品', c.collateral]];
+  if (c.track === 'ma') return [['年營收', c.rev], ['交易方向', c.side], ['預估規模', c.deal]];
+  return [['年營收', c.rev], ['年成長率', c.growth], ['募資金額', c.raise]];
+}
+function trackFacts(c){
+  const tech = ['外包與技術資源', `技術團隊 ${c.tech.team} · ${c.tech.self} · 外包 ${c.tech.out}`, true];
+  if (c.track === 'loan') return [['毛利率', c.margin], ['資金用途', c.use], ['成立年數', c.years + ' 年'], tech];
+  if (c.track === 'ma') return [['毛利率', c.margin], ['年成長率', c.growth], ['交易背景', c.reason, true], tech];
+  return [['毛利率', c.margin], ['資金用途', c.use], ['領投狀態', c.lead === '有' ? '已有領投' : '尚無領投'], tech];
+}
+function companyCard(c){
+  const sub = c.track === 'equity' ? `${c.stage} 輪 · 成立 ${c.years} 年 · ${c.people}` : `成立 ${c.years} 年 · ${c.people}`;
+  const action = c.status === 'pending' ? status('pending')
+    : `<a class="btn btn-primary btn-sm" href="#company-${c.id}">${c.status === 'L1' || c.status === 'L2' ? '查看檔案' : '查看與連結'}</a>`;
+  return `<article class="fs-entity">
+    <div class="fs-entity-top">${badge(c.verified)}${tag('gold', TRACKS[c.track])}<button type="button" class="fs-match" data-act="match" data-id="${c.match}">符合 ${c.match}/8 ⌄</button></div>
+    <div><h3>${c.industry} · ${c.label}</h3><div class="sub">${sub}</div></div>
+    ${metrics(trackMetrics(c))}
+    <div class="fs-path">${c.path}</div>
+    <details class="fs-more"><summary>展開完整條件</summary>${facts(trackFacts(c))}</details>
+    <div class="fs-actions">${follow(c.followed, 'follow-company', c.id)}<span class="fs-spacer"></span>${action}</div>
+  </article>`;
+}
+function projectCard(p){
+  return `<article class="fs-entity">
+    <div class="fs-entity-top">${tag(p.verified ? 'dark' : '', p.verified ? '✓ 已驗證' : '未查核')}${tag('blue', '合作項目')}<button type="button" class="fs-match" data-act="match" data-id="${p.match}">符合 ${p.match}/8 ⌄</button></div>
+    <div><h3>${p.title}</h3><div class="sub">${p.owner} · ${p.type} · ${p.industry} · ${p.region}</div></div>
+    ${metrics([['資金需求', p.capital], ['項目期間', p.period], ['目前階段', p.stage]])}
+    <details class="fs-more"><summary>查看合作回報與關係路徑</summary>${facts([['合作回報', p.ret], ['關係路徑', p.path]])}</details>
+    <div class="fs-actions">${follow(p.followed, 'follow-project', p.id)}<span class="fs-spacer"></span><button type="button" class="btn btn-secondary btn-sm" data-act="project-detail" data-id="${p.id}">查看</button><button type="button" class="btn btn-primary btn-sm" data-act="project-contact" data-id="${p.id}">聯繫</button></div>
+  </article>`;
+}
+
+/* ── 瀏覽投資人 ── */
+function investorsPage(){
+  return `<section class="content-section" aria-labelledby="h-inv">
+      ${sectionHead('h-inv', '瀏覽投資人', tag('blue', '本月連結額度 ' + state.companyQuota + ' / 10'))}
+      <p class="fs-lead">所有投資人先以匿名層呈現偏好與實績；平台不推薦、不代為聯繫。</p>
+      <div class="list-toolbar"><div class="fs-listbar" id="inv-count"></div><div class="list-actions" id="inv-actions"></div></div>
+      <div class="fs-split">${filterPanel('investors')}<div class="fs-cards" id="inv-list"></div></div>
+    </section>`;
+}
+function investorList(){
+  const q = state.investorQuery.toLowerCase();
+  const list = investors.filter(i => (!state.investorFilters.length || state.investorFilters.some(x => i.focus.includes(x))) && (!q || (i.org + i.focus).toLowerCase().includes(q)));
+  list.sort({ match:(a, b) => b.match - a.match, rate:(a, b) => b.rate - a.rate, active:(a, b) => b.recent - a.recent }[state.investorSort]);
+  document.getElementById('inv-count').innerHTML = `<span>共 <b>${list.length}</b> 位投資人</span>`;
+  document.getElementById('inv-list').innerHTML = list.length ? list.map(investorCard).join('') : '<p class="empty" style="grid-column:1/-1">找不到符合條件的投資人</p>';
+}
+function investorCard(i){
+  return `<article class="fs-entity">
+    <div class="fs-entity-top">${tag(i.level === '機構' ? 'dark' : 'blue', i.level + '級 · ' + i.type)}${tag('', ROLE_GROUPS[i.group])}<button type="button" class="fs-match" data-act="match" data-id="${i.match}">符合 ${i.match}/8 ⌄</button></div>
+    <div class="fs-entity-head">${avatar(i.org)}<div><h3>${i.org}</h3><div class="sub">${i.name} · 投資經理</div></div></div>
+    ${metrics([['單筆區間', i.ticket], ['平均回應', i.days + ' 天'], ['回應率', i.rate + '%']])}
+    <div class="fs-path">${i.path}</div>
+    <details class="fs-more"><summary>查看投資偏好與實績</summary>${facts([['主要領域', i.focus], ['投資階段', i.stage], ['參與程度', i.role], ['過往投資', i.deals + ' 件 · 近一年 ' + i.recent + ' 件']])}</details>
+    <div class="fs-actions">${follow(i.followed, 'follow-investor', i.id)}<button type="button" class="btn btn-secondary btn-sm" data-act="hello" data-id="${i.id}">打招呼</button><span class="fs-spacer"></span>
+      ${i.state === 'pending' ? status('pending') : `<button type="button" class="btn btn-primary btn-sm" data-act="connect-investor" data-id="${i.id}">發送連結</button>`}</div>
+  </article>`;
+}
+
+/* ── 我的檔案 ── */
+function techBlock(full){
+  const out = techItems.filter(t => t.kind === '外包').length;
+  return `<div class="fs-tech-sum"><div><span>技術團隊</span><b>12 人</b></div><div><span>自有技術</span><b>核心平台自研</b></div><div><span>外包項目</span><b>${out} 項</b></div></div>
+    ${full ? `<div class="fs-table-wrap"><table class="ro-table"><thead><tr><th>類型</th><th>項目</th><th>廠商／說明</th><th>期間</th></tr></thead><tbody>
+      ${techItems.map(t => `<tr><td>${tag(t.kind === '外包' ? 'orange' : t.kind === '認證' ? 'green' : 'blue', t.kind)}</td><td><b>${t.item}</b><br><span class="fs-note">${t.note}</span></td><td>${t.vendor}</td><td>${t.period}</td></tr>`).join('')}
+    </tbody></table></div>` : '<p class="fs-note">外包廠商名稱與合作明細，在你同意連結請求後於 L1 揭露。</p>'}`;
+}
+function feedBlock(){
+  const mine = posts.filter(p => has(p.role)), pinned = mine.filter(p => p.pinned), others = mine.filter(p => !p.pinned);
+  const card = (p) => `<div class="fs-post"><div class="fs-post-head">${avatar(p.author, 'round')}<div style="flex:1;min-width:0"><b>${esc(p.author)}</b><small>${esc(p.org)} · ${p.time}</small></div>
+      ${tag({ '徵求合作':'orange', '募資動態':'blue' }[p.type] || '', p.type)}${p.pinned ? tag('dark', '置頂') : ''}</div>
+      <p>${esc(p.text)}</p><div class="ops"><button type="button" class="fs-link" data-act="pin-post" data-id="${p.id}">${p.pinned ? '取消置頂' : '設為置頂'}</button><button type="button" class="fs-link" data-act="delete-post" data-id="${p.id}">刪除</button></div></div>`;
+  return `<div class="fs-card fs-composer"><h3>動態</h3>
+      <textarea class="textarea short" id="post-text" placeholder="分享進度、觀點，或正在尋找的機會…" aria-label="動態內容"></textarea>
+      <div class="row"><select class="select" id="post-type" aria-label="動態類型"><option>一般動態</option><option>募資動態</option><option>徵求合作</option></select><button type="button" class="btn btn-primary" data-act="post">發布動態</button></div>
+      ${pinned.length ? `<div class="fs-group-label">置頂</div>${pinned.map(card).join('')}` : ''}
+      <div class="fs-group-label">全部動態</div>${others.length ? others.map(card).join('') : '<p class="fs-note">尚無動態，發布第一則吧。</p>'}
+    </div>`;
+}
+function profilePage(){
+  const co = has('company'), inv = has('investor');
+  const me = companies[0], invMe = investors[0];
+  const connCo = requests.filter(r => r.state === 'L1' || r.state === 'L2').length, connInv = links.filter(l => l.state === 'L1' || l.state === 'L2').length;
+  const connLine = [co ? `已建立 ${connCo} 個投資人洽談關係` : '', inv ? `已建立 ${connInv} 家企業洽談關係` : ''].filter(Boolean).join(' · ');
+  const headline = (co ? `${me.industry} · ${me.label} · ${me.stage} 輪 · 成立 ${me.years} 年 · 員工 ${me.people}` : '') + (inv ? `${co ? ' · ' : ''}投資聚焦 ${investorPrefs.focus}` : '');
+  const coStats = [{key:'rev',label:'年營收',value:me.rev},{key:'margin',label:'毛利率',value:me.margin},{key:'growth',label:'年成長率',value:me.growth},{key:'raise',label:'募資金額',value:me.raise}];
+  const invStats = [{key:'deals',label:'過往投資',value:invMe.deals + ' 件'},{key:'recent',label:'近一年投資',value:invMe.recent + ' 件'},{key:'days',label:'平均回應',value:invMe.days + ' 天'},{key:'rate',label:'回應率',value:invMe.rate + '%'}];
+  const shown = (co ? coStats.filter(m => state.heroStats.company.includes(m.key)) : []).concat(inv ? invStats.filter(m => state.heroStats.investor.includes(m.key)) : []);
+  return `<section class="content-section" aria-labelledby="h-profile">
+      ${sectionHead('h-profile', '我的檔案', `<a class="title-btn" href="#settings"><span>編輯我的檔案</span></a>`)}
+      <div class="fs-card fs-hero">
+        <div class="fs-hero-main">
+          ${avatar('翰森科技', 'lg')}
+          <div><div class="btn-row" style="gap:8px">${co ? badge(me.verified) : ''}${inv ? tag('blue', invMe.level + '級投資人') : ''}</div>
+            <h1>翰森科技股份有限公司</h1><p class="headline">${headline}</p>
+            <p class="meta">台北市信義區 · <button type="button" class="fs-link" data-act="contact">查看聯絡資訊</button>${connLine ? ' · ' + connLine : ''}</p>
+            <div class="btn-row" style="margin-top:14px"><button type="button" class="btn btn-secondary btn-sm" data-act="share">複製檔案連結</button><button type="button" class="btn btn-secondary btn-sm" data-act="toast" data-msg="更多設定選項開發中。" aria-label="更多">⋯</button></div></div>
+          <div class="fs-aff">${co ? `<div><span>所屬產業</span><b>${me.industry}</b></div><div><span>目前階段</span><b>${me.stage} 輪</b></div>` : ''}${inv ? `<div><span>機構類型</span><b>${invMe.type}</b></div><div><span>主要領域</span><b>${esc(investorPrefs.focus)}</b></div>` : ''}</div>
+        </div>
+        ${co ? picker(coStats, state.heroStats.company, 'data-hero-co') : ''}${inv ? picker(invStats, state.heroStats.investor, 'data-hero-inv') : ''}
+        ${shown.length ? metrics(shown.map(m => [m.label, m.value])) : '<p class="fs-note">尚未選擇任何指標。</p>'}
+      </div>
+      <div class="fs-layout">
+        <div class="fs-stack">
+          <div class="fs-card fs-about"><h3>關於</h3>${co ? '<p class="fs-prose">以資料整合與流程自動化協助中大型企業管理財務營運，產品採年度訂閱制。</p>' : ''}
+            ${co ? `<div><b>合作模式與服務流程（企業）</b><p class="fs-prose">${esc(bios.company.mode)}</p></div><div><b>目前在找的機會（企業）</b><p class="fs-prose">${esc(bios.company.seeking)}</p></div>` : ''}
+            ${inv ? `<div><b>合作模式與服務流程（投資人）</b><p class="fs-prose">${esc(bios.investor.mode)}</p></div><div><b>目前在找的機會（投資人）</b><p class="fs-prose">${esc(bios.investor.seeking)}</p></div>` : ''}</div>
+          ${co ? `<div class="fs-card"><div class="fs-card-head"><h3>外包與技術資源</h3>${tag('gold', '10/13 週會新增')}</div>${techBlock(true)}</div>` : ''}
+          ${feedBlock()}
+        </div>
+        <aside class="fs-stack">
+          ${co ? `<div class="fs-card"><h3>基本資訊</h3><dl class="ro-pairs" style="margin-top:10px"><dt>統一編號</dt><dd>83170028</dd><dt>成立日期</dt><dd>2022.03.18</dd><dt>所在地</dt><dd>台北市信義區</dd><dt>資金用途</dt><dd>${me.use}</dd></dl></div>
+            <div class="fs-card"><h3>核心團隊</h3><div class="fs-member"><b>陳冠廷</b><span>執行長</span></div><div class="fs-member"><b>黃文華</b><span>財務長</span></div><div class="fs-member"><b>許雅雯</b><span>技術長</span></div></div>` : ''}
+          ${inv ? `<div class="fs-card"><h3>投資偏好</h3><dl class="ro-pairs" style="margin-top:10px"><dt>主要領域</dt><dd>${esc(investorPrefs.focus)}</dd><dt>投資階段</dt><dd>${esc(investorPrefs.stage)}</dd><dt>單筆區間</dt><dd>${esc(investorPrefs.ticket)}</dd><dt>參與程度</dt><dd>${esc(investorPrefs.role)}</dd></dl></div>` : ''}
+        </aside>
+      </div>
+    </section>`;
+}
+
+/* ── 編輯我的檔案：沿用新增商品的分段標籤＋表單卡片 ── */
+const revRange = (v) => v < 1000 ? '500 萬 – 1,000 萬' : v < 3000 ? '1,000 萬 – 3,000 萬' : v < 5000 ? '3,000 萬 – 5,000 萬' : v < 8000 ? '5,000 萬 – 8,000 萬' : v < 12000 ? '8,000 萬 – 1.2 億' : '1.2 億以上';
+const pctRange = (v) => { const n = Math.floor(v / 10) * 10; return n + '% – ' + (n + 10) + '%'; };
+const growthRange = (v) => v < 20 ? '0% – 20%' : v < 40 ? '20% – 40%' : v < 60 ? '40% – 60%' : '60% 以上';
+const field = (label, input, help = '', hint = '') => `<div class="field"><label class="field-label">${label}</label>${help ? `<p class="field-help">${help}</p>` : ''}${input}${hint}</div>`;
+const anonHint = (id, text) => `<p class="fs-note"${id ? ` id="${id}"` : ''}>${text}</p>`;
+const sigField = (role) => field('電子簽名', `<div class="btn-row">${signatures[role] ? `<img class="fs-sig" src="${signatures[role]}" alt="已上傳的簽名">` : '<span class="fs-note">尚未上傳簽名</span>'}<label class="btn-outline" style="display:inline-flex;align-items:center;cursor:pointer">選擇檔案<input type="file" accept="image/*" data-sig="${role}" hidden></label></div>`, '用於 NDA 等文件的電子簽署；未上傳時，簽署文件將以你的姓名文字代替。');
+function group(id, title, extra, body){
+  return `<div class="form-card"><div class="form-group" id="${id}"><div class="form-group-title"><h2>${title}</h2></div>${extra ? `<p class="field-help">${extra}</p>` : ''}${body}</div></div>`;
+}
+function settingsPage(){
+  const co = has('company'), inv = has('investor');
+  const tabs = [];
+  if (co) tabs.push(['set-basic','基本資訊'],['set-finance','財務概況'],['set-raise','募資需求'],['set-team','團隊與產品'],['set-tech','外包與技術資源'],['set-files','資料室檔案']);
+  if (inv) tabs.push(['set-invest','投資設定']);
+  const groups = [];
+  if (co){
+    groups.push(group('set-basic', '基本資訊', '用於資格驗證與 L1 具名資料。完成度 20%。', `
+      <div class="form-row">${field('公司名稱', '<input class="input" value="翰森科技股份有限公司">')}${field('統一編號', '<input class="input" value="83170028">')}</div>
+      <div class="form-row">${field('成立日期', '<input class="input" type="date" value="2022-03-18">')}${field('產業', '<select class="select"><option>企業軟體</option></select>')}</div>
+      <div class="form-row">${field('員工人數', '<input class="input" value="38">')}${field('所在地', '<input class="input" value="台北市信義區">')}</div>
+      ${sigField('company')}`));
+    groups.push(group('set-finance', '財務概況', '精確值不會出現在匿名公開層，投資人只看到區間。完成度 25%。', `
+      <div class="form-row">${field('年營收（萬元）', '<input class="input" id="rev" type="number" value="4237">', '', anonHint('rev-hint', '→ 投資人將看到：3,000 萬 – 5,000 萬　✓ 已匿名'))}
+        ${field('毛利率（%）', '<input class="input" id="margin" type="number" value="43.2">', '', anonHint('margin-hint', '→ 投資人將看到：40% – 50%　✓ 已匿名'))}</div>
+      <div class="form-row">${field('近一年成長率（%）', '<input class="input" id="growth" type="number" value="48">', '', anonHint('growth-hint', '→ 投資人將看到：40% – 60%　✓ 已匿名'))}
+        ${field('目前現金（萬元）', '<input class="input" value="2100">', '', anonHint('', '→ 不顯示於公開層，僅資料室可見'))}</div>`));
+    groups.push(group('set-raise', '募資需求', '募資只是長期檔案的一部分，可隨時暫停或更新。完成度 20%。', `
+      <div class="form-row">${field('募資金額（萬元）', '<input class="input" value="7000">', '', anonHint('', '→ 投資人將看到：6,000 萬 – 8,000 萬'))}${field('預計估值區間', '<select class="select"><option>3 億 – 5 億</option></select>')}</div>
+      ${field('資金用途', `<div class="fs-optgrid">${['業務擴編','產品開發','海外市場','人才招募'].map((x, i) => `<label class="fs-check"><input type="checkbox" ${i < 2 ? 'checked' : ''}>${x}</label>`).join('')}</div>`)}
+      <div class="form-row">${field('領投狀態', '<select class="select"><option>尚無領投</option><option>已有領投</option></select>')}${field('預計完成時間', '<input class="input" type="date" value="2027-01-31">')}</div>`));
+    groups.push(group('set-team', '團隊與產品', '僅在你同意連結請求後，於 L1 揭露。完成度 20%，缺少客戶結構分析。', `
+      <div><div class="fs-member"><b>陳冠廷 · 執行長</b><span>連續創業者，曾任企業雲端事業部總經理</span></div><div class="fs-member"><b>黃文華 · 財務長</b><span>前上市軟體集團財務協理，15 年經驗</span></div><div class="fs-member"><b>許雅雯 · 技術長</b><span>前跨國雲端平台資深架構師</span></div></div>
+      ${field('產品說明', '<textarea class="textarea short">以資料整合與流程自動化協助中大型企業管理財務營運，產品採年度訂閱制。</textarea>')}
+      ${field('合作模式與服務流程', `<textarea class="textarea short" id="bio-mode">${esc(bios.company.mode)}</textarea>`)}
+      ${field('目前在找的機會', `<textarea class="textarea short" id="bio-seeking">${esc(bios.company.seeking)}</textarea>`)}`));
+    groups.push(group('set-tech', '外包與技術資源', '10/13 週會新增：讓創投評估技術自主程度與外部依賴。公開層只顯示摘要，廠商明細於 L1 揭露。', `
+      <div class="form-row">${field('技術團隊人數', '<input class="input" value="12">')}${field('自有核心技術', '<input class="input" value="核心平台自研">')}</div>
+      <div class="fs-table-wrap"><table class="ro-table"><thead><tr><th>類型</th><th>項目</th><th>廠商／說明</th><th>期間</th></tr></thead><tbody>
+        ${techItems.map(t => `<tr><td>${t.kind}</td><td>${t.item}</td><td>${t.vendor}</td><td>${t.period}</td></tr>`).join('')}</tbody></table></div>
+      <div><button type="button" class="add-link" data-act="toast" data-msg="新增外包或技術資源（示意）">新增一筆</button></div>`));
+    groups.push(group('set-files', '資料室檔案', '上傳不等於開放；實際權限仍須到「資料室」逐份設定。完成度 15%。', `
+      <div class="fs-table-wrap"><table class="ro-table"><thead><tr><th>檔案</th><th>更新日期</th><th>狀態</th><th></th></tr></thead><tbody>
+        ${files.map((f, i) => `<tr><td><b>${f}</b></td><td>2026.09.${18 - i}</td><td>${tag('green', '已上傳')}</td><td><button type="button" class="fs-link" data-act="toast" data-msg="更新檔案（示意）">更新</button></td></tr>`).join('')}</tbody></table></div>
+      <div><button type="button" class="add-link" data-act="toast" data-msg="上傳檔案（示意）">上傳檔案</button></div>`));
+  }
+  if (inv){
+    groups.push(group('set-invest', '投資設定', '更新你的投資偏好與合作方式，讓企業更容易理解你的定位。', `
+      <div class="form-row">${field('主要領域', `<input class="input" id="pref-focus" value="${esc(investorPrefs.focus)}">`)}${field('投資階段', `<input class="input" id="pref-stage" value="${esc(investorPrefs.stage)}">`)}</div>
+      <div class="form-row">${field('單筆投資區間', `<input class="input" id="pref-ticket" value="${esc(investorPrefs.ticket)}">`)}${field('參與程度', `<input class="input" id="pref-role" value="${esc(investorPrefs.role)}">`)}</div>
+      ${field('合作模式與服務流程', `<textarea class="textarea short" id="bio-mode-inv">${esc(bios.investor.mode)}</textarea>`)}
+      ${field('目前在找的機會', `<textarea class="textarea short" id="bio-seeking-inv">${esc(bios.investor.seeking)}</textarea>`)}
+      ${sigField('investor')}`));
+  }
+  return `<section class="content-section" aria-labelledby="h-settings">
+      ${sectionHead('h-settings', '編輯我的檔案', co ? `<button type="button" class="btn btn-secondary btn-sm" data-act="preview-l0">預覽投資人看到的樣子</button>` : '')}
+      <p class="fs-lead">隨時更新單項資訊；公開層只顯示匿名區間。</p>
+      <nav class="section-tabs" id="set-tabs" aria-label="檔案分段">${tabs.map((t, i) => `<a class="section-tab" href="#${t[0]}" aria-current="${i === 0}"><span>${t[1]}</span></a>`).join('')}</nav>
+      <div class="form-stack">${groups.join('')}</div>
+      <div class="form-actions"><a class="btn btn-secondary" href="#profile">返回我的檔案</a><button type="button" class="btn btn-primary" data-act="save-profile">儲存變更</button></div>
+    </section>`;
+}
+
+/* ── 誰看過我（企業） ── */
+function viewsPage(){
+  let last = '';
+  const rows = views.map(v => {
+    const i = v[1] ? investors.find(x => x.id === v[1]) : null;
+    const g = v[0] !== last ? `<div class="fs-group-label">${last = v[0]}</div>` : '';
+    return `${g}<div class="fs-viewrow">${i ? avatar(i.org, 'round') : '<span class="fs-avatar round anon">匿</span>'}
+      <div><b>${i ? i.org + ' · ' + i.name : '一位' + (v[2] === '10:20' ? '機構級' : '認證級') + '投資人（匿名瀏覽）'}</b><span>${i ? i.focus : '已尊重對方的匿名瀏覽設定'}</span></div>
+      <time>${v[2]}</time><div>${v[3] > 1 ? `<span class="fs-repeat">第 ${v[3]} 次</span>` : ''}${i ? `<a class="btn btn-secondary btn-sm" href="#investors">看檔案</a>` : '<span class="fs-note">—</span>'}</div></div>`;
+  }).join('');
+  return `<section class="content-section" aria-labelledby="h-views">
+      ${sectionHead('h-views', '誰看過我', `<a class="btn btn-secondary btn-sm" href="#investors">瀏覽投資人</a>`)}
+      <p class="fs-lead">本週 12 次瀏覽 · 8 個不同對象；匿名瀏覽者只顯示資格級別。</p>
+      <div class="fs-card">${rows}</div></section>`;
+}
+
+/* ── 連結請求（企業） ── */
+function requestsPage(){
+  return `<section class="content-section" aria-labelledby="h-req">
+      ${sectionHead('h-req', '連結請求', tag('orange', pendingRequests() + ' 筆待回覆'))}
+      <p class="fs-lead">你可以同意、婉拒，或先用 50 字問清楚；揭露決定始終在你手上。</p>
+      ${requests.map(requestCard).join('')}</section>`;
+}
+function requestCard(r){
+  const i = investors.find(x => x.id === r.investor);
+  const acts = r.state === 'pending'
+    ? `<button type="button" class="btn btn-primary btn-sm" data-act="approve" data-id="${r.id}">同意揭露公司資訊</button><button type="button" class="btn btn-secondary btn-sm danger" data-act="decline" data-id="${r.id}">婉拒</button><button type="button" class="btn btn-secondary btn-sm" data-act="hello-request" data-id="${r.id}">先打招呼</button>`
+    : r.state === 'L1' ? `<a class="btn btn-secondary btn-sm" href="#roomadmin">管理下一層權限</a>` : '';
+  return `<article class="fs-card fs-request">
+    <div class="fs-request-head">${avatar(i.org)}<div><b>${i.org} · ${i.name} 投資經理</b><span>${i.level}級 · ${ROLE_GROUPS[i.group]} · 過往投資 ${i.deals} 件 · ${i.focus}</span></div>${status(r.state)}</div>
+    <div class="fs-path">${i.path}　<span class="fs-tag">概念展示</span></div>
+    <div class="fs-reqmeta"><span>想了解<b>${r.topics}</b></span><span>投資規模<b>${r.scale}</b></span><span>參與程度<b>${r.role}</b></span></div>
+    <blockquote class="fs-quote">「${r.text}」</blockquote>
+    <div class="fs-request-foot"><time>${r.date} 送出${r.state === 'pending' ? ' · 剩餘 ' + r.days + ' 天回應' : ''}</time><div class="btn-row">${acts}</div></div>
+  </article>`;
+}
+
+/* ── 我的連結（投資人） ── */
+function linksPage(){
+  return `<section class="content-section" aria-labelledby="h-links">
+      ${sectionHead('h-links', '我的連結', tag('blue', '本月 ' + state.investorQuota + ' / 5 剩餘'))}
+      <p class="fs-lead">追蹤連結請求、具名資訊與資料室開放狀態。</p>
+      <div class="fs-card fs-table-wrap"><table class="ro-table"><thead><tr><th>對象</th><th>送出日期</th><th>狀態</th><th>剩餘天數</th><th>動作</th></tr></thead><tbody>
+      ${links.map(l => { const c = companies.find(x => x.id === l.company); const named = l.state === 'L1' || l.state === 'L2';
+        return `<tr><td><b>${named ? unlockedName(c) : c.industry + ' · ' + c.label}</b><br><span class="fs-note">${l.id}</span></td><td>${l.date}</td><td>${status(l.state)}</td><td>${l.state === 'pending' ? l.days + ' 天' : '—'}</td>
+          <td>${l.state === 'pending' ? `<button type="button" class="btn btn-secondary btn-sm danger" data-act="withdraw" data-id="${l.id}">撤回</button>` : l.state === 'L1' ? `<a class="btn btn-secondary btn-sm" href="#company-${c.id}">查看公司資訊</a>` : l.state === 'L2' ? `<a class="btn btn-primary btn-sm" href="#dataroom">進入資料室</a>` : '—'}</td></tr>`; }).join('')}
+      </tbody></table></div></section>`;
+}
+
+/* ── 企業詳情（投資人視角） ── */
+function companyDetail(id){
+  const c = companies.find(x => x.id === id) || companies[0];
+  const unlocked = c.status === 'L1' || c.status === 'L2' || c.status === 'nda', l2 = c.status === 'L2', nda = c.status === 'nda', name = companyName(c);
+  const trackData = c.track === 'loan' ? [['融資需求', c.need], ['資金用途', c.use], ['擔保品', c.collateral]]
+    : c.track === 'ma' ? [['交易方向', c.side], ['預估規模', c.deal], ['交易背景', c.reason]]
+    : [['募資金額', c.raise], ['資金用途', c.use], ['領投狀態', c.lead === '有' ? '已有領投' : '尚無領投']];
+  const asideBtn = unlocked ? (l2 ? `<a class="btn btn-primary block" href="#dataroom">查看已開放資料</a>` : nda ? `<button type="button" class="btn btn-secondary block" disabled>NDA 待對方簽署</button>` : `<button type="button" class="btn btn-primary block" data-act="nda" data-id="${c.id}">申請簽署 NDA</button>`)
+    : c.status === 'pending' ? `<button type="button" class="btn btn-secondary block" disabled>連結請求待回覆</button>` : `<button type="button" class="btn btn-primary block" data-act="connect-company" data-id="${c.id}">發送連結請求</button>`;
+  return `<section class="content-section" aria-labelledby="h-detail">
+      ${sectionHead('h-detail', unlocked ? name : c.industry + ' · ' + c.label, `<a class="btn btn-secondary btn-sm" href="#browse">← 返回瀏覽投資</a>`)}
+      <p class="fs-lead">COMPANY PROFILE / ${String(c.id).padStart(4, '0')} · ${unlocked ? 'L1 具名層已由企業開放' : 'L0 匿名公開層'}</p>
+      <div class="fs-detail">
+        <div class="fs-card">
+          <div class="fs-section"><div class="btn-row" style="gap:8px">${badge(c.verified)}${tag('gold', TRACKS[c.track])}${tag(unlocked ? 'green' : 'blue', unlocked ? 'L1 已開放' : 'L0 公開')}</div>
+            <span class="fs-note">${c.track === 'equity' ? c.stage + ' 輪 · ' : ''}成立 ${c.years} 年 · 員工 ${c.people}</span></div>
+          <div class="fs-section"><h3>營運與財務概況</h3><div class="fs-datagrid">
+            ${[['年營收', c.rev], ['毛利率', c.margin], ['年成長率', c.growth]].concat(trackData).map(d => `<div class="fs-datum"><span>${d[0]}</span><b>${d[1]}</b></div>`).join('')}</div></div>
+          <div class="fs-section"><h3>外包與技術資源</h3>
+            ${c.id === 1 && unlocked ? techBlock(true) : `<div class="fs-tech-sum"><div><span>技術團隊</span><b>${c.tech.team}</b></div><div><span>自有技術</span><b>${c.tech.self}</b></div><div><span>外包項目</span><b>${c.tech.out}</b></div></div><p class="fs-note">${unlocked ? '企業尚未填寫外包廠商明細。' : '外包廠商與合作明細需企業同意連結後開放。'}</p>`}</div>
+          ${unlocked ? namedInfo(c) : `<div class="fs-section"><h3>受控揭露資訊</h3><div class="fs-locked">${['公司名稱與基本資料','核心團隊成員','產品與客戶','財務報表'].map(x => `<div>▣ ${x}<small>需企業同意後開放</small></div>`).join('')}</div></div>`}
+          ${unlocked ? `<div class="fs-section"><div class="fs-roomcall"><div><h3>財務資料室 ${nda ? status('nda') : status(l2 ? 'L2' : 'L1')}</h3><span class="fs-note">${l2 ? 'NDA 已確認，部分檔案已開放' : nda ? '你已完成電子簽署並送出，等待對方完成雙方簽署' : '須雙方線上簽署公版 NDA，再由企業逐份開啟'}</span></div>
+            ${l2 ? `<a class="btn btn-primary" href="#dataroom">進入資料室</a>` : nda ? `<button type="button" class="btn btn-secondary" disabled>等待對方簽署</button>` : `<button type="button" class="btn btn-primary" data-act="nda" data-id="${c.id}">申請簽署 NDA</button>`}</div></div>` : ''}
+        </div>
+        <aside class="fs-card">
+          <div class="fs-quota"><span>本月連結請求</span><b>${state.investorQuota} / 5</b><span>次剩餘</span></div>
+          ${asideBtn}
+          <div style="margin-top:8px">${follow(c.followed, 'follow-company', c.id, undefined, 'block')}</div>
+          <div class="fs-asidedata"><p><span>掛牌日期</span><b>${c.date}</b></p><p><span>最後更新</span><b>3 天前</b></p><p><span>已有意向</span><b>4 位</b></p><p><span>平均回應</span><b>3 天</b></p></div>
+          <label class="fs-check" style="margin-top:14px"><input type="checkbox" data-act-change="anonymous" ${state.anonymous ? 'checked' : ''}>匿名瀏覽此檔案</label>
+          <p class="fs-note">${state.anonymous ? '企業只會看到「一位認證級投資人」' : '企業會看到元啟創投 · 林承宇'}</p>
+        </aside>
+      </div></section>`;
+}
+function namedInfo(c){
+  const one = c.id === 1;
+  return `<div class="fs-section"><h3>公司資訊與產品</h3><div class="fs-datagrid"><div class="fs-datum"><span>公司名稱</span><b>${companyName(c)}</b></div><div class="fs-datum"><span>統一編號</span><b>${one ? '8317' : '9072'}••••</b></div><div class="fs-datum"><span>成立／所在地</span><b>${one ? '2022.03 · 台北市' : '2020.06 · 新竹市'}</b></div></div>
+      <p class="fs-prose">${one ? '以資料整合與流程自動化協助中大型企業管理財務營運，採年度訂閱制。' : '聚焦精準診斷設備與臨床數據整合，正推進海外法規認證。'}</p></div>
+    <div class="fs-section"><h3>核心團隊</h3><div><div class="fs-member"><b>陳冠廷 · 執行長</b><span>連續創業者，具市場拓展與組織管理經驗</span></div><div class="fs-member"><b>黃文華 · 財務長</b><span>前上市軟體集團財務協理，15 年經驗</span></div><div class="fs-member"><b>許雅雯 · 技術長</b><span>前跨國雲端平台資深架構師</span></div></div></div>
+    <div class="fs-section"><h3>營運里程碑</h3><dl class="ro-pairs"><dt>2022 Q2</dt><dd>完成產品 MVP 與首批企業客戶導入</dd><dt>2024 Q1</dt><dd>年度經常性收入進入下一級距</dd><dt>2026 Q2</dt><dd>啟動東南亞市場驗證</dd></dl></div>`;
+}
+
+/* ── 財務資料室（投資人看企業開放的檔案） ── */
+function dataRoomPage(){
+  return `<section class="content-section" aria-labelledby="h-room">
+      ${sectionHead('h-room', '翰森科技 · 財務資料室', `<a class="btn btn-secondary btn-sm" href="#company-1">← 返回公司檔案</a>`)}
+      <p class="fs-lead">L2 受控揭露｜每次檢視都會寫入稽核日誌。</p>
+      <div class="fs-banner"><b>✓ NDA 已由雙方線上簽署</b>元啟創投 2026.09.21 · 翰森科技 2026.09.21</div>
+      <div class="fs-card fs-table-wrap"><table class="ro-table"><thead><tr><th>檔案</th><th>分類</th><th>權限</th><th>動作</th></tr></thead><tbody>
+        ${files.map((f, i) => `<tr><td><div class="fs-file"><span class="fs-fileicon">${f.endsWith('xlsx') ? 'XLS' : 'PDF'}</span><b>${f}</b></div></td><td>${FILE_KINDS[i]}</td><td>${tag(perms['元啟創投'][i] ? 'green' : '', perms['元啟創投'][i] ? '已開放' : '未開放')}</td>
+          <td>${perms['元啟創投'][i] ? `<button type="button" class="btn btn-secondary btn-sm" data-act="viewfile" data-id="${i}">線上檢視</button>` : `<button type="button" class="btn btn-secondary btn-sm" data-act="requestfile">向企業申請</button>`}</td></tr>`).join('')}
+      </tbody></table></div>
+      <p class="fs-note">資料僅供線上檢視，不提供下載。</p></section>`;
+}
+
+/* ── 資料室權限管理（企業） ── */
+function roomAdminPage(){
+  const pending = ndaRequests.filter(r => r.state === 'pending');
+  const orgs = Object.keys(perms);
+  const fileCell = (f) => `<td><div class="fs-file"><span class="fs-fileicon">${f.endsWith('xlsx') ? 'XLS' : 'PDF'}</span><b>${f}</b></div></td>`;
+  return `<section class="content-section" aria-labelledby="h-admin">
+      ${sectionHead('h-admin', '資料室', tag('blue', orgs.length + ' 位 NDA 已確認對象'))}
+      <p class="fs-lead">每個檔案、每位投資人獨立開關；沒有「全部開啟」。完成 NDA 後會先套用對方角色的預設權限。</p>
+      ${pending.length ? `<div class="fs-card"><div class="fs-card-head"><h3>文件待你簽署</h3><span class="fs-note">對方已完成線上簽署，需要你完成雙方簽署</span></div>
+        ${pending.map(r => `<div class="fs-request-foot"><div><b>${r.org}</b>　${tag('orange', r.doc)}<br><span class="fs-note">${r.contact} · ${r.date} 已簽署並送出</span></div><button type="button" class="btn btn-primary btn-sm" data-act="view-nda" data-id="${r.id}">檢視並簽署</button></div>`).join('')}</div>` : ''}
+      <div class="fs-card"><div class="fs-card-head"><h3>依角色的預設權限</h3>${tag('gold', '10/13 週會新增')}</div>
+        <p class="fs-note" style="margin-bottom:10px">對方完成 NDA 後，依其角色（創投、天使投資人、一般企業）自動套用；之後仍可逐份調整。</p>
+        <div class="fs-table-wrap"><table class="ro-table"><thead><tr><th>檔案</th>${Object.values(ROLE_GROUPS).map(g => `<th>${g}</th>`).join('')}</tr></thead><tbody>
+          ${files.map((f, i) => `<tr>${fileCell(f)}${Object.keys(ROLE_GROUPS).map(g => `<td><label class="fs-switch"><input type="checkbox" data-tpl="${g}" data-i="${i}" ${roleTemplate[g][i] ? 'checked' : ''} aria-label="${ROLE_GROUPS[g]}：${f}"><i></i></label></td>`).join('')}</tr>`).join('')}
+        </tbody></table></div></div>
+      <div class="fs-card"><div class="fs-card-head"><h3>個別投資人權限</h3></div>
+        <div class="fs-table-wrap"><table class="ro-table"><thead><tr><th>檔案</th>${orgs.map(o => `<th>${o}<br><span class="fs-note">${ROLE_GROUPS[permGroup[o]]} · NDA 已確認</span></th>`).join('')}</tr></thead><tbody>
+          ${files.map((f, i) => `<tr>${fileCell(f)}${orgs.map(o => `<td><label class="fs-switch"><input type="checkbox" data-perm-org="${o}" data-i="${i}" ${perms[o][i] ? 'checked' : ''} aria-label="${o}：${f}"><i></i></label> <span class="fs-note">${perms[o][i] ? '開啟' : '關閉'}</span></td>`).join('')}</tr>`).join('')}
+        </tbody></table></div></div>
+      <details class="fs-card fs-disclosure"><summary>稽核日誌（開啟、關閉、進入與檢視皆留存）</summary>
+        ${audits.map(a => `<div class="fs-audit"><span class="fs-muted">${a[0]}</span><b>${a[1]}</b><span>${a[2]}</span><b>${a[3]}</b></div>`).join('')}</details>
+    </section>`;
+}
+
+/* ── 訊息 ── */
+function messagesPage(){
+  const list = (has('company') ? threads.company : []).concat(has('investor') ? threads.investor : []);
+  const shown = list.filter(t => state.threadFilter === 'all' || (state.threadFilter === 'hello' ? t.tag === 'hello' : t.tag !== 'hello'));
+  const cur = list.find(t => t.id === state.activeThread) || list[0];
+  const n = (hello) => list.filter(t => hello ? t.tag === 'hello' : t.tag !== 'hello').length;
+  return `<section class="content-section" aria-labelledby="h-msg">
+      ${sectionHead('h-msg', '訊息')}
+      <p class="fs-lead">打招呼與連結後對話集中管理，以標籤清楚區分關係階段。</p>
+      <div class="fs-card fs-msg">
+        <div class="fs-threads">${chipRow([['all', '全部'], ['hello', '打招呼 ' + n(true)], ['linked', '已連結 ' + n(false)]], state.threadFilter, 'data-thread-filter')}
+          ${shown.map(t => `<button type="button" class="fs-thread" data-thread="${t.id}" aria-current="${!!cur && t.id === cur.id}"><span class="top"><b>${t.org} · ${t.name}</b><time>${t.time}</time></span>${t.tag === 'hello' ? tag('orange', '打招呼') : tag(t.tag === 'L2' ? 'blue' : 'green', '已連結 · ' + t.tag)}<p>${t.msg}</p></button>`).join('')}</div>
+        ${cur ? `<div class="fs-chat"><div class="fs-chat-head"><b>${cur.org} · ${cur.name}</b><small>${cur.tag === 'hello' ? '打招呼，不代表已建立連結' : '已建立連結 · ' + cur.tag}</small></div>
+          <div class="fs-chat-body"><div class="fs-bubble">您好，想進一步了解貴公司的客戶續約狀況與市場擴張規劃。<time>昨天 16:08</time></div><div class="fs-bubble me">謝謝關注，我們已整理最新資訊，會在確認後回覆。<time>昨天 17:22</time></div><div class="fs-bubble">${cur.msg}<time>${cur.time}</time></div>
+            ${(sent[cur.id] || []).map(m => `<div class="fs-bubble me">${esc(m)}<time>剛剛</time></div>`).join('')}</div>
+          <div class="fs-composer-bar"><input class="input" id="msg-text" placeholder="輸入訊息…" aria-label="訊息"><button type="button" class="btn btn-primary" data-act="send-msg" data-id="${cur.id}">送出</button></div></div>` : '<p class="empty">尚無訊息</p>'}
+      </div></section>`;
+}
+
+/* ── 融資服務：需求診斷＋融資方案（方案依 10/13 週會可展示，但不放金融機構 Logo） ── */
+function finAssess(ans){
+  const [use, amount, collateral, bank, urgency] = ans, big = amount === '3,000 萬以上';
+  const tools = [
+    {name:'應收帳款融資',fit:collateral === '應收帳款' ? '高' : (use === '營運週轉' ? '中' : '低'),reason:collateral === '應收帳款' ? '你已有應收帳款可作為擔保基礎，核貸速度通常較快。' : '若主要擔保品不是應收帳款，這個工具的額度與速度優勢較難發揮。'},
+    {name:'不動產抵押貸款',fit:collateral === '不動產' ? (big ? '高' : '中') : '低',reason:collateral === '不動產' ? '不動產擔保通常能爭取到較高額度與較低利率，特別適合金額較大的需求。' : '需要產權清楚的不動產作為擔保，你目前的擔保品狀況較不符合。'},
+    {name:'設備／資產基礎融資',fit:collateral === '設備或存貨' ? '高' : (use === '設備或軟體採購' ? '中' : '低'),reason:collateral === '設備或存貨' ? '可用現有設備或存貨作為擔保，適合中期資金需求。' : '較適合有實體設備或存貨可供擔保的情況。'},
+    {name:'信用貸款／營運週轉方案',fit:(collateral === '目前沒有明確的擔保品' && bank !== '尚無穩定往來關係' && !big) ? '高' : (collateral === '目前沒有明確的擔保品' ? '中' : '低'),reason:bank === '已有多家穩定往來' ? '你已有穩定銀行往來紀錄，較容易以信用狀況取得核貸；但通常額度較適合中小型需求。' : '在沒有明確擔保品的情況下仍可考慮，但需要更完整的財務資料佐證。'},
+    {name:'信保基金搭配',fit:bank === '尚無穩定往來關係' ? '高' : '中',reason:bank === '尚無穩定往來關係' ? '由信保基金提供保證，是尚無穩定銀行往來紀錄的企業常見的敲門磚。' : '即使已有往來銀行，信保基金仍可用來提高核貸額度或降低擔保要求。'}];
+  const order = { '高':0, '中':1, '低':2 }; tools.sort((a, b) => order[a.fit] - order[b.fit]);
+  return { top:tools[0], tools, urgent:urgency === '1 個月內，較急迫',
+    docs:['最近 1–3 年財務報表（資產負債表、損益表、現金流量表）','401／403 申報資料與營所稅結算申報書','近 6 個月往來銀行存摺明細','若有擔保品：產權或所有權證明文件'] };
+}
+const srcTag = (t) => tag({ user:'blue', judge:'orange', demo:'' }[t], { user:'你填的', judge:'我們的判斷', demo:'示範參考' }[t]);
+function financingPage(){
+  return `<section class="content-section" aria-labelledby="h-fin">
+      ${sectionHead('h-fin', '融資服務')}
+      <p class="fs-lead">借貸市場資訊複雜，多數企業也不確定該準備什麼擔保品、該找誰談。先做需求診斷釐清方向，或直接瀏覽融資方案。</p>
+      ${chipRow([['quiz', '融資需求診斷'], ['plans', '融資方案']], state.finTab, 'data-fin-tab')}
+      ${state.finTab === 'plans' ? financingPlans() : state.finDone ? financingReport() : financingQuiz()}
+    </section>`;
+}
+function financingQuiz(){
+  const i = state.finStep, q = FINQUIZ[i];
+  return `<div class="fs-narrow fs-stack">
+      <ol class="stepper" id="fin-stepper" aria-label="診斷進度"></ol>
+      <div class="fs-card"><span class="fs-note">第 ${i + 1} / ${FINQUIZ.length} 題</span><p class="fs-q">${q.q}</p>
+        <div class="fs-opts">${q.opts.map((o, oi) => `<button type="button" class="fs-opt" data-fin-opt="${oi}" aria-pressed="${state.finAnswers[i] === o}"><span class="rd"></span>${o}</button>`).join('')}</div>
+        <div class="form-actions" style="margin-top:20px"><button type="button" class="btn btn-secondary" data-act="fin-back" ${i === 0 ? 'disabled' : ''}>← 上一題</button></div></div></div>`;
+}
+function financingReport(){
+  const r = finAssess(state.finAnswers), fit = (f) => ({ '高':'green', '中':'orange', '低':'' }[f]);
+  return `<div class="fs-narrow fs-card fs-stack">
+      <div><span class="fs-note">初步診斷結果 · 建議方向</span> ${srcTag('user')}<p class="fs-result">${r.top.name}</p><p class="fs-prose">${r.top.reason} ${srcTag('judge')}</p></div>
+      ${r.urgent ? `<div class="fs-banner warn">你選擇了「1 個月內、較急迫」——部分工具的審核時間可能無法配合，建議儘快預約顧問一對一討論，先確認可行的時程。</div>` : ''}
+      <div><h3>接下來需要準備的資料</h3><ul class="fs-ul">${r.docs.map(d => `<li>${d}</li>`).join('')}</ul></div>
+      <div class="form-actions"><button type="button" class="btn btn-secondary" data-act="fin-restart">重新填寫</button><button type="button" class="btn btn-primary" data-act="advisory">預約專人諮詢</button></div>
+      <details class="fs-disclosure"><summary>查看完整工具比較與我們不做的事</summary>
+        <div class="fs-table-wrap"><table class="ro-table"><thead><tr><th>工具</th><th>適合度</th><th>原因</th></tr></thead><tbody>${r.tools.map(t => `<tr><td><b>${t.name}</b></td><td>${tag(fit(t.fit), t.fit)}</td><td class="fs-note">${t.reason}</td></tr>`).join('')}</tbody></table></div>
+        <p class="fs-note" style="margin:10px 0 16px">排序依你填答的用途、金額、擔保品與銀行往來狀況綜合推算；實際利率與額度需視各資金方當下承作意願而定，僅供顧問諮詢前參考 ${srcTag('demo')}</p>
+        <h3>我們不做的事</h3><ul class="fs-ul"><li>不保證核貸，最終仍以資金方審核結果為準</li><li>不代為簽署任何文件</li><li>不預先收取「保證核貸」名義的費用</li><li>未經你同意，不會將你的資料提供給第三方資金方</li></ul>
+      </details></div>`;
+}
+function financingPlans(){
+  const list = financing.filter(f => !state.financingFilters.length || state.financingFilters.includes(f.type));
+  return `<div class="fs-banner warn">依平台規範，融資方案只以文字呈現，不顯示金融機構 Logo；實際條件依授信結果決定，平台不保證核貸。</div>
+    <div class="fs-split">
+      <details class="fs-card fs-filters" open><summary>篩選融資</summary>
+        <div class="fs-card-head" style="margin:0;padding-bottom:10px"><h3>篩選融資</h3><button type="button" class="fs-link" data-act="reset-filter" data-id="financing">重設</button></div>
+        <div class="fs-fgroup"><span class="fs-flabel">融資類型</span>${['企業信用貸款','應收帳款承購','中期專案貸款','循環信用額度'].map(v => `<label class="fs-check"><input type="checkbox" data-filter="financing" value="${v}" ${state.financingFilters.includes(v) ? 'checked' : ''}>${v}</label>`).join('')}</div>
+        <div class="fs-fgroup"><span class="fs-flabel">資金用途</span>${['營運週轉','現金流調度','設備與軟體採購','海外市場拓展'].map(v => `<label class="fs-check"><input type="checkbox">${v}</label>`).join('')}</div>
+        <div class="fs-fgroup"><span class="fs-flabel">擔保條件</span><div class="chips">${['全部','免擔保','需擔保'].map((v, i) => `<button type="button" class="chip" aria-pressed="${i === 0}" data-act="radio-chip">${v}</button>`).join('')}</div></div>
+      </details>
+      <div class="fs-cards">${list.map(f => `<article class="fs-entity">
+        <div class="fs-entity-top">${tag(f.verified ? 'dark' : '', f.verified ? '✓ 資金方已驗證' : '資格確認中')}<button type="button" class="fs-match" data-act="match" data-id="${f.match}">符合 ${f.match}/8 ⌄</button></div>
+        <div><span class="fs-amount">${f.amount}</span><div class="sub">${f.type} · ${f.use}</div></div>
+        <div><h3>${f.title}</h3><div class="sub">${f.provider}</div></div>
+        ${metrics([['參考成本', f.rate], ['融資期間', f.term]])}
+        <details class="fs-more"><summary>查看擔保、時程與還款方式</summary>${facts([['擔保條件', f.collateral], ['預估時程', f.speed], ['還款方式', f.repay + '。實際條件依授信結果決定，平台不保證核貸。', true]])}</details>
+        <div class="fs-actions">${follow(f.followed, 'follow-financing', f.id, ['＋ 收藏', '✓ 已收藏'])}<span class="fs-spacer"></span><button type="button" class="btn btn-secondary btn-sm" data-act="financing-detail" data-id="${f.id}">條件</button><button type="button" class="btn btn-primary btn-sm" data-act="financing-apply" data-id="${f.id}">提出需求</button></div>
+      </article>`).join('') || '<p class="empty" style="grid-column:1/-1">沒有符合的融資方案</p>'}</div>
+    </div>`;
+}
+
+/* ── 併購顧問 ── */
+function maPage(){
+  let last = '', stages = '';
+  MA_STAGES.forEach((s, i) => {
+    if (s.phase !== last){ stages += `<div class="fs-phase">${s.phase}</div>`; last = s.phase; }
+    stages += `<div class="fs-stage"><span class="n">${i + 1}</span><div><b>${s.title}</b> <span class="fs-note">${s.helper}</span><ul class="fs-ul" style="margin-top:6px">${s.bullets.map(b => `<li>${b}</li>`).join('')}</ul></div></div>`;
+  });
+  const tri = '<div class="h">出售方（賣方）</div><div class="h c">財務 SENSE</div><div class="h">收購方（買方）</div>' + MA_TRI.map(s => (s.center && !s.seller && !s.buyer)
+    ? `<div class="c mid full${s.key ? ' key' : ''}">${s.center}</div>`
+    : `<div class="c${s.seller ? '' : ' empty'}${s.key && s.seller ? ' key' : ''}">${s.seller || ''}</div><div class="c mid${s.center ? '' : ' empty'}">${s.center || ''}</div><div class="c${s.buyer ? '' : ' empty'}${s.key && s.buyer ? ' key' : ''}">${s.buyer || ''}</div>`).join('');
+  return `<section class="content-section" aria-labelledby="h-ma">
+      ${sectionHead('h-ma', '併購顧問服務')}
+      <p class="fs-lead">無論是尋找收購標的、評估出場，或準備被併購，併購案件通常機密性高、流程也長——這是我們建議先與顧問一對一討論，而非直接在平台公開媒合的原因。</p>
+      <div class="fs-card"><h3>適合哪些需求？</h3><div class="fs-needs" style="margin-top:12px"><div>想出售公司或尋求併購退場</div><div>想併購同業或供應鏈擴大規模</div><div>想引進策略股東並保留部分經營權</div></div></div>
+      <div class="fs-card"><h3>顧問能提供哪些協助？</h3><ul class="fs-ul" style="margin-top:10px"><li>從估值、名單篩選到條件協商，全程一對一顧問陪同</li><li>保密專區揭露與 NDA 流程，降低資訊外流風險</li><li>盡職調查、合約起草到成交後整合的完整支援</li></ul></div>
+      <div class="fs-roomcall" style="width:100%"><div><h3>如何開始？</h3><span class="fs-note">先進行一次一對一「個別諮詢」，讓顧問了解你的情況，再規劃後續步驟。</span></div><button type="button" class="btn btn-primary" data-act="ma-consult">預約併購顧問諮詢</button></div>
+      <div class="fs-card fs-request-foot"><div><h3>找對象，或找項目？</h3><span class="fs-note">可直接瀏覽併購審視中的企業、投資人或合作項目。</span></div><div class="btn-row"><a class="btn btn-secondary btn-sm" href="#investors">瀏覽潛在對象</a><button type="button" class="btn btn-secondary btn-sm" data-act="browse-track" data-id="ma">瀏覽併購審視</button></div></div>
+      <details class="fs-card fs-disclosure"><summary>查看完整五階段服務流程</summary>
+        <div class="fs-flow">${MA_STAGES.map((s, i) => `<div><small>STEP ${i + 1}</small><b>${s.title}</b><span>${s.helper}</span></div>`).join('')}</div>${stages}</details>
+      <details class="fs-card fs-disclosure"><summary>查看三方分工與關鍵合約節點</summary>
+        <p class="fs-note" style="margin-bottom:10px">同一併購案，三方各自負責的步驟；金色標示為關鍵合約節點。</p>
+        <div class="fs-tri">${tri}</div>
+        <p class="fs-note" style="margin-top:10px">金色標示列為關鍵合約與收費節點（簽署顧問合約／簽署 NDA／簽署意向書）；實際費率另見顧問合約與成交條款，此頁不呈現具體費率。</p></details>
+    </section>`;
+}
+
+/* ═════════ 對話框 ═════════ */
+const dlg = document.getElementById('dlg'), dlgForm = document.getElementById('dlg-form');
+function modal(title, body, foot = '', wide = false){
+  dlg.classList.toggle('wide', !!wide);
+  dlgForm.innerHTML = `<div class="fs-dlg-head"><h2 id="dlg-title">${title}</h2><button type="button" class="fs-dlg-x" data-close aria-label="關閉">×</button></div>
+    <div class="fs-dlg-body">${body}</div>${foot ? `<div class="fs-dlg-foot">${foot}</div>` : ''}`;
+  if (!dlg.open) dlg.showModal();
+}
+const closeModal = () => { if (dlg.open) dlg.close(); };
+const cancelBtn = (label = '取消') => `<button type="button" class="btn btn-secondary" data-close>${label}</button>`;
+dlg.addEventListener('click', (e) => { if (e.target === dlg || e.target.closest('[data-close]')) closeModal(); });
+
+function connectModal(id, side){
+  const t = side === 'company' ? companies.find(x => x.id === id) : investors.find(x => x.id === id);
+  const title = side === 'company' ? t.industry + ' · ' + t.label : t.org + ' · ' + t.name;
+  modal('發送連結請求', `<p>對象：<b>${title}</b>。送出會扣除一次本月額度，對方須在 14 天內明確回應。</p>
+    ${field('為何有興趣（必填，至少 100 字）', '<textarea class="textarea" id="reason" placeholder="請具體說明連結原因、相關經驗與希望進一步了解的內容"></textarea>', '', '<span class="fs-count-hint" id="reason-count">0 / 100 字</span>')}
+    ${field('想進一步了解', `<div class="fs-optgrid">${['財務細節','客戶結構','技術／產品','外包與技術資源','團隊背景','股權結構','退場規劃'].map(x => `<label class="fs-check"><input type="checkbox">${x}</label>`).join('')}</div>`)}
+    <div class="form-row">${field('投資規模意向', '<select class="select"><option>2,000 萬 – 5,000 萬</option><option>500–2,000 萬</option><option>5,000 萬以上</option></select>')}${field('參與程度', '<select class="select"><option>純財務投資</option><option>董事席次</option><option>深度營運參與</option></select>')}</div>`,
+    `${cancelBtn()}<button type="button" class="btn btn-primary" id="submit-connect" data-act="submit-connect" data-id="${id}" data-side="${side}" disabled>送出連結請求</button>`);
+}
+function helloModal(inv){
+  modal('打招呼', `<p>傳給 ${inv.org} · ${inv.name}。這是輕量訊息，不會改變連結或揭露狀態。</p>
+    ${field('訊息（最多 50 字）', '<textarea class="textarea short" id="hello-text" maxlength="50" placeholder="先問一個簡短問題…"></textarea>', '', '<span class="fs-count-hint ok" id="hello-count">0 / 50 字</span>')}
+    <p class="fs-note">今日還可送出 ${state.helloQuota} 次打招呼。</p>`,
+    `${cancelBtn()}<button type="button" class="btn btn-primary" id="send-hello" data-act="send-hello" disabled>送出</button>`);
+}
+function approveModal(id){
+  const r = requests.find(x => x.id === id), i = investors.find(x => x.id === r.investor);
+  modal('確認開放 L1 具名資訊', `<p>你即將對 <b>${i.org} · ${i.name}</b> 開放：</p>
+    <ul class="fs-ul"><li>公司名稱、統編、成立日期、所在地</li><li>3–4 位核心團隊成員與經歷</li><li>產品說明、主要客戶類型、營運里程碑</li><li>外包廠商與技術資源明細</li></ul>
+    <p class="fs-note">財務報表、財務模型、股權結構與重大合約不會開放。L1 一旦開放不可撤回。</p>`,
+    `${cancelBtn()}<button type="button" class="btn btn-primary" data-act="confirm-approve" data-id="${id}">由我確認開放</button>`);
+}
+function previewModal(){
+  modal('投資人看到的 L0 匿名檔案', `<article class="fs-entity"><div class="fs-entity-top">${badge(true)}${tag('gold', '募資審視')}${tag('blue', '匿名預覽')}</div>
+    <div><h3>企業軟體 · SaaS</h3><div class="sub">成立 4 年 · 員工 30–50 人</div></div>
+    ${facts([['年營收', '3,000 萬 – 5,000 萬'], ['毛利率／成長', '40% – 50% · 40% – 60%'], ['募資金額', '6,000 萬 – 8,000 萬'], ['資金用途', '業務擴編、產品開發'], ['領投狀態', '尚無領投'], ['外包與技術資源', '技術團隊 12 人 · 核心平台自研 · 外包 3 項']])}
+    <p class="fs-note">公司名稱、統編、精確財務數字、外包廠商名稱與團隊身分皆未顯示。</p></article>`,
+    `<button type="button" class="btn btn-primary" data-close>確認</button>`);
+}
+function projectModal(id, contact){
+  const p = projects.find(x => x.id === id);
+  if (contact) return modal('聯繫項目發起方', `<p>你將聯繫 <b>${p.owner}</b>。請簡述可提供的資源或合作方向：</p>${field('合作訊息', '<textarea class="textarea" placeholder="例如：我們可提供企業客戶導入、產品整合或共同投資資源…"></textarea>')}`,
+    `${cancelBtn()}<button type="button" class="btn btn-primary" data-act="done" data-msg="已聯繫項目發起方，對方可在訊息中心回覆。">送出聯繫</button>`);
+  modal('項目內容｜' + p.title, `<div class="btn-row">${tag(p.verified ? 'dark' : '', p.verified ? '✓ 已驗證發起方' : '未經查核')}</div><p class="fs-note">${p.owner} · ${p.type}</p>
+    ${facts([['產業／地區', p.industry + ' · ' + p.region], ['目前階段', p.stage], ['資金需求', p.capital], ['預計期間', p.period], ['合作回報', p.ret, true]])}
+    <p>發起方希望尋找具企業客戶、區域通路或產業營運能力的合作夥伴。進一步資料將在雙方確認連結後開放。</p>`, `<button type="button" class="btn btn-primary" data-close>關閉</button>`);
+}
+function financingModal(id, apply){
+  const f = financing.find(x => x.id === id);
+  if (apply) return modal('提出初步融資需求', `<p>資金方：<b>${f.provider}</b>。此步驟僅提出初步需求，不代表申請完成或保證核貸。</p>
+    <div class="form-row">${field('預計需求金額（萬元）', '<input class="input" type="number" value="2000">')}${field('預計動用時間', '<input class="input" type="date" value="2026-11-15">')}</div>
+    ${field('資金用途說明', '<textarea class="textarea short" placeholder="請簡述資金用途與預計還款來源"></textarea>')}`,
+    `${cancelBtn()}<button type="button" class="btn btn-primary" data-act="done" data-msg="初步融資需求已送出；資金方將進行資格與授信評估。">確認送出</button>`);
+  modal('融資條件｜' + f.title, `<div class="btn-row">${tag(f.verified ? 'dark' : '', f.verified ? '✓ 資金方已驗證' : '資格確認中')}</div><p class="fs-note">${f.provider} · ${f.type}</p>
+    ${facts([['可貸金額', f.amount], ['期間', f.term], ['參考成本', f.rate], ['還款方式', f.repay], ['擔保條件', f.collateral], ['預估時程', f.speed]])}
+    <div class="fs-banner warn">實際條件仍須依企業信用、財務狀況與資金方授信結果決定。</div>`, `<button type="button" class="btn btn-primary" data-close>關閉</button>`);
+}
+function matchModal(n){
+  const ok = ['產業領域','投資階段','資金規模','參與程度','目標市場','毛利率結構','外包與技術資源'].slice(0, n), no = ['領投狀態','海外營收'].slice(0, Math.max(0, 8 - n));
+  modal('條件符合 ' + n + '/8', `<p class="fs-note">依雙方公開欄位客觀比對，不是推薦或評分。</p>
+    <div class="form-row"><div><h3 style="color:#1F8A57">符合條件</h3>${ok.map(x => `<p>✓ ${x}</p>`).join('')}</div><div><h3 class="fs-muted">未符合／未設定</h3>${no.map(x => `<p>— ${x}</p>`).join('')}</div></div>`,
+    `<button type="button" class="btn btn-primary" data-close>知道了</button>`);
+}
+function viewer(i){
+  audits.unshift(['2026.09.23 14:32', '元啟創投 林承宇', '檢視', files[i]]);
+  modal(files[i], `<div class="fs-watermark">唯讀模式 · 元啟創投 林承宇 · 2026.09.23 14:32</div>
+    <div class="fs-doc"><h3>翰森科技股份有限公司</h3><b>${files[i].replace(/\.(pdf|xlsx)$/, '')}</b><p class="fs-note">機密文件｜僅供授權對象審閱</p><div class="fs-docline"></div><div class="fs-docline"></div><div class="fs-docline" style="width:58%"></div><div style="height:60px"></div><div class="fs-docline"></div></div>`, '', true);
+}
+// 線上簽署：公版 NDA／合作備忘錄（10/13 週會：整合線上簽署備忘錄、公版 NDA）
+const DOCS = { nda:'公版保密協議（NDA）', mou:'合作備忘錄（MOU）' };
+function ndaModal(id, doc = 'nda'){
+  const c = companies.find(x => x.id === id), name = companyName(c);
+  modal('線上簽署', `${field('文件類型', `<div class="chips">${Object.entries(DOCS).map(([k, v]) => `<button type="button" class="chip" data-act="nda-doc" data-id="${id}" data-doc="${k}" aria-pressed="${k === doc}">${v}</button>`).join('')}</div>`)}
+    <div class="fs-doc"><h3>${doc === 'nda' ? '保密協議 Non-Disclosure Agreement' : '合作備忘錄 Memorandum of Understanding'}</h3>
+      <p class="fs-note">甲方（${doc === 'nda' ? '資訊接收方' : '提出方'}）：元啟創投 · 林承宇　・　乙方（${doc === 'nda' ? '資訊揭露方' : '受邀方'}）：${name}</p>
+      <div class="fs-docline"></div><div class="fs-docline"></div><div class="fs-docline" style="width:70%"></div>
+      <p class="fs-note" style="margin-top:14px">${doc === 'nda' ? '甲方承諾僅將乙方於資料室揭露之財務報表、客戶集中度等資料用於本次投資評估，不得另作他用或對外揭露。' : '雙方就投資評估與後續合作方向達成初步共識，本備忘錄不具投資承諾效力。'}本文件簽署紀錄與後續存取行為將由財務 SENSE 平台留存稽核。</p></div>
+    ${field('電子簽名（甲方）', signatures.investor ? `<img class="fs-sig" src="${signatures.investor}" alt="你的簽名">` : '<input class="input" value="林承宇" disabled>', '', signatures.investor ? '' : '<p class="fs-note">尚未上傳親筆簽名，本次將以文字姓名代替；可至「編輯我的檔案」上傳。</p>')}
+    <label class="fs-check"><input type="checkbox" id="nda-agree">本人已閱讀並同意上述文件內容，並以電子簽名方式完成本次簽署</label>`,
+    `${cancelBtn()}<button type="button" class="btn btn-primary" id="submit-nda" data-act="submit-nda" data-id="${id}" data-doc="${doc}" disabled>簽署並送出</button>`, true);
+}
+function ndaApproveModal(id){
+  const r = ndaRequests.find(x => x.id === id);
+  modal('確認並完成雙方簽署', `<div class="fs-doc"><h3>${r.doc}</h3><p class="fs-note">甲方（資訊接收方）：${r.org} · ${r.contact}　・　乙方（資訊揭露方）：翰森科技股份有限公司</p>
+      <div class="fs-docline"></div><div class="fs-docline"></div><div class="fs-docline" style="width:70%"></div>
+      <p class="fs-note" style="margin-top:14px">對方已於 ${r.date} 以電子簽名完成甲方簽署。你完成乙方簽署後即雙方生效；${r.org} 會依其角色（${ROLE_GROUPS[permGroup[r.org]]}）套用預設權限，之後仍可逐份調整。</p></div>
+    ${field('電子簽名（乙方，你的簽名）', signatures.company ? `<img class="fs-sig" src="${signatures.company}" alt="你的簽名">` : '<span class="fs-note">尚未上傳親筆簽名，本次將以公司名稱代替；可至「編輯我的檔案」上傳。</span>')}
+    <label class="fs-check"><input type="checkbox" id="nda-approve-agree">本人已閱讀並同意上述文件內容</label>`,
+    `${cancelBtn()}<button type="button" class="btn btn-primary" id="confirm-nda" data-act="confirm-nda" data-id="${id}" disabled>確認簽署</button>`, true);
+}
+function advisoryModal(){
+  modal('預約專人諮詢', `<p>我們會依你剛才的診斷結果，安排熟悉該類融資方案的顧問與你聯繫；由專人一對一討論，不是制式媒合。</p>
+    <div class="form-row">${field('聯絡人', '<input class="input" value="黃文華">')}${field('聯絡電話', '<input class="input" placeholder="09xx-xxx-xxx">')}</div>
+    ${field('方便聯繫的時段', '<select class="select"><option>上午（9:00–12:00）</option><option>下午（13:00–17:00）</option><option>不拘</option></select>')}
+    ${field('想先讓顧問知道的補充資訊（選填）', '<textarea class="textarea short" placeholder="例如：希望盡快動用、正在準備擴廠等"></textarea>')}`,
+    `${cancelBtn()}<button type="button" class="btn btn-primary" data-act="done" data-msg="已送出諮詢請求，專人將於 1–2 個工作天內與你聯繫。">送出諮詢請求</button>`);
+}
+function maConsultModal(){
+  modal('預約併購顧問諮詢', `<p>請留下基本資訊，顧問會先進行「個別諮詢」了解你的情況，再討論後續的媒合與流程規劃。</p>
+    <div class="form-row">${field('姓名', '<input class="input" value="黃文華">')}${field('職稱', '<input class="input" value="財務長">')}</div>
+    <div class="form-row">${field('公司', '<input class="input" value="翰森科技股份有限公司">')}${field('Email', '<input class="input" type="email" placeholder="you@company.com">')}</div>
+    <div class="form-row">${field('手機', '<input class="input" placeholder="09xx-xxx-xxx">')}${field('您是', '<select class="select"><option>想賣（出售方）</option><option>想買（收購方）</option><option>尚未確定</option></select>')}</div>
+    ${field('其他需求（選填）', '<textarea class="textarea short" placeholder="希望啟動的時程、目前準備狀況等"></textarea>')}`,
+    `${cancelBtn()}<button type="button" class="btn btn-primary" data-act="done" data-msg="已送出併購諮詢需求，顧問將盡快與你聯繫進行個別諮詢。">送出諮詢需求</button>`);
+}
+
+/* ═════════ 路由與渲染（單頁，#hash 切換子頁） ═════════ */
+const app = document.querySelector('.app'), view = document.getElementById('view');
+// 只屬於某個角色的頁面；目前視角沒有該角色時回到入口頁
+const PAGE_ROLE = { views:'company', requests:'company', roomadmin:'company', links:'investor', dataroom:'investor' };
+const CRUMB = { settings:'編輯我的檔案', company:'企業詳情', dataroom:'財務資料室' };
+const PAGES = { home:homePage, browse:browsePage, investors:investorsPage, profile:profilePage, settings:settingsPage, views:viewsPage, requests:requestsPage,
+  links:linksPage, roomadmin:roomAdminPage, dataroom:dataRoomPage, messages:messagesPage, financing:financingPage, ma:maPage, company:() => companyDetail(state.detailId) };
+const NOW = () => '2026.10.26 ' + new Date().toTimeString().slice(0, 5);
+
+function parseHash(){
+  const h = location.hash.slice(1);
+  const m = h.match(/^company-(\d+)$/);
+  if (m){ state.detailId = +m[1]; return 'company'; }
+  if (/^set-/.test(h)) return 'settings';   // 編輯頁的分段錨點
+  return PAGES[h] ? h : 'home';
+}
+function render(){
+  let page = parseHash();
+  if (PAGE_ROLE[page] && !has(PAGE_ROLE[page])) page = 'home';
+  const changed = page !== state.page;
+  // 編輯頁點分段標籤只是捲動，不重畫
+  if (!changed && page === 'settings' && /^set-/.test(location.hash.slice(1))) return;
+  state.page = page;
+  app.dataset.page = page;
+  app.dataset.role = state.roles.join(' ');
+  if (CRUMB[page]) app.dataset.crumb = CRUMB[page]; else delete app.dataset.crumb;
+  SenseShell.refresh();
+  view.innerHTML = `<div class="fs-view">${PAGES[page]()}</div>`;
+  afterRender(page);
+  document.querySelectorAll('[data-demo-role]').forEach(b => b.setAttribute('aria-pressed', b.dataset.demoRole === (state.roles.length === 2 ? 'both' : state.roles[0])));
+  if (changed){
+    const anchor = /^set-/.test(location.hash.slice(1)) && document.getElementById(location.hash.slice(1));
+    if (anchor) anchor.scrollIntoView(); else window.scrollTo(0, 0);
+  }
+}
+function afterRender(page){
+  view.querySelectorAll('.ticket').forEach(SenseUI.ticketLine);
+  if (page === 'browse'){
+    const box = document.getElementById('browse-actions');
+    box.innerHTML = SenseUI.listActions({ query:state.browseQuery, sorts:[{key:'updated',label:'最新更新'},{key:'match',label:'條件符合度'}], sort:state.browseSort, placeholder:'搜尋產業或項目' });
+    SenseUI.bindListActions(box, { onQuery:(q) => { state.browseQuery = q; browseList(); }, onSort:(k) => { state.browseSort = k; browseList(); } });
+    browseList();
+  }
+  if (page === 'investors'){
+    const box = document.getElementById('inv-actions');
+    box.innerHTML = SenseUI.listActions({ query:state.investorQuery, sorts:[{key:'match',label:'條件符合度'},{key:'rate',label:'回應率'},{key:'active',label:'最近活躍'}], sort:state.investorSort, placeholder:'搜尋機構或領域' });
+    SenseUI.bindListActions(box, { onQuery:(q) => { state.investorQuery = q; investorList(); }, onSort:(k) => { state.investorSort = k; investorList(); } });
+    investorList();
+  }
+  if (page === 'settings'){
+    SenseForm.sectionTabs(document.getElementById('set-tabs'));
+    [['rev', revRange], ['margin', pctRange], ['growth', growthRange]].forEach(([id, fn]) => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', () => { document.getElementById(id + '-hint').textContent = '→ 投資人將看到：' + fn(+el.value) + '　✓ 已匿名'; });
+    });
+  }
+  if (page === 'financing' && state.finTab === 'quiz' && !state.finDone){
+    SenseForm.stepper(document.getElementById('fin-stepper'), FINQUIZ, state.finStep + 1, { check:SenseShell.asset('ic-check.svg') });
+  }
+}
+// 列表頁只重畫列表（保留搜尋框焦點），其他頁整頁重畫
+function refreshView(){
+  if (state.page === 'browse') browseList();
+  else if (state.page === 'investors') investorList();
+  else render();
+}
+const toggleFollow = (arr, id, on, off) => { const x = arr.find(o => o.id === id); x.followed = !x.followed; refreshView(); toast(x.followed ? on : off); };
+const now = NOW;
+
+/* ═════════ 互動 ═════════ */
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('[data-act],[data-browse-tab],[data-fin-tab],[data-fin-opt],[data-thread],[data-thread-filter],[data-home-feed],[data-hero-co],[data-hero-inv],[data-demo-role]');
+  if (!t) return;
+  const d = t.dataset, id = d.id && /^\d+$/.test(d.id) ? +d.id : d.id;
+  if (d.demoRole){ state.roles = d.demoRole === 'both' ? ['company','investor'] : [d.demoRole]; render(); return toast('原型示範：已切換為「' + t.textContent + '」視角'); }
+  if (d.browseTab){ state.browseTab = d.browseTab; return browseList(); }
+  if (d.finTab){ state.finTab = d.finTab; return render(); }
+  if (d.finOpt){ const i = state.finStep; state.finAnswers[i] = FINQUIZ[i].opts[+d.finOpt]; if (i < FINQUIZ.length - 1) state.finStep++; else state.finDone = true; return render(); }
+  if (d.thread){ state.activeThread = d.thread; return render(); }
+  if (d.threadFilter){ state.threadFilter = d.threadFilter; return render(); }
+  if (d.homeFeed){ state.homeFeed = d.homeFeed; return render(); }
+  const pick = (arr, key) => { const i = arr.indexOf(key); i > -1 ? arr.splice(i, 1) : arr.push(key); render(); };
+  if (d.heroCo) return pick(state.heroStats.company, d.heroCo);
+  if (d.heroInv) return pick(state.heroStats.investor, d.heroInv);
+
+  switch (d.act){
+    case 'toast': return toast(d.msg);
+    case 'done': closeModal(); return toast(d.msg);
+    case 'radio-chip': t.parentElement.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c === t)); return;
+    case 'reset-filter': state[{ companies:'companyFilters', investors:'investorFilters', financing:'financingFilters' }[id]] = []; return render();
+    case 'follow-company': return toggleFollow(companies, id, '已追蹤此企業檔案；更新將出現在首頁。', '已取消追蹤。');
+    case 'follow-investor': return toggleFollow(investors, id, '已追蹤此投資人。', '已取消追蹤。');
+    case 'follow-project': return toggleFollow(projects, id, '已追蹤此項目，後續更新會出現在首頁。', '已取消追蹤項目。');
+    case 'follow-financing': return toggleFollow(financing, id, '融資方案已收藏。', '已取消收藏。');
+    case 'match': return matchModal(id);
+    case 'project-detail': return projectModal(id, false);
+    case 'project-contact': return projectModal(id, true);
+    case 'financing-detail': return financingModal(id, false);
+    case 'financing-apply': return financingModal(id, true);
+    case 'connect-company': return connectModal(id, 'company');
+    case 'connect-investor': return connectModal(id, 'investor');
+    case 'hello': return helloModal(investors.find(x => x.id === id));
+    case 'hello-request': return helloModal(investors.find(x => x.id === requests.find(r => r.id === id).investor));
+    case 'approve': return approveModal(id);
+    case 'decline': requests.find(x => x.id === id).state = 'declined'; render(); return toast('已婉拒，不需填理由，也不影響對方評價。');
+    case 'confirm-approve': requests.find(x => x.id === id).state = 'L1'; closeModal(); render(); return toast('L1 具名資訊已由你開放；資料室仍維持關閉。');
+    case 'preview-l0': return previewModal();
+    case 'contact': return modal('聯絡資訊', `<dl class="ro-pairs"><dt>單位名稱</dt><dd>${ME.org}</dd><dt>聯絡窗口</dt><dd>${ME.name} · ${ME.tag}</dd><dt>平台訊息</dt><dd>可透過「訊息」功能直接聯繫</dd></dl>`, cancelBtn('關閉'));
+    case 'share': try { navigator.clipboard.writeText(location.href.split('#')[0] + '#profile'); } catch (err) {} return toast('檔案連結已複製。');
+    case 'post': {
+      const text = document.getElementById('post-text').value.trim(); if (!text) return toast('請先輸入動態內容。');
+      const role = has('company') ? 'company' : 'investor', me = identities[role];
+      posts.unshift({ id:++postSeq, role, org:me.org, author:me.name, time:now(), type:document.getElementById('post-type').value, pinned:false, text });
+      render(); return toast('動態已發布。');
+    }
+    case 'pin-post': { const p = posts.find(x => x.id === id); p.pinned = !p.pinned; render(); return toast(p.pinned ? '已設為置頂。' : '已取消置頂。'); }
+    case 'delete-post': posts = posts.filter(x => x.id !== id); render(); return toast('已刪除動態。');
+    case 'save-profile': {
+      const v = (x) => { const el = document.getElementById(x); return el ? el.value : null; };
+      if (v('bio-mode') != null){ bios.company.mode = v('bio-mode'); bios.company.seeking = v('bio-seeking'); }
+      if (v('pref-focus') != null){ Object.assign(investorPrefs, { focus:v('pref-focus'), stage:v('pref-stage'), ticket:v('pref-ticket'), role:v('pref-role') }); bios.investor.mode = v('bio-mode-inv'); bios.investor.seeking = v('bio-seeking-inv'); }
+      return toast('檔案已儲存；相關頁面的公開區間已同步更新。');
+    }
+    case 'withdraw': { const l = links.find(x => x.id === id); l.state = 'expired'; companies.find(x => x.id === l.company).status = null; render(); return toast('連結請求已撤回並關閉。'); }
+    case 'nda': return ndaModal(id);
+    case 'nda-doc': return ndaModal(id, d.doc);
+    case 'submit-nda': {
+      const c = companies.find(x => x.id === id); c.status = 'nda'; const l = links.find(x => x.company === id); if (l) l.state = 'nda';
+      audits.unshift([now(), '你', '簽署' + DOCS[d.doc] + '並送出', unlockedName(c)]);
+      closeModal(); render(); return toast('你已完成線上簽署並送出，等待對方完成雙方簽署後開放資料室。');
+    }
+    case 'view-nda': return ndaApproveModal(id);
+    case 'confirm-nda': {
+      if (t.dataset.step !== '2'){ t.dataset.step = '2'; t.textContent = '再按一次以完成雙方簽署'; return; }
+      const r = ndaRequests.find(x => x.id === id); r.state = 'approved';
+      perms[r.org] = roleTemplate[permGroup[r.org]].slice();
+      audits.unshift([now(), '你', '完成雙方簽署', r.org]);
+      closeModal(); render(); return toast(`已與 ${r.org} 完成雙方簽署，並套用「${ROLE_GROUPS[permGroup[r.org]]}」預設權限。`);
+    }
+    case 'viewfile': return viewer(id);
+    case 'requestfile': t.disabled = true; t.textContent = '已申請'; return toast('已向企業申請這一份檔案的權限。');
+    case 'send-msg': { const inp = document.getElementById('msg-text'); if (!inp.value.trim()) return; (sent[id] = sent[id] || []).push(inp.value.trim()); render(); return toast('訊息已送出。'); }
+    case 'fin-back': if (state.finStep > 0){ state.finStep--; render(); } return;
+    case 'fin-restart': state.finStep = 0; state.finAnswers = []; state.finDone = false; return render();
+    case 'advisory': return advisoryModal();
+    case 'ma-consult': return maConsultModal();
+    case 'browse-track': state.browseTab = id; location.hash = 'browse'; return;
+    case 'fin-plans': state.finTab = 'plans'; location.hash = 'financing'; return;
+    case 'submit-connect': {
+      if (d.side === 'company'){ const c = companies.find(x => x.id === id); c.status = 'pending'; state.investorQuota--; links.unshift({ id:'C-2611', company:id, date:'2026.10.26', state:'pending', days:14 }); }
+      else { investors.find(x => x.id === id).state = 'pending'; state.companyQuota--; }
+      closeModal(); render(); return toast('已送出。對方須在 14 天內明確回應，逾期將自動關閉。');
+    }
+    case 'send-hello': state.helloQuota--; closeModal(); return toast('招呼已送出；此動作不會升級關係或開放資訊。');
+  }
+});
+
+document.addEventListener('change', (e) => {
+  const t = e.target, d = t.dataset;
+  if (d.filter){
+    const key = { companies:'companyFilters', investors:'investorFilters', financing:'financingFilters' }[d.filter];
+    state[key] = t.checked ? [...state[key], t.value] : state[key].filter(x => x !== t.value);
+    return d.filter === 'financing' ? render() : refreshView();
+  }
+  if (d.permOrg){
+    perms[d.permOrg][+d.i] = t.checked;
+    audits.unshift([now(), '你', t.checked ? '開啟權限' : '關閉權限', files[+d.i] + ' → ' + d.permOrg]);
+    render(); return toast(`已${t.checked ? '開啟' : '關閉'}「${files[+d.i]}」對 ${d.permOrg} 的權限。`);
+  }
+  if (d.tpl){ roleTemplate[d.tpl][+d.i] = t.checked; return toast(`已更新「${ROLE_GROUPS[d.tpl]}」的預設權限；之後完成 NDA 的對象會套用。`); }
+  if (d.actChange === 'anonymous'){ state.anonymous = t.checked; render(); return toast(state.anonymous ? '已切換匿名瀏覽。' : '已切換具名瀏覽。'); }
+  if (d.sig){
+    const f = t.files[0]; if (!f) return;
+    const rd = new FileReader(); rd.onload = () => { signatures[d.sig] = rd.result; render(); toast('簽名已上傳並儲存。'); }; rd.readAsDataURL(f);
+  }
+  if (t.id === 'nda-agree') document.getElementById('submit-nda').disabled = !t.checked;
+  if (t.id === 'nda-approve-agree') document.getElementById('confirm-nda').disabled = !t.checked;
+});
+
+document.addEventListener('input', (e) => {
+  const t = e.target;
+  if (t.id === 'reason'){ const n = t.value.trim().length, c = document.getElementById('reason-count'); c.textContent = n + ' / 100 字'; c.classList.toggle('ok', n >= 100); document.getElementById('submit-connect').disabled = n < 100; }
+  if (t.id === 'hello-text'){ document.getElementById('hello-count').textContent = t.value.length + ' / 50 字'; document.getElementById('send-hello').disabled = !t.value.length; }
+  if (t.classList.contains('range')) t.style.setProperty('--fill', t.value + '%');
+});
+document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.id === 'msg-text'){ e.preventDefault(); document.querySelector('[data-act="send-msg"]').click(); } });
+
+SenseShell.mount();
+window.addEventListener('hashchange', render);
+render();
+</script>
+</body>
+</html>

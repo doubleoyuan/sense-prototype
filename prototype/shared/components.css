@@ -21,8 +21,39 @@ img{display:block}
 .sidebar button{text-align:left}
 .sb-card{background:var(--white);border-radius:var(--r-20);padding:20px;display:flex;flex-direction:column;align-items:flex-start;gap:20px;flex:none}
 
-.sb-logo{display:flex;align-items:center;text-decoration:none}
-.sb-logotype{display:block;height:40px;width:auto;max-width:100%}  /* Figma 4118:740：固定高 40px（598×185 等比 ≈ 129px 寬） */
+/* 側欄收合（Figma 4127:212 展開、4127:537 收合）：桌機才有，收合後只剩 70px 窄欄（標誌＋展開鈕） */
+/* 只有按下收合／展開時才有轉場（.nav-anim 由 shell.js 加上），換頁載入時直接是最終寬度 */
+.app.nav-anim .sidebar{transition:width .2s ease}
+.sb-card{position:relative}
+/* 展開／收合動畫中卡片維持原寬，不讓文字被擠到換行（抽屜模式寬度可能小於 320，不套用） */
+@media (min-width:1024px){ .sb-card,.sb-user{min-width:calc(var(--sidebar-w) - 40px)} }
+/* 收合鈕：貼在白卡右緣、與「找商務合作」同高（卡片內距 20＋logo 36＋間距 20＋組距 10，往上 3） */
+.sb-collapse{position:absolute;right:0;top:83px;width:20px;height:51px;display:flex;align-items:center;justify-content:center;
+  background:var(--white);border:1px solid var(--black-200);border-right:0;border-radius:4px 0 0 4px}
+/* 外觀照稿 20px，可點範圍左右各多 6px（共 32px） */
+.sb-collapse::before{content:"";position:absolute;inset:0 -6px}
+.sb-rail{display:none;flex-direction:column;align-items:flex-start;gap:20px}
+.sb-rail-logo{display:block}
+.sb-rail-logo img{display:block;height:36px;width:auto}
+.sb-expand{width:30px;height:30px;margin-left:-3px;display:flex;align-items:center;justify-content:center;
+  background:var(--white);border:1px solid var(--black-200);border-radius:100px}
+/* 箭頭（shell.js 內嵌 SVG）：平常灰；hover／鍵盤聚焦時底色轉為「找商務合作」的橘、箭頭變白並加粗 */
+.sb-collapse,.sb-expand{transition:background-color .2s,border-color .2s}
+.sb-collapse-ic{display:block;width:16px;height:16px;flex:none}
+.sb-collapse-ic path{fill:var(--black-300);stroke:var(--white);stroke-width:0;stroke-linejoin:round;transition:fill .2s,stroke-width .2s}
+.sb-expand .sb-collapse-ic path{fill:var(--black-400)}
+.sb-collapse:hover,.sb-collapse:focus-visible,.sb-expand:hover,.sb-expand:focus-visible{background:var(--cta-orange);border-color:var(--cta-orange)}
+.sb-collapse:hover path,.sb-collapse:focus-visible path,.sb-expand:hover path,.sb-expand:focus-visible path{fill:var(--white);stroke-width:1.2px}
+.sb-collapse:focus-visible,.sb-expand:focus-visible{outline:2px solid var(--black-800);outline-offset:2px}
+.app.nav-collapsed .sidebar{width:70px}
+.app.nav-collapsed .sb-card,.app.nav-collapsed .sb-user{display:none}
+.app.nav-collapsed .sb-rail{display:flex}
+@media (prefers-reduced-motion:reduce){ .app.nav-anim .sidebar,.sb-collapse,.sb-expand,.sb-collapse-ic path{transition:none} }
+
+.sb-logo{display:flex;align-items:center;padding-left:10px;text-decoration:none}
+.sb-logotype{display:block;height:36px;width:auto;max-width:100%}  /* Figma 4118:740：固定高 36px（≈116px 寬） */
+/* 側欄分四組（logo／模組／我的專屬內容／後台管理），組與組之間 30px、組內 20px（Figma 4104:155） */
+.sb-card > .sb-cta,.sb-card > .sb-sec{margin-top:10px}
 
 /* 找商務合作 */
 .sb-cta{position:relative;display:flex;align-items:center;gap:40px;padding:10px 20px;border:2px solid var(--cta-orange);border-radius:40px;
@@ -50,9 +81,10 @@ a.sb-mod-label:hover{color:var(--strong)}
 .sb-chev{width:32px;height:32px;margin:-4px;display:grid;place-items:center;flex:none;border-radius:6px}
 .sb-chev:hover{background:var(--black-100)}
 .sb-chev img{width:24px;height:24px}
-.sb-sub{display:flex;flex-direction:column;gap:10px;width:100%}
+/* 子選單每列加高（2026-10-26 使用者回饋原本太密）：上下內距 8px，列與列之間 6px */
+.sb-sub{display:flex;flex-direction:column;gap:6px;width:100%}
 .sb-sub-item{display:block;width:100%;padding:0 10px;text-decoration:none;color:inherit}
-.sb-sub-item span{display:block;padding:0 10px;border-bottom:1px solid var(--black-200);font-size:14px;font-weight:400;line-height:24px;white-space:nowrap;transition:color .15s,border-color .15s}
+.sb-sub-item span{display:block;padding:8px 10px;border-bottom:1px solid var(--black-200);font-size:14px;font-weight:400;line-height:24px;white-space:nowrap;transition:color .15s,border-color .15s}
 .sb-sub-item:hover span{color:var(--strong)}
 .sb-sub-item.active span{color:var(--strong);font-weight:600;border-bottom-color:var(--c)}
 
@@ -83,18 +115,21 @@ a.sb-mod-label:hover{color:var(--strong)}
 .header-inner{width:100%;max-width:var(--content-max);margin:0 auto;display:flex;align-items:center;gap:12px}
 .header-spacer{flex:1}
 
-/* 頁籤形狀的模組標題：單一路徑（取自 Figma 左右斜角＋中段），可用 --tab-* 換色 */
-.title-tab{--tab-fill:var(--black-50);--tab-stroke:var(--black-400);--tab-text:var(--black-700);
-  position:relative;width:153px;height:36px;flex:none}
-a.title-tab{text-decoration:none;cursor:pointer;border-radius:6px}
-a.title-tab .tab-shape .body{transition:filter .15s}
-a.title-tab:hover .tab-shape .body{filter:brightness(.97)}
-.title-tab .tab-shape{position:absolute;left:-2px;top:-2px;width:157px;height:44px;overflow:visible}
-.title-tab .tab-shape path{stroke-width:4;paint-order:stroke;stroke-linejoin:round}
-.title-tab .tab-shape .shadow{fill:var(--black-200);stroke:var(--black-200)}
-.title-tab .tab-shape .body{fill:var(--tab-fill);stroke:var(--tab-stroke)}
-.title-tab .tab-text{position:absolute;left:27px;top:0;width:100px;height:36px;display:flex;align-items:center;justify-content:center;
-  font-size:14px;font-weight:700;line-height:16px;letter-spacing:var(--tracking-ultra);color:var(--tab-text);white-space:nowrap}
+/* Breadcrumb：放在 header 左側（取代原本的模組頁籤，2026-10-26）。
+   文字一律灰階、不帶模組色；上層可點為淺灰，目前頁為深色 */
+.breadcrumb{min-width:0;display:flex;align-items:center}
+.breadcrumb ol{list-style:none;margin:0;padding:0;display:flex;align-items:center;min-width:0;
+  font-size:14px;font-weight:700;line-height:36px;letter-spacing:var(--tracking-ultra);white-space:nowrap}
+.breadcrumb li{display:flex;align-items:center;min-width:0}
+.breadcrumb li + li::before{content:"/";margin:0 12px;font-size:18px;color:var(--black-300)}
+.breadcrumb a{color:var(--black-400);text-decoration:none;border-radius:6px;transition:color .15s}
+.breadcrumb a:hover{color:var(--black-800)}
+.breadcrumb a:focus-visible{outline:2px solid var(--black-800);outline-offset:2px}
+.breadcrumb [aria-current]{color:var(--black-800);overflow:hidden;text-overflow:ellipsis}
+/* 手機用：「‹ 上一層」返回連結，桌機隱藏 */
+.breadcrumb .breadcrumb-back{display:none;align-items:center;gap:4px;height:36px;padding-right:4px;
+  font-size:14px;font-weight:700;letter-spacing:var(--tracking-ultra);color:var(--black-700);text-decoration:none;white-space:nowrap}
+.breadcrumb .breadcrumb-back svg{width:18px;height:18px;flex:none}
 
 /* 圖示按鈕（通知、搜尋、排序） */
 .icon-btn{height:36px;min-width:56px;padding:8px 16px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
@@ -109,13 +144,6 @@ a.title-tab:hover .tab-shape .body{filter:brightness(.97)}
 /* 頁面區塊：區塊之間 40px（.content），區塊內 20px */
 .content-section{width:100%;display:flex;flex-direction:column;gap:20px;align-items:flex-start}
 
-/* Breadcrumb */
-.breadcrumb{display:flex;align-items:center;gap:10px;font-weight:700;line-height:32px;white-space:nowrap}
-.breadcrumb .root{font-size:12px;color:var(--black-400)}
-.breadcrumb .sep{font-size:18px;color:var(--black-500)}
-.breadcrumb .cur{font-size:12px;color:var(--black-800)}
-.breadcrumb a{text-decoration:none;transition:color .15s}
-.breadcrumb a:hover{color:var(--black-800)}
 
 /* TicketHero：入口頁的票券 */
 .ticket{--ticket-line-inset:8px;position:relative;display:flex;align-items:stretch;max-width:100%}
@@ -298,12 +326,22 @@ a.title-tab:hover .tab-shape .body{filter:brightness(.97)}
   .app.nav-open .sidebar{transform:none;box-shadow:0 0 40px rgba(0,0,0,.15)}
   .app.nav-open .backdrop{display:block;position:fixed;inset:0;background:rgba(0,0,0,.28);z-index:35}
   .hamburger{display:inline-flex}
+  /* 抽屜模式不提供收合：一律顯示完整側欄 */
+  .sb-collapse{display:none}
+  .app.nav-collapsed .sidebar{width:var(--sidebar-w)}
+  .app.nav-collapsed .sb-card,.app.nav-collapsed .sb-user{display:flex}
+  .app.nav-collapsed .sb-rail{display:none}
   .card-grid{--cols:3}
 }
 @media (max-width:899px){ .card-grid{--cols:2} }
 @media (max-width:767px){
   :root{--header-h:65px}
   .header{padding:14px 16px}
+  /* 麵包屑：深層頁只留「‹ 上一層」，入口頁只留目前模組名稱 */
+  .breadcrumb.is-deep ol{display:none}
+  .breadcrumb.is-deep .breadcrumb-back{display:inline-flex}
+  .breadcrumb li:not(:last-child){display:none}
+  .breadcrumb li + li::before{display:none}
   .content{padding:24px 16px}
   .ticket{width:100%}
   .ticket-body{flex:1;flex-direction:column;align-items:flex-start;gap:14px}

@@ -41,7 +41,3 @@
 }
 
 .app[data-module="product"]{ --accent:#4D9DF8; --accent-border:#1A81F6; }
-
-/* header 頁籤：淡色底＋模組色外框＋模組深色字（2026-10-13 選定，優先度低於 CTA）。
-   其他模組的色值確認後再加，未設定前維持灰色 */
-.app[data-module="product"] .title-tab{ --tab-fill:var(--mod-product-tint); --tab-stroke:var(--mod-product); --tab-text:var(--mod-product-strong); }

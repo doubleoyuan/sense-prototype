@@ -8,26 +8,18 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="shared/tokens.css?v=20261020a">
-<link rel="stylesheet" href="shared/components.css?v=20261020a">
-<link rel="stylesheet" href="shared/forms.css?v=20261020a">
+<link rel="stylesheet" href="shared/tokens.css?v=20261026g">
+<link rel="stylesheet" href="shared/components.css?v=20261026g">
+<link rel="stylesheet" href="shared/forms.css?v=20261026g">
 <style>
   /* ── 本頁新增的元件（推導）：UI Library 尚未收錄，確認後再移到 shared/ ── */
   /* 狀態標籤：已報名／開放報名／即將開放、消息／優惠 */
   .status{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:var(--tracking-wider);white-space:nowrap}
-  .status.joined{background:var(--accent);color:var(--white)}
   .status.open{background:var(--mod-product-tint);color:var(--accent-border)}
   .status.soon{background:var(--black-100);color:var(--black-500)}
   .status.deal{background:var(--metric-bg);color:#C25E1F}
   .status.news{background:var(--mod-product-tint);color:var(--accent-border)}
-  /* 下一場活動：日期方塊＋資訊 */
-  .next-event{display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:start}
-  .date-box{width:72px;padding:8px 0;border-radius:16px;background:var(--ticket);display:flex;flex-direction:column;align-items:center}
-  .date-box small{font-size:12px;font-weight:600;letter-spacing:var(--tracking-wider);color:var(--black-600)}
-  .date-box b{font-size:32px;font-weight:500;font-style:italic;line-height:40px;color:var(--black-800)}
-  .next-title{font-size:18px;font-weight:700;line-height:28px;letter-spacing:var(--tracking-super);color:var(--black-800)}
   .meta-line{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;font-size:14px;line-height:24px;letter-spacing:1.6px;color:var(--black-600)}
-  .tip{padding:10px 14px;border-radius:12px;background:var(--step-highlight);font-size:14px;line-height:24px;letter-spacing:1.6px;color:var(--black-700)}
   /* 公司方塊 */
   .co-grid{width:100%;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
   .co-tile{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--line-soft);border-radius:16px;background:var(--white);text-align:left;transition:border-color .15s}
@@ -47,8 +39,126 @@
   .feed-item small{font-size:12px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
   .verified{width:18px;height:18px;vertical-align:-3px;margin-left:6px}
   .ro-list{margin:0;padding-left:20px;font-size:15px;line-height:26px;letter-spacing:1.6px;color:var(--black-800)}
+  /* 報名按鈕（表格內用的小尺寸，推導自 .btn-primary）、私密欄位提示、LINE 社群卡 */
+  .reg-btn{height:32px;padding:0 16px;border-radius:var(--r-30);background:transparent;border:1px solid var(--black-300);color:var(--black-700);
+    font-size:12px;font-weight:700;letter-spacing:var(--tracking-wider);white-space:nowrap;transition:border-color .15s,color .15s}
+  .reg-btn:hover,.reg-btn:focus-visible{border-color:var(--black-600);color:var(--black-800)}
+  /* 表格內的「已報名」：與入場券同款黑底白勾＋黑字 */
+  .ev-joined{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;letter-spacing:var(--tracking-wider);color:var(--black-800);white-space:nowrap}
+  .ev-joined svg{width:18px;height:18px;flex:none}
+  .btn-row{display:flex;flex-wrap:wrap;gap:12px}
+  .private-note{font-size:12px;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+  /* 客戶服務經理聯絡卡（推導） */
+  .cs-card{display:flex;flex-direction:row;align-items:center;gap:20px;flex-wrap:wrap}
+  .cs-avatar{width:56px;height:56px;flex:none;border-radius:50%;background:var(--black-100);display:grid;place-items:center;font-size:20px;font-weight:700;color:var(--black-700)}
+  .cs-info{flex:1;min-width:240px;display:flex;flex-direction:column;gap:4px}
+  .cs-info b{font-size:16px;font-weight:700;letter-spacing:var(--tracking-super);color:var(--black-800)}
+  .cs-info p{margin:4px 0 0;font-size:14px;line-height:24px;letter-spacing:1.6px;color:var(--black-700)}
+  .cs-actions{display:flex;gap:12px;flex-wrap:wrap}
+  .line-card{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .line-card p{font-size:14px;line-height:24px;letter-spacing:1.6px;color:var(--black-700);flex:1;min-width:240px}
+  /* 下一場活動入場券：沿用 .ticket 外形（票面＋撕線＋票根），內容改為下一場活動（推導） */
+  .tk-event{width:100%}
+  .tk-event .ticket-body{flex:1;gap:24px;padding:24px 0}
+  .tk-event .ticket-perf{margin:-24px 0}  /* 撕線要跟票身內距一致，缺口才會剛好落在票券邊緣 */
+  .tk-date{width:76px;flex:none;padding:10px 0;border-radius:16px;background:var(--white);display:flex;flex-direction:column;align-items:center}
+  .tk-date small{font-size:12px;font-weight:600;line-height:18px;letter-spacing:var(--tracking-wider);color:var(--black-600)}
+  .tk-date b{font-size:34px;font-weight:500;font-style:italic;line-height:42px;color:var(--black-800)}
+  .tk-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+  .tk-kicker{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;font-size:13px;font-weight:500;letter-spacing:var(--tracking-wider);color:var(--black-600)}
+  .tk-type{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:20px;background:var(--white);font-size:12px;font-weight:600;color:var(--black-700)}
+  .tk-title{margin:0;font-size:20px;font-weight:700;line-height:30px;letter-spacing:var(--tracking-super);color:var(--black-800)}
+  .tk-meta span{display:inline-flex;align-items:center;gap:6px}
+  .tk-meta svg{width:16px;height:16px;flex:none;color:var(--black-500)}
+  .tk-meta{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:14px;line-height:24px;letter-spacing:1.6px;color:var(--black-600)}
+  .tk-stub{width:176px;flex:none;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+  .tk-joined{display:flex;align-items:center;gap:8px;font-size:20px;font-weight:700;letter-spacing:var(--tracking-super);color:var(--black-800)}
+  .tk-joined svg{width:24px;height:24px;color:var(--black-800)}
+  .tk-link{display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:500;letter-spacing:var(--tracking-super);color:var(--black-800)}
+  .tk-link svg{width:14px;height:14px;flex:none}
+  .tk-link:hover{text-decoration:underline;text-underline-offset:4px}
+  /* 已報名入場券輪播：後方疊一張露出右上角、左右箭頭、點點分頁（推導，依使用者草稿） */
+  .tk-carousel{width:100%;display:grid;grid-template-columns:40px minmax(0,1fr) 40px;align-items:center;gap:12px}
+  .tk-carousel.single{grid-template-columns:minmax(0,1fr)}
+  /* 疊票：依後面還剩幾張，最多再疊 2 張（共 3 層）；每層往右上錯開 12px，越後面顏色越深 */
+  /* 預留空間依「最多會疊幾層」固定（--pad），切換時前方票券不會忽寬忽窄 */
+  .tk-stack{--pad:0px;position:relative;padding:var(--pad) var(--pad) 0 0}
+  .tk-stack .tk-back{position:absolute;width:auto;pointer-events:none}
+  .tk-stack .tk-back.k1{--ticket:#E1D0C0;opacity:.8;z-index:1;top:calc(var(--pad) - 12px);right:calc(var(--pad) - 12px);bottom:12px;left:12px}
+  .tk-stack .tk-back.k2{--ticket:#CDB8A3;opacity:.6;top:calc(var(--pad) - 24px);right:calc(var(--pad) - 24px);bottom:24px;left:24px}
+  .tk-stack .tk-front{position:relative;z-index:2}
+  /* 上方缺口露出的是後面那張票：前方缺口用第二張的顏色、第二張缺口用第三張的顏色，最後面那張維持白色。
+     做法：藏起原本的白色缺口圖，在撕線頂端畫一個同尺寸的 V（深 7.28px、45 度斜邊），填上後面那張的顏色 */
+  .tk-cut{display:none;position:absolute;top:0;left:50%;width:14.56px;height:7.28px;transform:translateX(-50%);
+    background:var(--cut);clip-path:polygon(0 0,100% 0,50% 100%)}
+  /* 後方票券半透明（第二張 80%、第三張 60%），缺口顏色用疊合後實際看到的顏色 */
+  .tk-stack.depth-1 .tk-front{--cut:#E7D9CD}  /* 第二張 80% 疊在白底 */
+  .tk-stack.depth-2 .tk-front{--cut:#E1D1C2}  /* 第二張 80% 疊在（第三張 60% 疊在白底）上 */
+  .tk-stack.depth-2 .k1{--cut:#E1D4C8}        /* 第三張 60% 疊在白底 */
+  .tk-stack:is(.depth-1,.depth-2) .tk-front .tk-cut,
+  .tk-stack.depth-2 .k1 .tk-cut{display:block}
+  .tk-stack:is(.depth-1,.depth-2) .tk-front .ticket-notch.top,
+  .tk-stack.depth-2 .k1 .ticket-notch.top{display:none}
+  .tk-nav{width:40px;height:40px;border-radius:50%;border:1px solid var(--black-200);background:var(--white);display:grid;place-items:center;color:var(--black-600);
+    filter:drop-shadow(0 2px 0 var(--black-200));transition:background .15s,color .15s}
+  .tk-nav:hover:not([disabled]){background:var(--black-50);color:var(--black-800)}
+  .tk-nav[disabled]{opacity:.35;cursor:default}
+  .tk-nav svg{width:16px;height:16px}
+  .tk-dots{display:flex;justify-content:center;align-items:center;gap:8px}
+  .tk-dots button{width:8px;height:8px;border-radius:4px;background:var(--black-300);transition:width .2s,background .2s}
+  .tk-dots button[aria-current="true"]{width:24px;background:var(--accent)}
+  .tk-dots button{position:relative}
+  .tk-dots button::before{content:"";position:absolute;inset:-8px}  /* 點擊範圍放大 */
+  .tk-count{text-align:center;font-size:13px;font-weight:600;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+  @media (max-width:767px){ .tk-carousel{grid-template-columns:minmax(0,1fr)} .tk-nav{display:none} }
+  @media (min-width:768px){ .tk-head{display:contents} }
+  @media (max-width:767px){
+    .tk-event .ticket-body{align-items:stretch;padding:24px 24px 24px 0}
+    .tk-head{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+    .tk-date{width:auto;flex-direction:row;align-items:baseline;gap:8px;padding:4px 14px;border-radius:12px}
+    .tk-date b{font-size:22px;line-height:30px}
+    .tk-title{font-size:18px;line-height:28px}
+    .tk-stub{width:100%;flex-direction:row;justify-content:space-between;padding-top:14px;border-top:1px dashed rgba(0,0,0,.18)}
+  }
+  /* 我的公司：上方身分卡（左：縮圖＋認證標章＋名稱，右：三項公司屬性），其餘資訊列在下方（推導） */
+  .profile{width:100%;display:flex;flex-direction:column;gap:28px}
+  .pc-card{position:relative;width:100%;max-width:560px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px;align-items:center;
+    padding:28px 32px;border-radius:24px;background:var(--white);box-shadow:0 6px 24px rgba(0,0,0,.10)}
+  .pc-id{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;min-width:0}
+  .pc-logo{position:relative;width:112px;height:112px;margin-bottom:8px}
+  .pc-logo svg.logo{width:100%;height:100%;display:block;border-radius:28px;border:1px solid var(--black-200)}
+  .pc-logo .badge{position:absolute;right:-8px;bottom:-8px;width:34px;height:34px;border-radius:50%;background:var(--white);display:grid;place-items:center}
+  .pc-logo .badge svg{width:28px;height:28px}
+  .pc-name{margin:0;font-size:26px;font-weight:700;line-height:34px;letter-spacing:var(--tracking-super);color:var(--black-800)}
+  .pc-brand{font-size:14px;font-weight:500;letter-spacing:var(--tracking-wider);color:var(--black-600)}
+  .pc-stats{margin:0;display:flex;flex-direction:column}
+  .pc-stats div{padding:12px 0;border-bottom:1px solid var(--black-200)}
+  .pc-stats div:first-child{padding-top:0}
+  .pc-stats div:last-child{border-bottom:0;padding-bottom:0}
+  .pc-stats dd{margin:0;font-size:22px;font-weight:700;line-height:30px;letter-spacing:var(--tracking-wider);color:var(--black-800)}
+  .pc-stats dt{font-size:12px;font-weight:500;line-height:18px;letter-spacing:var(--tracking-wider);color:var(--black-600)}
+  /* 名片斜紋裝飾：左上、右下兩個角落，SENSE 品牌漸層（設計稿 mock-pr-card.html 方案 A） */
+  .pc-card{overflow:hidden}
+  .pc-card > :not(.pc-deco){position:relative}
+  .pc-deco{position:absolute;width:150px;height:110px;pointer-events:none}
+  .pc-deco.tl{top:0;left:0}
+  .pc-deco.br{right:0;bottom:0;transform:rotate(180deg)}
+  /* 下方詳細資料預設收合（非必要資訊，避免佔太多空間） */
+  .pc-head{width:100%;max-width:560px;display:flex;flex-direction:column;align-items:center;gap:20px}
+  .pc-toggle{display:inline-flex;align-items:center;gap:8px}  /* 外觀沿用 .btn-outline（幽靈按鈕） */
+  .pc-toggle.btn-outline,.pc-toggle.btn-outline:hover,.pc-toggle.btn-outline:focus-visible{border-color:transparent;background:transparent}  /* 不要外框線與底色，文字已足夠提示 */
+  .pc-toggle.btn-outline:hover,.pc-toggle.btn-outline:focus-visible{color:var(--black-800)}  /* hover 只讓文字與箭頭變深黑，不用淡藍 */
+  .pc-toggle svg{width:14px;height:14px;flex:none;transition:transform .2s}
+  .pc-toggle[aria-expanded="true"] svg{transform:rotate(180deg)}
+  .pc-list{list-style:none;margin:0;padding:0;width:100%;max-width:760px;display:flex;flex-direction:column;gap:20px}
+  .pc-list > li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:14px;align-items:start}
+  .pc-list .ic{width:28px;height:28px;color:var(--black-700)}
+  .pc-list .ic svg{width:24px;height:24px;margin-top:2px}
+  .pc-list h3{margin:0 0 4px;font-size:15px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-super);color:var(--black-800)}
+  .pc-list p{margin:0;font-size:15px;line-height:26px;letter-spacing:1.6px;color:var(--black-800)}
+  @media (max-width:559px){ .pc-card{grid-template-columns:minmax(0,1fr);padding:28px 24px} }
   .content > section, .content > .content-section{scroll-margin-top:calc(var(--header-h) + 16px)}
-  @media (max-width:767px){ .club-grid{grid-template-columns:minmax(0,1fr)} .next-event{grid-template-columns:minmax(0,1fr)} }
+  @media (max-width:767px){ .club-grid{grid-template-columns:minmax(0,1fr)} }
 </style>
 </head>
 <body>
@@ -59,46 +169,24 @@
     <header class="header" id="header"></header>
 
     <main class="content">
-      <nav class="breadcrumb" aria-label="麵包屑"><span class="root">SENSE</span><span class="sep">/</span><span class="cur" aria-current="page">公關SENSE</span></nav>
-
-      <!-- 模組介紹＋我的統計 -->
-      <section class="content-section" aria-labelledby="h-intro">
-        <div class="section-title"><h2 id="h-intro">公關 SENSE</h2></div>
-        <section class="ticket" aria-label="公關 SENSE 概況">
-          <span class="ticket-paper left"></span>
-          <div class="ticket-body">
-            <div class="ticket-slogan"><h1>認識圈層裡的企業夥伴</h1><p>透過講座、聚會與俱樂部，找到下一個合作機會</p></div>
-            <span class="ticket-perf" aria-hidden="true">
-              <span class="ticket-notch top"><span><img src="shared/assets/ticket-notch-top.svg" alt=""></span></span>
-              <span class="ticket-notch bottom"><span><img src="shared/assets/ticket-notch-bottom.svg" alt=""></span></span>
-            </span>
-            <div class="ticket-stats">
-              <p class="ticket-stat"><b id="st-events">0</b><span>場已參加活動</span></p><hr>
-              <p class="ticket-stat"><b id="st-met">0</b><span>家已認識企業</span></p>
-            </div>
-          </div>
-          <span class="ticket-paper right"></span>
-          <button class="ticket-close" aria-label="關閉公關 SENSE 概況"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
-        </section>
-      </section>
-
       <!-- 我的公司 -->
       <section class="content-section" id="me" aria-labelledby="h-me">
         <div class="section-title"><h2 id="h-me">我的公司</h2></div>
-        <div class="form-card form-group review-card" id="me-card"></div>
+        <div class="profile" id="me-card"></div>
       </section>
 
       <!-- 近期活動 -->
       <section class="content-section" id="academy" aria-labelledby="h-academy">
         <div class="section-title"><h2 id="h-academy">近期活動</h2></div>
-        <div class="form-card form-group" id="next-event"></div>
+        <!-- 下一場活動入場券 -->
+        <div id="ticket-slot" style="width:100%;display:flex;flex-direction:column;gap:20px"></div>
         <div class="form-card form-group" aria-label="接下來的場次"><div class="form-group-title"><h2>接下來的場次</h2></div><div style="overflow-x:auto"><table class="ro-table" id="ev-table"></table></div></div>
       </section>
 
       <!-- 公司名冊 -->
       <section class="content-section" id="directory" aria-labelledby="h-dir">
         <div class="section-title"><h2 id="h-dir">公司名冊</h2></div>
-        <p class="field-help">認識 SENSE 平台上的會員企業，依產業找到想合作的夥伴。</p>
+        <p class="field-help">依產業認識 SENSE 平台上的會員企業。</p>
         <div class="chips" id="ind-chips" role="group" aria-label="依產業篩選"></div>
         <div class="co-grid" id="co-grid"></div>
       </section>
@@ -116,13 +204,36 @@
         <div class="club-grid" id="club-grid"></div>
         <div class="form-card form-group"><div class="form-group-title"><h2>最新消息與優惠</h2></div><div class="feed" id="club-feed"></div></div>
         <button type="button" class="add-link" id="more-clubs"></button>
+        <div class="form-card form-group" aria-label="LINE 社群">
+          <div class="form-group-title"><h2>LINE 社群</h2></div>
+          <div class="line-card">
+            <p>活動前後的即時交流先在 LINE 社群進行；線上俱樂部則用來經營長期人脈。</p>
+            <button type="button" class="btn btn-secondary" data-toast="LINE 社群連結尚未提供（示意）">加入 LINE 社群</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 客戶服務經理 -->
+      <section class="content-section" id="service" aria-labelledby="h-service">
+        <div class="section-title"><h2 id="h-service">客戶服務經理</h2></div>
+        <div class="form-card form-group cs-card">
+          <span class="cs-avatar" aria-hidden="true">林</span>
+          <div class="cs-info">
+            <b>林佳穎</b><span class="field-help">公關 SENSE 客戶服務經理（示意）</span>
+            <p>活動報名、會後交流或想認識特定企業，都可以直接找我協助安排。</p>
+          </div>
+          <div class="cs-actions">
+            <button type="button" class="btn btn-secondary" data-toast="聯絡信箱尚未提供（示意）">寄信聯絡</button>
+            <button type="button" class="btn btn-secondary" data-toast="預約功能尚未製作（示意）">預約 30 分鐘諮詢</button>
+          </div>
+        </div>
       </section>
     </main>
   </div>
 </div>
 
-<script src="shared/shell.js?v=20261020a"></script>
-<script src="shared/components.js?v=20261020a"></script>
+<script src="shared/shell.js?v=20261026g"></script>
+<script src="shared/components.js?v=20261026g"></script>
 <script>
 SenseShell.mount();
 const esc = SenseUI.esc;
@@ -149,8 +260,9 @@ const COMPANIES = [
 const coById = (id) => COMPANIES.find(c => c.id === id);
 const MY_PROFILE = {
   intro:'以會員經營機制驅動回購的眼鏡零售品牌，強調名單再行銷與分眾溝通。',
-  facts:['零售', '51–200 人', '北部・南部', '成立 2015'],
-  offer:['全台 18 間門市，可作為合作品牌的體驗與取貨據點', '會員 CRM 再行銷實務經驗，可分享分眾溝通做法', '門市活動空間，可承接 20 人以內的小型聚會'],
+  ind:'零售', size:'51–200 人', region:'北部・南部', founded:2015,
+  specialty:'眼鏡零售・會員經營',  // KYC 公開欄位「專業別」
+  has:['全台 18 間門市，可作為合作品牌的體驗與取貨據點', '會員 CRM 再行銷實務經驗，可分享分眾溝通做法', '門市活動空間，可承接 20 人以內的小型聚會'],
   need:['大健康產業的異業聯名夥伴', '企業員工福利通路（驗光到府）', '社群聲量與媒體曝光'],
   meet:'企業福委會或人資主管，以及健康檢查、保險相關品牌的行銷負責人。',
   stats:{ events:3, clubs:2, met:18 }
@@ -159,17 +271,19 @@ const SLOT = { noon:'中午 12:00–14:00', night:'晚上 19:00–21:00', day:'�
 const EV_TYPE = { insight:'學院講座', day:'主題式交流聚會' };
 const EVENTS = [
   { d:'2026-10-20', slot:'noon',  type:'insight', series:'SENSE INSIGHT 學院 EP04', title:'趨勢判斷｜關稅變局下的佈局抉擇', host:'經濟研究機構 首席經濟學家', cap:40, status:'joined' },
-  { d:'2026-11-10', slot:'night', type:'insight', series:'SENSE INSIGHT 學院 EP05', title:'成長策略｜成長停滯時，找出企業的第二條成長曲線', host:'知名零售品牌 行銷長', cap:40, status:'open' },
-  { d:'2026-11-21', slot:'day',   type:'day',     series:'SENSE DAY', title:'運動社交日：高爾夫', host:'綠夾克 Golface', cap:32, status:'soon' },
-  { d:'2026-12-08', slot:'noon',  type:'insight', series:'SENSE INSIGHT 學院 EP06', title:'資本布局｜併購是捷徑，還是陷阱', host:'會計師事務所 併購諮詢合夥人', cap:40, status:'soon' },
-  { d:'2027-01-12', slot:'night', type:'insight', series:'SENSE INSIGHT 學院 EP07', title:'AI 與數據｜資料沉睡，AI 也救不了', host:'國際管理顧問公司 數據策略合夥人', cap:40, status:'soon' }
+  { d:'2026-11-10', slot:'night', type:'insight', series:'SENSE INSIGHT 學院 EP05', title:'成長策略｜成長停滯時，找出企業的第二條成長曲線', host:'知名零售品牌 行銷長', cap:40, status:'joined' },
+  { d:'2026-11-21', slot:'day',   type:'day',     series:'SENSE DAY', title:'運動社交日：高爾夫', host:'綠夾克 Golface', cap:32, status:'joined' },
+  { d:'2026-12-08', slot:'noon',  type:'insight', series:'SENSE INSIGHT 學院 EP06', title:'資本布局｜併購是捷徑，還是陷阱', host:'會計師事務所 併購諮詢合夥人', cap:40, status:'open' },
+  { d:'2027-01-12', slot:'night', type:'insight', series:'SENSE INSIGHT 學院 EP07', title:'AI 與數據｜資料沉睡，AI 也救不了', host:'國際管理顧問公司 數據策略合夥人', cap:40, status:'soon' },
+  { d:'2027-02-09', slot:'noon',  type:'insight', series:'SENSE INSIGHT 學院 EP08', title:'經營領導｜接班不是交棒，是重新創業', host:'傳產二代企業家 總經理', cap:40, status:'soon' }
 ];
-const EV_STATUS = { joined:['joined', '✓ 已報名'], open:['open', '開放報名'], soon:['soon', '即將開放'] };
+const EV_STATUS = { open:['open', '開放報名'], soon:['soon', '即將開放'] };
 const RECAPS = [
-  { d:'2026-09-19', type:'day', title:'標竿場域參訪：走進生態圈夥伴的第一線', host:'popworld／禾樂映像', photos:24, video:true, g:'linear-gradient(135deg,#FFB080,#FFDD80)' },
   { d:'2026-09-08', type:'insight', title:'數位轉型｜導入新系統前，先問對三個問題', host:'上市科技公司 資訊長', photos:16, video:true, g:'linear-gradient(135deg,#99C7FB,#B6BDFF)' },
   { d:'2026-08-11', type:'insight', title:'品牌經營｜小品牌如何在社群時代被記住', host:'設計顧問公司 創意總監', photos:18, video:true, g:'linear-gradient(135deg,#B6E6E4,#99C7FB)' },
-  { d:'2026-07-14', type:'insight', title:'市場展望｜2026 下半年，經營者該關注的五個訊號', host:'投資研究機構 首席分析師', photos:21, video:false, g:'linear-gradient(135deg,#B6BDFF,#FFB080)' }
+  { d:'2026-07-14', type:'insight', title:'市場展望｜2026 下半年，經營者該關注的五個訊號', host:'投資研究機構 首席分析師', photos:21, video:false, g:'linear-gradient(135deg,#B6BDFF,#FFB080)' },
+  // SENSE DAY 每半年一次（會議記錄 2026-10-13）：上一場 5 月，下一場 11/21
+  { d:'2026-05-23', type:'day', title:'標竿場域參訪：走進生態圈夥伴的第一線', host:'popworld／禾樂映像', photos:24, video:true, g:'linear-gradient(135deg,#FFB080,#FFDD80)' }
 ];
 const CLUBS = [
   { id:'martech', name:'MarTech 實務社', type:'需求社', icon:'◎', founder:'lensense', members:8, news:3, deals:1, joined:true },
@@ -189,39 +303,181 @@ const VERIFIED = '<svg class="verified" viewBox="0 0 24 24" role="img" aria-labe
 const status = (k) => `<span class="status ${EV_STATUS[k][0]}">${EV_STATUS[k][1]}</span>`;
 const item = (label, html, wide) => `<div class="ro-item${wide ? ' span-2' : ''}"><span class="ro-label">${label}</span>${html}</div>`;
 
-/* ═════════ 票券統計 ═════════ */
-document.getElementById('st-events').textContent = MY_PROFILE.stats.events;
-document.getElementById('st-met').textContent = MY_PROFILE.stats.met;
 
 /* ═════════ 我的公司（唯讀卡片） ═════════ */
 const me = coById(ME.companyId), P = MY_PROFILE;
+// 示意 logo：眼鏡圖形＋品牌字（正式版由公司上傳 logo）
+const DEMO_LOGO = `<svg class="logo" viewBox="0 0 112 112" role="img" aria-label="${esc(me.name)} logo（示意）">
+  <rect width="112" height="112" fill="#FFF8F1"/>
+  <g fill="none" stroke="${me.tint}" stroke-width="5" stroke-linecap="round">
+    <circle cx="36" cy="50" r="15"/><circle cx="76" cy="50" r="15"/><path d="M51 48q5-5 10 0M21 47l-7-6M91 47l7-6"/>
+  </g>
+  <text x="56" y="90" text-anchor="middle" font-family="Roboto Condensed, sans-serif" font-size="17" font-weight="700" letter-spacing="1.5" fill="${me.tint}">iDai</text>
+</svg>`;
+const BADGE = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#4DB8EE"/><path d="M6.8 12.4l3.4 3.4 7-7.2" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="square"/></svg>';
+const IC = (d) => `<span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${d}</svg></span>`;
+const ICONS = {
+  intro:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/>',
+  region:'<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+  has:'<path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>',
+  need:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5"/>',
+  meet:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6 6 0 0 1 3.5 5.5"/>'
+};
+const years = Number(TODAY.slice(0, 4)) - P.founded;
+// 斜紋：45 度，粗帶（藍→青）在內、細帶（黃→橘）在外
+// 動態模糊：沿斜紋方向（45 度）模糊較多、垂直方向微微柔化；每條程度不同。
+// 做法：濾鏡套在「旋轉 -45 度」的座標系上，SVG 的水平模糊就變成沿斜紋方向。
+const PC_BLUR = { tl:[[8, 1.2], [4, 0.6]], br:[[3, 0.8], [9, 1.5]] };  // [沿斜向, 垂直]：[粗帶, 細帶]
+const pcDeco = (pos) => {
+  const band = (n, pts, fill, op) => { const [a, b] = PC_BLUR[pos][n];
+    return `<g transform="rotate(-45)"><g filter="url(#pcd-${pos}-b${n})"><g transform="rotate(45)"><polygon points="${pts}" fill="${fill}" opacity="${op}"/></g></g></g>`; };
+  const blur = (n) => { const [a, b] = PC_BLUR[pos][n];
+    return `<filter id="pcd-${pos}-b${n}" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="${a} ${b}"/></filter>`; };
+  return `
+  <svg class="pc-deco ${pos}" viewBox="0 0 150 110" overflow="visible" aria-hidden="true">
+    <defs>
+      <linearGradient id="pcd-${pos}-1" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#0073F5"/><stop offset="1" stop-color="#42D6CD"/></linearGradient>
+      <linearGradient id="pcd-${pos}-2" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#FABF32"/><stop offset="1" stop-color="#FF5024"/></linearGradient>
+      ${blur(0)}${blur(1)}
+    </defs>
+    ${band(0, '0,38 38,0 64,0 0,64', `url(#pcd-${pos}-1)`, '.85')}
+    ${band(1, '0,76 76,0 84,0 0,84', `url(#pcd-${pos}-2)`, '.9')}
+  </svg>`;
+};
+const bullets = (arr) => `<ul class="ro-list">${arr.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
 document.getElementById('me-card').innerHTML = `
-  <div class="form-group-title"><h2>${esc(me.name)}${VERIFIED}</h2><button type="button" class="edit-link" data-toast="公司資料編輯頁尚未製作">編輯</button></div>
-  <div class="ro-grid">
-    ${item('公司簡介', `<p class="ro-value">${esc(P.intro)}</p>`, true)}
-    ${item('公司屬性', `<div class="ro-chips">${P.facts.map(f => `<span>${esc(f)}</span>`).join('')}</div>`, true)}
-    ${item('我能提供', `<ul class="ro-list">${P.offer.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`)}
-    ${item('我需要', `<ul class="ro-list">${P.need.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`)}
-    ${item('想認識', `<p class="ro-value">${esc(P.meet)}</p>`, true)}
-  </div>`;
+  <div class="pc-head">
+  <div class="pc-card">
+    ${pcDeco('tl')}${pcDeco('br')}
+    <div class="pc-id">
+      <span class="pc-logo">${DEMO_LOGO}<span class="badge" title="已認證商家" role="img" aria-label="已認證商家">${BADGE}</span></span>
+      <h2 class="pc-name">${esc(me.name)}</h2>
+      <span class="pc-brand">${esc(P.specialty)}</span>
+    </div>
+    <dl class="pc-stats">
+      <div><dd>${esc(P.ind)}</dd><dt>產業</dt></div>
+      <div><dd>${esc(P.size)}</dd><dt>公司規模</dt></div>
+      <div><dd>${years} 年</dd><dt>成立（${P.founded}）</dt></div>
+    </dl>
+  </div>
+  <button type="button" class="btn-outline pc-toggle" aria-expanded="false" aria-controls="pc-list"><span>查看公司詳細資料</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l5 5 5-5"/></svg></button>
+  </div>
+  <ul class="pc-list" id="pc-list" hidden>
+    <li>${IC(ICONS.intro)}<div><h3>公司簡介</h3><p>${esc(P.intro)}</p></div></li>
+    <li>${IC(ICONS.region)}<div><h3>營運地區</h3><p>${esc(P.region)}</p></div></li>
+    <li>${IC(ICONS.has)}<div><h3>已有資源</h3>${bullets(P.has)}</div></li>
+    <li>${IC(ICONS.need)}<div><h3>需要資源</h3>${bullets(P.need)}</div></li>
+    <li>${IC(ICONS.meet)}<div><h3>想認識</h3><p>${esc(P.meet)}</p><span class="private-note">🔒 僅你與股感團隊可見，用於活動中為你引薦</span></div></li>
+  </ul>`;
+
+document.querySelector('.pc-toggle').addEventListener('click', (e) => {
+  const btn = e.currentTarget, open = btn.getAttribute('aria-expanded') !== 'true';
+  btn.setAttribute('aria-expanded', open);
+  btn.querySelector('span').textContent = open ? '收合公司詳細資料' : '查看公司詳細資料';
+  document.getElementById('pc-list').hidden = !open;
+});
 
 /* ═════════ 近期活動 ═════════ */
+// 會員已繳年費，活動全部免費；報名為示意（正式版經參與感 API 免跳頁完成）
 const upcoming = EVENTS.filter(e => e.d >= TODAY);
-const nx = upcoming[0], n = fmt(nx.d);
-document.getElementById('next-event').innerHTML = `
-  <div class="form-group-title"><h2>下一場活動</h2></div>
-  <div class="next-event">
-    <div class="date-box"><small>${n.m} 月</small><b>${n.d}</b><small>週${n.w}</small></div>
-    <div class="stack" style="display:flex;flex-direction:column;gap:10px;min-width:0">
-      <div class="meta-line"><span class="status open">${EV_TYPE[nx.type]}</span><span>${esc(nx.series)}</span></div>
-      <h3 class="next-title">${esc(nx.title)}</h3>
-      <div class="meta-line"><span>時間：${SLOT[nx.slot]}</span><span>講者：${esc(nx.host)}</span><span>名額 ${nx.cap} 人</span>${status(nx.status)}</div>
-      ${nx.status === 'joined' ? '<p class="tip">行前提醒：講後開放會員交流，歡迎提前準備想認識的對象。</p>' : ''}
-      <div><button type="button" class="btn btn-primary" data-toast="活動詳情頁尚未製作">活動詳情</button></div>
+const regBtn = (e, big) => big
+  ? `<button type="button" class="btn btn-primary" data-reg="${e.d}">立即報名</button>`
+  : `<button type="button" class="reg-btn" data-reg="${e.d}">立即報名</button>`;
+const CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="currentColor"/><path d="M6.8 12.4l3.4 3.4 7-7.2" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="square"/></svg>';
+const PERF = `<span class="ticket-perf" aria-hidden="true"><span class="tk-cut"></span>
+  <span class="ticket-notch top"><span><img src="shared/assets/ticket-notch-top.svg" alt=""></span></span>
+  <span class="ticket-notch bottom"><span><img src="shared/assets/ticket-notch-bottom.svg" alt=""></span></span></span>`;
+
+/* 已報名入場券：每場報名一張，依日期排序；多張時可用箭頭、點點或滑動切換。沒有報名時不顯示 */
+const META_ICON = {
+  person:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="5.5" r="2.8"/><path d="M2.8 14a5.2 5.2 0 0 1 10.4 0"/></svg>',
+  clock:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="6"/><path d="M8 4.8V8l2.2 1.6"/></svg>'
+};
+const ARROW = (d) => `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d}"/></svg>`;
+let tkIdx = 0;
+const ticketHTML = (e, cls) => {
+  // 後方疊的票券：不放內容，但保留撕線，位置與前方票券一致（票根同寬，撕線就落在同一個相對位置）
+  if (!e) return `<div class="ticket tk-event ${cls}" aria-hidden="true"><span class="ticket-paper left"></span><div class="ticket-body"><span style="flex:1"></span>${PERF}<span class="tk-stub"></span></div><span class="ticket-paper right"></span></div>`;
+  const n = fmt(e.d);
+  return `
+    <section class="ticket tk-event ${cls}" aria-label="已報名：${n.m}/${n.d} ${esc(e.title)}">
+      <span class="ticket-paper left"></span>
+      <div class="ticket-body">
+        <div class="tk-head">
+          <div class="tk-date"><small>${n.m} 月</small><b>${n.d}</b><small>週${n.w}</small></div>
+          <div class="tk-info">
+            <div class="tk-kicker"><span class="tk-type">${EV_TYPE[e.type]}</span><span>${esc(e.series)}</span></div>
+            <h3 class="tk-title">${esc(e.title)}</h3>
+            <div class="tk-meta"><span>${META_ICON.person}${esc(e.host)}</span><span>${META_ICON.clock}${(SLOT[e.slot].match(/\d{1,2}:\d{2}–\d{1,2}:\d{2}/) || [SLOT[e.slot]])[0]}</span></div>
+          </div>
+        </div>
+        ${PERF}
+        <div class="tk-stub"><span class="tk-joined">${CHECK}已報名</span><button type="button" class="tk-link" data-toast="活動詳情頁尚未製作" aria-label="活動詳情（另開視窗）">活動詳情<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h4v4M13 3L7 9"/><path d="M11 9.5V13H3V5h3.5"/></svg></button></div>
+      </div>
+      <span class="ticket-paper right"></span>
+    </section>`;
+};
+const drawTicket = (dir = 0) => {
+  const list = upcoming.filter(e => e.status === 'joined'), slot = document.getElementById('ticket-slot');
+  if (!list.length){ slot.innerHTML = ''; slot.hidden = true; return; }
+  slot.hidden = false;
+  tkIdx = Math.min(Math.max(tkIdx, 0), list.length - 1);
+  const many = list.length > 1, cur = list[tkIdx], hasNext = tkIdx < list.length - 1;
+  const depth = Math.min(2, list.length - 1 - tkIdx);  // 後面還剩幾張就疊幾層，最多 2 層
+  const pager = !many ? '' : list.length > 6
+    ? `<p class="tk-count" aria-live="polite">${tkIdx + 1} / ${list.length}</p>`
+    : `<div class="tk-dots" role="group" aria-label="切換已報名的活動">${list.map((e, i) => { const f = fmt(e.d);
+        return `<button type="button" data-tk="${i}" aria-label="第 ${i + 1} 場：${f.m}/${f.d} ${esc(e.title)}" aria-current="${i === tkIdx}"></button>`; }).join('')}</div>`;
+  slot.innerHTML = `
+    <div class="tk-carousel${many ? '' : ' single'}" aria-roledescription="輪播" aria-label="我已報名的活動（共 ${list.length} 場）">
+      ${many ? `<button type="button" class="tk-nav" data-tk-step="-1" aria-label="上一場"${tkIdx === 0 ? ' disabled' : ''}>${ARROW('M10 3L5 8l5 5')}</button>` : ''}
+      <div class="tk-stack depth-${depth}" style="--pad:${Math.min(2, list.length - 1) * 12}px">${depth > 1 ? ticketHTML(null, 'tk-back k2') : ''}${depth > 0 ? ticketHTML(null, 'tk-back k1') : ''}${ticketHTML(cur, 'tk-front')}</div>
+      ${many ? `<button type="button" class="tk-nav" data-tk-step="1" aria-label="下一場"${!hasNext ? ' disabled' : ''}>${ARROW('M6 3l5 5-5 5')}</button>` : ''}
     </div>
-  </div>`;
-document.getElementById('ev-table').innerHTML = `<thead><tr><th>日期</th><th>活動</th><th>類型</th><th>狀態</th></tr></thead><tbody>${
-  upcoming.slice(1).map(e => { const f = fmt(e.d); return `<tr><td style="white-space:nowrap">${f.m}/${f.d}（${f.w}）</td><td>${esc(e.title)}<br><small style="color:var(--black-500)">${esc(e.host)}</small></td><td style="white-space:nowrap">${EV_TYPE[e.type]}</td><td>${status(e.status)}</td></tr>`; }).join('')}</tbody>`;
+    ${pager}`;
+  slot.querySelectorAll('.ticket').forEach(t => SenseUI.ticketLine(t));
+  const front = slot.querySelector('.tk-front');
+  if (dir && !matchMedia('(prefers-reduced-motion: reduce)').matches)
+    front.animate([{ opacity:0, transform:`translateX(${dir * 32}px)` }, { opacity:1, transform:'none' }], { duration:240, easing:'cubic-bezier(.4,0,.2,1)' });
+};
+const goTicket = (i) => { const dir = Math.sign(i - tkIdx); if (!dir) return; tkIdx = i; drawTicket(dir); };
+
+/* 接下來的場次：列出全部場次，已報名的顯示標籤 */
+const drawEvents = () => {
+  document.getElementById('ev-table').innerHTML = `<thead><tr><th>日期</th><th>活動</th><th>類型</th><th>名額</th><th>狀態</th></tr></thead><tbody>${
+    upcoming.length ? upcoming.map(e => { const f = fmt(e.d); return `<tr><td style="white-space:nowrap">${f.m}/${f.d}（${f.w}）</td><td>${esc(e.title)}<br><small style="color:var(--black-500)">${esc(e.host)}</small></td><td style="white-space:nowrap">${EV_TYPE[e.type]}</td><td style="white-space:nowrap">${e.cap} 人</td><td>${e.status === 'open' ? regBtn(e) : e.status === 'joined' ? `<span class="ev-joined">${CHECK}已報名</span>` : status(e.status)}</td></tr>`; }).join('')
+      : '<tr><td colspan="5" style="padding:20px 10px;color:var(--black-500)">目前沒有排定的場次。</td></tr>'}</tbody>`;
+};
+document.addEventListener('click', (e) => {
+  const reg = e.target.closest('[data-reg]');
+  if (reg){
+    const ev = EVENTS.find(x => x.d === reg.dataset.reg); ev.status = 'joined';
+    tkIdx = upcoming.filter(x => x.status === 'joined').indexOf(ev);  // 報名後直接切到這一張
+    drawTicket(); drawEvents(); SenseShell.toast('已完成報名（示意）'); return;
+  }
+  const step = e.target.closest('[data-tk-step]');
+  if (step){ goTicket(tkIdx + Number(step.dataset.tkStep)); return; }
+  const dot = e.target.closest('[data-tk]');
+  if (dot) goTicket(Number(dot.dataset.tk));
+});
+// 鍵盤：焦點在輪播內時用左右鍵切換；手機：左右滑動切換
+const tkSlot = document.getElementById('ticket-slot');
+tkSlot.addEventListener('keydown', (e) => {
+  if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+  const n = upcoming.filter(x => x.status === 'joined').length, next = tkIdx + (e.key === 'ArrowRight' ? 1 : -1);
+  if (next < 0 || next >= n) return;
+  e.preventDefault(); goTicket(next);
+  const d = tkSlot.querySelector(`[data-tk="${next}"]`); if (d && document.activeElement?.dataset.tk != null) d.focus();
+});
+let swipeX = null;
+tkSlot.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') swipeX = e.clientX; });
+tkSlot.addEventListener('pointerup', (e) => {
+  if (swipeX == null) return; const dx = e.clientX - swipeX; swipeX = null;
+  const n = upcoming.filter(x => x.status === 'joined').length;
+  if (Math.abs(dx) > 40){ const next = tkIdx + (dx < 0 ? 1 : -1); if (next >= 0 && next < n) goTicket(next); }
+});
+drawTicket();
+drawEvents();
 
 /* ═════════ 公司名冊：依產業篩選 ═════════ */
 const INDS = ['全部', ...new Set(COMPANIES.map(c => c.ind))].sort((a, b) => (a === '全部' ? -1 : b === '全部' ? 1 : (a === '其他') - (b === '其他')));
