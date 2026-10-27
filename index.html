@@ -31,7 +31,11 @@
   .item.disabled{pointer-events:none;opacity:.55}
   .item.disabled .go{color:var(--ink-3)}
   .note{margin:0;font-size:12px;color:var(--ink-3);line-height:1.7;border-top:1px solid var(--line);padding-top:16px}
-  @media (max-width:520px){ .wrap{padding:28px 20px} .item{flex-wrap:wrap} .item .go{margin-left:20px} }
+  /* 手機：色條固定在左側貫穿整張卡，「瀏覽」一律排在說明文字下方，避免長說明把色條擠到獨立一行 */
+  @media (max-width:520px){ .wrap{padding:28px 20px}
+    .item{display:grid;grid-template-columns:4px minmax(0,1fr);column-gap:16px;row-gap:8px;align-items:start}
+    .bar{grid-row:1 / span 2}
+    .item .go{grid-column:2;margin-left:0} }
 </style>
 </head>
 <body>
@@ -41,20 +45,26 @@
       <h1>SENSE 平台原型</h1>
       <p class="lead">SENSE 各模組的可互動原型，用於內部討論與規格對齊。</p>
     </div>
+    <!-- 更新時間取自 dist/ 內該原型最新一版的檔名日期 -->
     <nav class="list" aria-label="原型列表">
+      <a class="item" href="prototype/landing-wireframe.html" style="--c:#424242">
+        <span class="bar"></span>
+        <span><b>首頁 wireframe</b><p>更新時間：26 Oct, 2026</p></span>
+        <span class="go">瀏覽</span>
+      </a>
       <a class="item" href="prototype/product-sense.html" style="--c:#99C7FB">
         <span class="bar"></span>
-        <span><b>商品 SENSE</b><p>瀏覽商品（分類篩選、搜尋與排序）、新增商品三步驟</p></span>
+        <span><b>商品 SENSE</b><p>更新時間：20 Oct, 2026</p></span>
         <span class="go">瀏覽</span>
       </a>
       <a class="item" href="prototype/pr-sense.html" style="--c:#B6BDFF">
         <span class="bar"></span>
-        <span><b>公關 SENSE</b><p>一覽頁、公司名冊、近期活動、活動回顧、俱樂部</p></span>
+        <span><b>公關 SENSE</b><p>更新時間：22 Oct, 2026</p></span>
         <span class="go">瀏覽</span>
       </a>
       <a class="item" href="prototype/finance-sense.html" style="--c:#FFDD80">
         <span class="bar"></span>
-        <span><b>財務 SENSE</b><p>側欄與 header 外框（內容待需求確認）</p></span>
+        <span><b>財務 SENSE</b><p>更新時間：26 Oct, 2026</p></span>
         <span class="go">瀏覽</span>
       </a>
       <span class="item disabled" style="--c:#B6E6E4" aria-disabled="true">
@@ -62,11 +72,6 @@
         <span><b>行銷 SENSE・策略 SENSE</b></span>
         <span class="go">規劃中</span>
       </span>
-      <a class="item" href="prototype/landing-wireframe.html" style="--c:#424242">
-        <span class="bar"></span>
-        <span><b>首頁 wireframe</b><p>對外首頁黑白線稿：服務介紹、會員登入、預約洽談表單，附區塊標註</p></span>
-        <span class="go">瀏覽</span>
-      </a>
     </nav>
     <p class="note">僅供內部使用，非經許可不得外流。原型中的公司資料、活動與數據皆為示意。</p>
   </main>
