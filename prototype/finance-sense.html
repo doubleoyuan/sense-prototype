@@ -61,14 +61,25 @@
   .fs-picker{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
   .fs-picker > span{font-size:12px;font-weight:600;letter-spacing:var(--tracking-wider);color:var(--black-500);margin-right:4px}
 
-  /* 首頁票券：撐滿內容寬度（沿用公關 SENSE 入場券的做法） */
-  .fs-hero-ticket{width:100%}
-  .fs-hero-ticket .ticket-body{flex:1}
+  /* 首頁第一列：我的檔案（直式，1/3）＋待處理事項（2/3），兩張卡等高（2026-10-27 使用者確認） */
+  .fs-home-top{width:100%;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:20px}
+  .fs-home-top > .content-section > .fs-card{flex:1}
+  .fs-profilecard{display:flex;flex-direction:column;gap:16px}
+  .fs-profilecard .fs-progress-meta{margin-top:auto}
+  .fs-profilecard .btn{align-self:flex-start}
+  .fs-todo-more{display:block;width:100%;padding-top:12px;border-top:1px solid var(--black-100);text-align:center;font-size:13px;font-weight:600;letter-spacing:var(--tracking-wider);color:var(--black-600)}
+  .fs-todo-more:hover{color:var(--hover-teal)}
+  /* 首頁按鈕：藍框藍字白底，避免實心藍太多（2026-10-27 使用者確認，先只用在首頁；尺寸與陰影同 btn-primary） */
+  .fs-btn-outline{background:var(--white);border:1px solid #CFE3FD;color:var(--accent-border);filter:drop-shadow(0 4px 0 #E3EEFD)}
+  .btn.fs-btn-outline.btn-sm{filter:drop-shadow(0 2px 0 #E3EEFD)}  /* 小尺寸的陰影位移是 2px（.btn.btn-sm），這裡只換顏色 */
+  .fs-btn-outline:hover{background:#F5F9FF}
   /* 首頁：募資／融資／併購三條路徑卡（外框沿用 ResourceCard） */
   .fs-paths{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
   .fs-path-card{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:20px;border:1px solid var(--line-soft);border-radius:var(--r-30);background:var(--white);transition:border-color .15s}
   .fs-path-card:hover{border-color:var(--hover-teal)}
   .fs-path-card h3{font-size:18px;font-weight:700;line-height:28px;letter-spacing:var(--tracking-ultra)}
+  /* 標題螢光筆：只墊字的下半部，顏色沿用黃色標籤底色（2026-10-27 取代重複的「○○審視」標籤，先只用在首頁） */
+  .fs-marker{padding:0 4px;background:linear-gradient(transparent 55%,#FFF6DB 55%)}
   .fs-path-card p{flex:1;font-size:14px;line-height:24px;letter-spacing:1.6px;color:var(--black-600)}
   .fs-path-card .count{font-size:13px;font-weight:600;letter-spacing:var(--tracking-wider);color:var(--black-500);margin-bottom:6px}
   /* 首頁：專屬顧問卡（推導自公關 SENSE 的客戶服務經理卡） */
@@ -310,7 +321,7 @@
     .fs-filters{position:static}
     .fs-filters > summary{display:block;cursor:pointer;font-size:14px;font-weight:700;letter-spacing:var(--tracking-wider)}
     .fs-filters > .fs-card-head{display:none}
-    .fs-profilebar{grid-template-columns:minmax(0,1fr)}
+    .fs-profilebar,.fs-home-top{grid-template-columns:minmax(0,1fr)}
     .fs-paths,.fs-needs{grid-template-columns:minmax(0,1fr)}
     .fs-flow{grid-template-columns:repeat(2,minmax(0,1fr))}
   }
@@ -462,7 +473,7 @@ const state = {
   activeThread:'c1', threadFilter:'all',
   finTab:'quiz', finStep:0, finAnswers:[], finDone:false,
   browseTab:'all', browseQuery:'', browseSort:'updated', companyFilters:[], investorFilters:[], investorQuery:'', investorSort:'match', financingFilters:[],
-  homeFeed:'company', techFilled:false,
+  homeFeed:'company', techFilled:false, todoAll:false,
   heroStats:{ company:['rev','margin','growth','raise'], investor:['deals','recent','days','rate'] }
 };
 const has = (r) => state.roles.includes(r);
@@ -502,18 +513,29 @@ function profileBar(){
     <a class="btn btn-primary" href="${state.techFilled ? '#settings' : '#set-tech'}">完善檔案</a></div>`;
 }
 
-/* ── 首頁：票券 → 募資／融資／併購入口 → 我的檔案 → 待處理事項 → 最近動態 → 專屬顧問（2026-10-26 使用者確認的大綱） ── */
+// 首頁用的直式版本：與待處理事項並排，只佔 1/3 寬
+function profileCard(){
+  const next = state.techFilled ? '補上客戶結構分析' : '補上外包與技術資源';
+  return `<div class="fs-card fs-profilecard">
+    <div class="fs-id">${avatar('翰森科技', 'lg')}<div><h3>翰森科技 ${badge(true)}</h3><span class="fs-note">企業軟體 · A+ 輪 · 檔案公開中</span></div></div>
+    <div><div class="fs-progress-meta"><b>檔案完成度 ${state.profileCompletion}%</b><span class="fs-muted">本週被瀏覽 12 次</span></div>
+      <div class="fs-progress"><i style="width:${state.profileCompletion}%"></i></div><span class="fs-note">下一步：${next}</span></div>
+    <a class="btn fs-btn-outline btn-sm" href="${state.techFilled ? '#settings' : '#set-tech'}">完善檔案</a></div>`;
+}
+
+/* ── 首頁：我的檔案＋待處理事項（同一列）→ 募資／融資／併購入口 → 最近動態 → 專屬顧問（2026-10-27 使用者確認移除票券） ── */
+const TODO_LIMIT = 3;
 const trackCount = (t) => companies.filter(c => c.track === t).length;
 function pathCards(){
   const cards = [
-    { tag:'募資審視', title:'募資', desc:'找到投資偏好相符的投資人，或瀏覽正在募資的企業。', count:`${trackCount('equity')} 家企業募資中`,
-      main:`<button type="button" class="btn btn-primary btn-sm" data-act="browse-track" data-id="equity">瀏覽募資企業</button>`, sub:`<a class="btn btn-secondary btn-sm" href="#investors">找投資人</a>` },
-    { tag:'融資審視', title:'融資', desc:'先用 5 題診斷釐清方向，再看融資方案或由專人規劃。', count:`${financing.length} 個融資方案`,
-      main:`<a class="btn btn-primary btn-sm" href="#financing">開始 5 題診斷</a>`, sub:`<button type="button" class="btn btn-secondary btn-sm" data-act="fin-plans">看融資方案</button>` },
-    { tag:'併購審視', title:'併購', desc:'出售、收購或引進策略股東，先與顧問一對一討論。', count:`${trackCount('ma')} 家企業評估中`,
-      main:`<button type="button" class="btn btn-primary btn-sm" data-act="ma-consult">預約併購顧問</button>`, sub:`<button type="button" class="btn btn-secondary btn-sm" data-act="browse-track" data-id="ma">瀏覽併購審視</button>` }];
+    { title:'募資', desc:'找到投資偏好相符的投資人，或瀏覽正在募資的企業。', count:`${trackCount('equity')} 家企業募資中`,
+      main:`<button type="button" class="btn fs-btn-outline btn-sm" data-act="browse-track" data-id="equity">瀏覽募資企業</button>`, sub:`<a class="btn btn-secondary btn-sm" href="#investors">找投資人</a>` },
+    { title:'融資', desc:'先用 5 題診斷釐清方向，再看融資方案或由專人規劃。', count:`${financing.length} 個融資方案`,
+      main:`<a class="btn fs-btn-outline btn-sm" href="#financing">開始 5 題診斷</a>`, sub:`<button type="button" class="btn btn-secondary btn-sm" data-act="fin-plans">看融資方案</button>` },
+    { title:'併購', desc:'出售、收購或引進策略股東，先與顧問一對一討論。', count:`${trackCount('ma')} 家企業評估中`,
+      main:`<button type="button" class="btn fs-btn-outline btn-sm" data-act="ma-consult">預約併購顧問</button>`, sub:`<button type="button" class="btn btn-secondary btn-sm" data-act="browse-track" data-id="ma">瀏覽併購審視</button>` }];
   return `<div class="fs-paths">${cards.map(c => `<div class="fs-path-card">
-      ${tag('gold', c.tag)}<h3>${c.title}</h3><p>${c.desc}</p><span class="count">${c.count}</span>
+      <h3><span class="fs-marker">${c.title}</span></h3><p>${c.desc}</p><span class="count">${c.count}</span>
       <div class="btn-row">${c.main}${c.sub}</div></div>`).join('')}</div>`;
 }
 // 待處理事項：把連結請求、NDA、資料室權限等散在各頁的待辦集中（取代 PO 版的指標卡）
@@ -521,15 +543,15 @@ function todoItems(){
   const list = [];
   if (has('company')){
     requests.filter(r => r.state === 'pending').forEach(r => { const i = investors.find(x => x.id === r.investor);
-      list.push({ ic:'連', title:`${i.org} · ${i.name} 送來連結請求`, sub:`想了解：${r.topics} · 剩 ${r.days} 天回應`, btn:`<a class="btn btn-primary btn-sm" href="#requests">處理</a>` }); });
+      list.push({ ic:'連', title:`${i.org} · ${i.name} 送來連結請求`, sub:`想了解：${r.topics} · 剩 ${r.days} 天回應`, btn:`<a class="btn fs-btn-outline btn-sm" href="#requests">處理</a>` }); });
     ndaRequests.filter(r => r.state === 'pending').forEach(r =>
-      list.push({ ic:'簽', title:`${r.org} 已簽署${r.doc}，等你完成雙方簽署`, sub:`${r.contact} · ${r.date}`, btn:`<button type="button" class="btn btn-primary btn-sm" data-act="view-nda" data-id="${r.id}">檢視並簽署</button>` }));
+      list.push({ ic:'簽', title:`${r.org} 已簽署${r.doc}，等你完成雙方簽署`, sub:`${r.contact} · ${r.date}`, btn:`<button type="button" class="btn fs-btn-outline btn-sm" data-act="view-nda" data-id="${r.id}">檢視並簽署</button>` }));
     requests.filter(r => r.state === 'L1').forEach(r => { const i = investors.find(x => x.id === r.investor);
       if (!perms[i.org] || perms[i.org].every(v => !v)) list.push({ ic:'權', title:`${i.org} 已連結（L1），資料室尚未開放任何檔案`, sub:'完成 NDA 後可依角色套用預設權限', btn:`<a class="btn btn-secondary btn-sm" href="#roomadmin">設定權限</a>` }); });
   }
   if (has('investor')){
     links.filter(l => l.state === 'L1').forEach(l => { const c = companies.find(x => x.id === l.company);
-      list.push({ ic:'簽', title:`${unlockedName(c)} 已開放 L1 具名資訊`, sub:'可申請線上簽署 NDA，進一步查看資料室', btn:`<a class="btn btn-primary btn-sm" href="#company-${c.id}">查看</a>` }); });
+      list.push({ ic:'簽', title:`${unlockedName(c)} 已開放 L1 具名資訊`, sub:'可申請線上簽署 NDA，進一步查看資料室', btn:`<a class="btn fs-btn-outline btn-sm" href="#company-${c.id}">查看</a>` }); });
     const waiting = links.filter(l => l.state === 'pending');
     if (waiting.length) list.push({ ic:'等', title:`${waiting.length} 筆連結請求等待企業回覆`, sub:`最短剩 ${Math.min(...waiting.map(l => l.days))} 天`, btn:`<a class="btn btn-secondary btn-sm" href="#links">查看</a>` });
   }
@@ -548,28 +570,17 @@ function homePage(){
   const co = has('company'), inv = has('investor');
   // 兩種角色都有時以企業內容為主；最近動態用頁籤切換，不整串往下疊
   const feedTab = co && inv ? state.homeFeed : co ? 'company' : 'investor';
-  const pending = pendingRequests(), todos = todoItems();
-  const summary = co ? `${pending} 筆連結請求待回覆，${ndaRequests.filter(r => r.state === 'pending').length} 份文件等你簽署。` : '你追蹤的 3 家企業本週更新了募資需求、領投狀態或檔案完整度。';
-  const stats = co ? [[pending, '筆連結請求待回覆'], [12, '次本週檔案瀏覽']] : [[3, '家追蹤企業有更新'], [2, '筆連結已建立']];
+  const todos = todoItems(), shown = state.todoAll ? todos : todos.slice(0, TODO_LIMIT);
+  const todoBody = todos.length
+    ? shown.map(activityRow).join('') + (todos.length > TODO_LIMIT ? `<button type="button" class="fs-todo-more" data-act="todo-all">${state.todoAll ? '收合' : `查看全部 ${todos.length} 項`}</button>` : '')
+    : `<p class="fs-note">都處理完了。可以到 <a class="fs-link" href="#browse">瀏覽投資</a> 看看最近更新的企業。</p>`;
+  const todoSection = `<section class="content-section" aria-labelledby="h-todo">${sectionHead('h-todo', '待處理事項')}
+      <div class="fs-card">${todoBody}</div></section>`;
   return `
-    <section class="content-section" aria-label="今日摘要">
-      <section class="ticket fs-hero-ticket" aria-label="今日摘要">
-        <span class="ticket-paper left"></span>
-        <div class="ticket-body">
-          <div class="ticket-slogan"><h1>募資、融資、併購，從這裡開始</h1><p>${summary}</p></div>
-          <span class="ticket-perf" aria-hidden="true">
-            <span class="ticket-notch top"><span><img src="${SenseShell.asset('ticket-notch-top.svg')}" alt=""></span></span>
-            <span class="ticket-notch bottom"><span><img src="${SenseShell.asset('ticket-notch-bottom.svg')}" alt=""></span></span>
-          </span>
-          <div class="ticket-stats">${stats.map(s => `<p class="ticket-stat"><b>${s[0]}</b><span>${s[1]}</span></p>`).join('<hr>')}</div>
-        </div>
-        <span class="ticket-paper right"></span>
-      </section>
-    </section>
+    ${co ? `<div class="fs-home-top">
+      <section class="content-section" aria-labelledby="h-me">${sectionHead('h-me', '我的檔案')}${profileCard()}</section>
+      ${todoSection}</div>` : todoSection}
     <section class="content-section" aria-labelledby="h-paths">${sectionHead('h-paths', '你想做什麼？')}${pathCards()}</section>
-    ${co ? `<section class="content-section" aria-labelledby="h-me">${sectionHead('h-me', '我的檔案')}${profileBar()}</section>` : ''}
-    <section class="content-section" aria-labelledby="h-todo">${sectionHead('h-todo', '待處理事項', todos.length ? tag('orange', todos.length + ' 項') : '')}
-      <div class="fs-card">${todos.length ? todos.map(activityRow).join('') : '<p class="fs-note">目前沒有待處理的事項。</p>'}</div></section>
     <section class="content-section" aria-labelledby="h-act">${sectionHead('h-act', '最近動態')}
       ${co && inv ? chipRow([['company', '最近互動'], ['investor', '追蹤更新']], feedTab, 'data-home-feed') : ''}
       <div class="fs-card">${(feedTab === 'company' ? COMPANY_FEED : INVESTOR_FEED).map(activityRow).join('')}</div></section>
@@ -1297,6 +1308,7 @@ document.addEventListener('click', (e) => {
     case 'ma-consult': return maConsultModal();
     case 'browse-track': state.browseTab = id; location.hash = 'browse'; return;
     case 'fin-plans': state.finTab = 'plans'; location.hash = 'financing'; return;
+    case 'todo-all': state.todoAll = !state.todoAll; return render();
     case 'submit-connect': {
       if (d.side === 'company'){ const c = companies.find(x => x.id === id); c.status = 'pending'; state.investorQuota--; links.unshift({ id:'C-2611', company:id, date:'2026.10.26', state:'pending', days:14 }); }
       else { investors.find(x => x.id === id).state = 'pending'; state.companyQuota--; }
