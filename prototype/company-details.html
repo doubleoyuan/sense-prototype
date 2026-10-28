@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>公司資料</title>
+<link rel="icon" type="image/svg+xml" href="shared/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="shared/tokens.css?v=20261028b">
+<link rel="stylesheet" href="shared/components.css?v=20261028b">
+<link rel="stylesheet" href="shared/forms.css?v=20261028b">
+<style>
+  /* ── 公司身分卡＋詳細資料：沿用 pr-sense.html「我的公司」區塊（推導），需求確認後再抽成共用 ── */
+  .ro-list{margin:0;padding-left:20px;font-size:15px;line-height:26px;letter-spacing:1.6px;color:var(--black-800)}
+  .private-note{font-size:12px;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+  .profile{width:100%;display:flex;flex-direction:column;gap:28px}
+  .pc-card{position:relative;width:100%;max-width:560px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px;align-items:center;
+    padding:28px 32px;border-radius:24px;background:var(--white);box-shadow:0 6px 24px rgba(0,0,0,.10)}
+  .pc-id{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;min-width:0}
+  .pc-logo{position:relative;width:112px;height:112px;margin-bottom:8px}
+  .pc-logo svg.logo{width:100%;height:100%;display:block;border-radius:28px;border:1px solid var(--black-200)}
+  .pc-logo .badge{position:absolute;right:-8px;bottom:-8px;width:34px;height:34px;border-radius:50%;background:var(--white);display:grid;place-items:center}
+  .pc-logo .badge svg{width:28px;height:28px}
+  .pc-name{margin:0;font-size:26px;font-weight:700;line-height:34px;letter-spacing:var(--tracking-super);color:var(--black-800)}
+  .pc-brand{font-size:14px;font-weight:500;letter-spacing:var(--tracking-wider);color:var(--black-600)}
+  .pc-stats{margin:0;display:flex;flex-direction:column}
+  .pc-stats div{padding:12px 0;border-bottom:1px solid var(--black-200)}
+  .pc-stats div:first-child{padding-top:0}
+  .pc-stats div:last-child{border-bottom:0;padding-bottom:0}
+  .pc-stats dd{margin:0;font-size:22px;font-weight:700;line-height:30px;letter-spacing:var(--tracking-wider);color:var(--black-800)}
+  .pc-stats dt{font-size:12px;font-weight:500;line-height:18px;letter-spacing:var(--tracking-wider);color:var(--black-600)}
+  .pc-card{overflow:hidden}
+  .pc-card > :not(.pc-deco){position:relative}
+  .pc-deco{position:absolute;width:150px;height:110px;pointer-events:none}
+  .pc-deco.tl{top:0;left:0}
+  .pc-deco.br{right:0;bottom:0;transform:rotate(180deg)}
+  /* 公司資料頁是專屬頁，詳細資料直接展開，不放收合鈕 */
+  .pc-list{list-style:none;margin:0;padding:0;width:100%;max-width:760px;display:flex;flex-direction:column;gap:20px}
+  .pc-list > li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:14px;align-items:start}
+  .pc-list .ic{width:28px;height:28px;color:var(--black-700)}
+  .pc-list .ic svg{width:24px;height:24px;margin-top:2px}
+  .pc-list h3{margin:0 0 4px;font-size:15px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-super);color:var(--black-800)}
+  .pc-list p{margin:0;font-size:15px;line-height:26px;letter-spacing:1.6px;color:var(--black-800)}
+  @media (max-width:559px){ .pc-card{grid-template-columns:minmax(0,1fr);padding:28px 24px} }
+</style>
+</head>
+<body>
+<!-- 僅供內部使用，非經許可不得外流。公司資料頁（側欄「我的專屬內容 › 公司資料」），內容延伸自 pr-sense.html「我的公司」區塊，示意資料沿用該頁。 -->
+<div class="app" data-module="mine" data-page="company">
+  <aside class="sidebar" id="sidebar" aria-label="主選單"></aside>
+  <div class="main">
+    <header class="header" id="header"></header>
+
+    <main class="content">
+      <section class="content-section" aria-labelledby="h-company">
+        <div class="section-title"><h2 id="h-company">公司資料</h2></div>
+        <div class="profile" id="me-card"></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script src="shared/shell.js?v=20261028b"></script>
+<script src="shared/components.js?v=20261028b"></script>
+<script>
+SenseShell.mount();
+const esc = SenseUI.esc;
+
+/* ═════════ 示意資料（沿用 pr-sense.html，內部原型用） ═════════ */
+const TODAY = '2026-10-16';
+const ME = { name:'森川眼鏡', tint:'#B45309' };
+const MY_PROFILE = {
+  intro:'以會員經營機制驅動回購的眼鏡零售品牌，強調名單再行銷與分眾溝通。',
+  ind:'零售', size:'51–200 人', region:'北部・南部', founded:2015,
+  specialty:'眼鏡零售・會員經營',  // KYC 公開欄位「專業別」
+  has:['全台 18 間門市，可作為合作品牌的體驗與取貨據點', '會員 CRM 再行銷實務經驗，可分享分眾溝通做法', '門市活動空間，可承接 20 人以內的小型聚會'],
+  need:['大健康產業的異業聯名夥伴', '企業員工福利通路（驗光到府）', '社群聲量與媒體曝光'],
+  meet:'企業福委會或人資主管，以及健康檢查、保險相關品牌的行銷負責人。'
+};
+
+/* ═════════ 公司身分卡＋詳細資料（唯讀） ═════════ */
+const me = ME, P = MY_PROFILE;
+// 示意 logo：眼鏡圖形＋品牌字（正式版由公司上傳 logo）
+const DEMO_LOGO = `<svg class="logo" viewBox="0 0 112 112" role="img" aria-label="${esc(me.name)} logo（示意）">
+  <rect width="112" height="112" fill="#FFF8F1"/>
+  <g fill="none" stroke="${me.tint}" stroke-width="5" stroke-linecap="round">
+    <circle cx="36" cy="50" r="15"/><circle cx="76" cy="50" r="15"/><path d="M51 48q5-5 10 0M21 47l-7-6M91 47l7-6"/>
+  </g>
+  <text x="56" y="90" text-anchor="middle" font-family="Roboto Condensed, sans-serif" font-size="17" font-weight="700" letter-spacing="1.5" fill="${me.tint}">MORI</text>
+</svg>`;
+const BADGE = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#4DB8EE"/><path d="M6.8 12.4l3.4 3.4 7-7.2" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="square"/></svg>';
+const IC = (d) => `<span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${d}</svg></span>`;
+const ICONS = {
+  intro:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/>',
+  region:'<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+  has:'<path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>',
+  need:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5"/>',
+  meet:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6 6 0 0 1 3.5 5.5"/>'
+};
+const years = Number(TODAY.slice(0, 4)) - P.founded;
+// 斜紋裝飾：與 pr-sense.html 相同（45 度，粗帶藍→青在內、細帶黃→橘在外，沿斜向動態模糊）
+const PC_BLUR = { tl:[[8, 1.2], [4, 0.6]], br:[[3, 0.8], [9, 1.5]] };  // [沿斜向, 垂直]：[粗帶, 細帶]
+const pcDeco = (pos) => {
+  const band = (n, pts, fill, op) => `<g transform="rotate(-45)"><g filter="url(#pcd-${pos}-b${n})"><g transform="rotate(45)"><polygon points="${pts}" fill="${fill}" opacity="${op}"/></g></g></g>`;
+  const blur = (n) => { const [a, b] = PC_BLUR[pos][n];
+    return `<filter id="pcd-${pos}-b${n}" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="${a} ${b}"/></filter>`; };
+  return `
+  <svg class="pc-deco ${pos}" viewBox="0 0 150 110" overflow="visible" aria-hidden="true">
+    <defs>
+      <linearGradient id="pcd-${pos}-1" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#0073F5"/><stop offset="1" stop-color="#42D6CD"/></linearGradient>
+      <linearGradient id="pcd-${pos}-2" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#FABF32"/><stop offset="1" stop-color="#FF5024"/></linearGradient>
+      ${blur(0)}${blur(1)}
+    </defs>
+    ${band(0, '0,38 38,0 64,0 0,64', `url(#pcd-${pos}-1)`, '.85')}
+    ${band(1, '0,76 76,0 84,0 0,84', `url(#pcd-${pos}-2)`, '.9')}
+  </svg>`;
+};
+const bullets = (arr) => `<ul class="ro-list">${arr.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
+document.getElementById('me-card').innerHTML = `
+  <div class="pc-card">
+    ${pcDeco('tl')}${pcDeco('br')}
+    <div class="pc-id">
+      <span class="pc-logo">${DEMO_LOGO}<span class="badge" title="已認證商家" role="img" aria-label="已認證商家">${BADGE}</span></span>
+      <h3 class="pc-name">${esc(me.name)}</h3>
+      <span class="pc-brand">${esc(P.specialty)}</span>
+    </div>
+    <dl class="pc-stats">
+      <div><dd>${esc(P.ind)}</dd><dt>產業</dt></div>
+      <div><dd>${esc(P.size)}</dd><dt>公司規模</dt></div>
+      <div><dd>${years} 年</dd><dt>成立（${P.founded}）</dt></div>
+    </dl>
+  </div>
+  <ul class="pc-list">
+    <li>${IC(ICONS.intro)}<div><h3>公司簡介</h3><p>${esc(P.intro)}</p></div></li>
+    <li>${IC(ICONS.region)}<div><h3>營運地區</h3><p>${esc(P.region)}</p></div></li>
+    <li>${IC(ICONS.has)}<div><h3>已有資源</h3>${bullets(P.has)}</div></li>
+    <li>${IC(ICONS.need)}<div><h3>需要資源</h3>${bullets(P.need)}</div></li>
+    <li>${IC(ICONS.meet)}<div><h3>想認識</h3><p>${esc(P.meet)}</p><span class="private-note">🔒 僅你與股感團隊可見，用於活動中為你引薦</span></div></li>
+  </ul>`;
+</script>
+</body>
+</html>

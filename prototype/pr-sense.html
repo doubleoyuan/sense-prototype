@@ -8,9 +8,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="shared/tokens.css?v=20261026g">
-<link rel="stylesheet" href="shared/components.css?v=20261026g">
-<link rel="stylesheet" href="shared/forms.css?v=20261026g">
+<link rel="stylesheet" href="shared/tokens.css?v=20261028b">
+<link rel="stylesheet" href="shared/components.css?v=20261028b">
+<link rel="stylesheet" href="shared/forms.css?v=20261028b">
 <style>
   /* ── 本頁新增的元件（推導）：UI Library 尚未收錄，確認後再移到 shared/ ── */
   /* 狀態標籤：已報名／開放報名／即將開放、消息／優惠 */
@@ -44,10 +44,43 @@
     font-size:12px;font-weight:700;letter-spacing:var(--tracking-wider);white-space:nowrap;transition:border-color .15s,color .15s}
   .reg-btn:hover,.reg-btn:focus-visible{border-color:var(--black-600);color:var(--black-800)}
   /* 表格內的「已報名」：與入場券同款黑底白勾＋黑字 */
+  /* 即將舉辦的活動卡片（推導，依使用者提供的卡片稿；配色改用 tokens） */
+  .ev-cards-wrap{width:100%;display:flex;flex-direction:column;gap:16px}
+  .ev-cards-wrap:empty{display:none}
+  /* 近期活動區塊裡的二級小標：已報名、即將舉辦、所有活動 */
+  .pr-subhead{margin:0;padding:10px 0;
+    font-size:16px;font-weight:700;line-height:32px;letter-spacing:var(--tracking-ultra);color:var(--black-700);white-space:nowrap}
+  .pr-subsec{width:100%;display:flex;flex-direction:column;gap:16px}
+  .ev-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+  .ev-card{border:1px solid var(--black-200);border-radius:var(--r-16);background:var(--white);overflow:hidden;display:flex;flex-direction:column}
+  .ev-band{padding:10px 20px;font-size:13px;font-weight:700;line-height:20px;letter-spacing:var(--tracking-wider);
+    background:var(--mod-product-tint);color:var(--mod-product-strong)}
+  .ev-band.day{background:var(--ticket);color:var(--black-800)}
+  .ev-body{padding:20px;display:flex;flex-direction:column;gap:8px;flex:1}
+  /* 活動縮圖（示意）：2:1，學院講座偏藍紫、SENSE DAY 偏橘黃，皆取自模組色 */
+  .ev-thumb{position:relative;aspect-ratio:2/1;border-radius:var(--r-10);background:linear-gradient(135deg,var(--mod-product),var(--mod-pr));overflow:hidden}
+  .ev-thumb.day{background:linear-gradient(135deg,var(--mod-strategy),var(--mod-finance))}
+  .ev-thumb span{position:absolute;top:10px;left:10px;padding:1px 8px;border-radius:var(--r-8);background:var(--white);font-size:11px;letter-spacing:var(--tracking-wider);color:var(--black-600)}
+  .ev-meta{margin-top:6px;display:flex;align-items:center;flex-wrap:wrap;gap:10px;font-size:13px;font-weight:700;letter-spacing:var(--tracking-wider);color:var(--black-600)}
+  .ev-meta b{color:var(--black-800)}
+  .ev-card h3{margin:0;font-size:18px;font-weight:700;line-height:28px;letter-spacing:var(--tracking-wider);color:var(--black-800)}
+  .ev-host{margin:0;font-size:14px;line-height:22px;letter-spacing:var(--tracking-wider);color:var(--black-600)}
+  .ev-seats{margin-top:6px;padding-top:12px;border-top:1px solid var(--black-200);display:flex;align-items:center;justify-content:space-between;gap:8px;
+    font-size:14px;font-weight:700;letter-spacing:var(--tracking-wider);color:var(--black-800)}
+  .ev-full{height:24px;padding:0 10px;border-radius:var(--r-30);background:var(--metric-bg);color:var(--cta-orange);display:inline-flex;align-items:center;font-size:12px;font-weight:700}
+  .ev-deadline{margin:0;display:flex;align-items:center;gap:6px;font-size:13px;letter-spacing:var(--tracking-wider);color:var(--black-600)}
+  .ev-deadline svg{width:14px;height:14px;flex:none}
+  .ev-actions{margin-top:auto;padding-top:8px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .ev-actions .btn{min-width:0;width:100%;padding:0 12px;white-space:nowrap}
+  /* 藍色外框按鈕：外觀沿用財務 SENSE 的 fs-btn-outline（模組專屬元件各自留在頁內，定案後再抽成共用） */
+  .pr-btn-outline{background:var(--white);border:1px solid #CFE3FD;color:var(--accent-border);filter:drop-shadow(0 4px 0 #E3EEFD)}
+  .pr-btn-outline:hover{background:#F5F9FF}
+  .ev-actions .ev-joined{justify-content:center;height:44px;font-size:14px}
+  .ev-actions .ev-joined svg{width:20px;height:20px}
+  @media (max-width:767px){ .ev-cards{grid-template-columns:minmax(0,1fr)} }
   .ev-joined{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;letter-spacing:var(--tracking-wider);color:var(--black-800);white-space:nowrap}
   .ev-joined svg{width:18px;height:18px;flex:none}
   .btn-row{display:flex;flex-wrap:wrap;gap:12px}
-  .private-note{font-size:12px;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
   /* 客戶服務經理聯絡卡（推導） */
   .cs-card{display:flex;flex-direction:row;align-items:center;gap:20px;flex-wrap:wrap}
   .cs-avatar{width:56px;height:56px;flex:none;border-radius:50%;background:var(--black-100);display:grid;place-items:center;font-size:20px;font-weight:700;color:var(--black-700)}
@@ -139,25 +172,23 @@
   .pc-stats dt{font-size:12px;font-weight:500;line-height:18px;letter-spacing:var(--tracking-wider);color:var(--black-600)}
   /* 名片斜紋裝飾：左上、右下兩個角落，SENSE 品牌漸層（設計稿 mock-pr-card.html 方案 A） */
   .pc-card{overflow:hidden}
+  /* 整張名片是連結：hover 加深陰影並出現卡片 hover 外框色 */
+  a.pc-card{text-decoration:none;color:inherit;transition:box-shadow .15s}
+  a.pc-card:hover{box-shadow:0 8px 28px rgba(0,0,0,.14),0 0 0 1px var(--hover-teal)}
+  a.pc-card:focus-visible{outline:2px solid var(--accent-border);outline-offset:3px}
   .pc-card > :not(.pc-deco){position:relative}
   .pc-deco{position:absolute;width:150px;height:110px;pointer-events:none}
   .pc-deco.tl{top:0;left:0}
   .pc-deco.br{right:0;bottom:0;transform:rotate(180deg)}
-  /* 下方詳細資料預設收合（非必要資訊，避免佔太多空間） */
-  .pc-head{width:100%;max-width:560px;display:flex;flex-direction:column;align-items:center;gap:20px}
-  .pc-toggle{display:inline-flex;align-items:center;gap:8px}  /* 外觀沿用 .btn-outline（幽靈按鈕） */
-  .pc-toggle.btn-outline,.pc-toggle.btn-outline:hover,.pc-toggle.btn-outline:focus-visible{border-color:transparent;background:transparent}  /* 不要外框線與底色，文字已足夠提示 */
-  .pc-toggle.btn-outline:hover,.pc-toggle.btn-outline:focus-visible{color:var(--black-800)}  /* hover 只讓文字與箭頭變深黑，不用淡藍 */
-  .pc-toggle svg{width:14px;height:14px;flex:none;transition:transform .2s}
-  .pc-toggle[aria-expanded="true"] svg{transform:rotate(180deg)}
-  .pc-list{list-style:none;margin:0;padding:0;width:100%;max-width:760px;display:flex;flex-direction:column;gap:20px}
-  .pc-list > li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:14px;align-items:start}
-  .pc-list .ic{width:28px;height:28px;color:var(--black-700)}
-  .pc-list .ic svg{width:24px;height:24px;margin-top:2px}
-  .pc-list h3{margin:0 0 4px;font-size:15px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-super);color:var(--black-800)}
-  .pc-list p{margin:0;font-size:15px;line-height:26px;letter-spacing:1.6px;color:var(--black-800)}
   @media (max-width:559px){ .pc-card{grid-template-columns:minmax(0,1fr);padding:28px 24px} }
   .content > section, .content > .content-section{scroll-margin-top:calc(var(--header-h) + 16px)}
+  /* 大標題底下的區塊左右各內縮 20px；大標題本身維持整行寬度（只套用在公關頁） */
+  .content > .content-section{padding-inline:20px}
+  .content > .content-section > .section-title{width:calc(100% + 40px);margin-inline:-20px}
+  @media (max-width:767px){
+    .content > .content-section{padding-inline:8px}  /* 手機版內縮改為 8px */
+    .content > .content-section > .section-title{width:calc(100% + 16px);margin-inline:-8px}
+  }
   @media (max-width:767px){ .club-grid{grid-template-columns:minmax(0,1fr)} }
 </style>
 </head>
@@ -180,7 +211,12 @@
         <div class="section-title"><h2 id="h-academy">近期活動</h2></div>
         <!-- 下一場活動入場券 -->
         <div id="ticket-slot" style="width:100%;display:flex;flex-direction:column;gap:20px"></div>
-        <div class="form-card form-group" aria-label="接下來的場次"><div class="form-group-title"><h2>接下來的場次</h2></div><div style="overflow-x:auto"><table class="ro-table" id="ev-table"></table></div></div>
+        <!-- 即將舉辦：可以報名的每月活動與 SENSE DAY -->
+        <div class="ev-cards-wrap" id="ev-cards" aria-labelledby="h-ev-cards"></div>
+        <div class="pr-subsec" aria-labelledby="h-ev-table">
+          <h3 class="pr-subhead" id="h-ev-table">所有活動</h3>
+          <div class="form-card form-group"><div style="overflow-x:auto"><table class="ro-table" id="ev-table"></table></div></div>
+        </div>
       </section>
 
       <!-- 公司名冊 -->
@@ -232,8 +268,8 @@
   </div>
 </div>
 
-<script src="shared/shell.js?v=20261026g"></script>
-<script src="shared/components.js?v=20261026g"></script>
+<script src="shared/shell.js?v=20261028b"></script>
+<script src="shared/components.js?v=20261028b"></script>
 <script>
 SenseShell.mount();
 const esc = SenseUI.esc;
@@ -241,21 +277,21 @@ const esc = SenseUI.esc;
 /* ═════════ 示意資料（沿用 pr-sense.html，內部原型用） ═════════ */
 const TODAY = '2026-10-16';
 const WEEK = ['日','一','二','三','四','五','六'];
-const ME = { companyId:'aidai' };
+const ME = { companyId:'morikawa' };
 const COMPANIES = [
   { id:'stockfeel', name:'股感媒體科技', short:'股', ind:'金融科技', tint:'#1E40AF' }, { id:'anqian', name:'安錢感', short:'安', ind:'金融科技', tint:'#0F766E' },
-  { id:'baoxian', name:'保險感', short:'保', ind:'金融科技', tint:'#3F3AA9' }, { id:'robbins', name:'羅賓斯保代', short:'羅', ind:'金融科技', tint:'#334155' },
-  { id:'abc', name:'Asia Bankers Club', short:'A', ind:'金融科技', tint:'#7C2D12' }, { id:'innomy', name:'英諾美生技', short:'英', ind:'大健康', tint:'#C2185B' },
-  { id:'aidai', name:'愛戴眼鏡', short:'愛', ind:'零售', tint:'#B45309', brand:'愛戴 iDai' }, { id:'kumi', name:'酷覓星', short:'酷', ind:'零售', tint:'#BE185D' },
-  { id:'zocha', name:'摩拓旅程 ZOCHA', short:'Z', ind:'區域經濟', tint:'#1FA67A' }, { id:'lvdian', name:'旅電', short:'旅', ind:'區域經濟', tint:'#0E7490' },
-  { id:'lizhang', name:'里長伯', short:'里', ind:'區域經濟', tint:'#65A30D' }, { id:'loop', name:'LOOP', short:'L', ind:'區域經濟', tint:'#0891B2' },
-  { id:'juli', name:'硬是愛數據 揪里嗨', short:'揪', ind:'區域經濟', tint:'#EA580C' }, { id:'fanggan', name:'房感不動產科技', short:'房', ind:'房產生活', tint:'#B45309' },
-  { id:'jiangren', name:'匠人部落', short:'匠', ind:'房產生活', tint:'#78350F' }, { id:'haiyue', name:'海悅國際', short:'海', ind:'房產生活', tint:'#155E75' },
-  { id:'lensense', name:'聯想感', short:'聯', ind:'行銷科技', tint:'#4338CA' }, { id:'shangshu', name:'尚書思鹿', short:'尚', ind:'行銷科技', tint:'#6D28D9' },
-  { id:'sfinfo', name:'股感資訊', short:'資', ind:'行銷科技', tint:'#1D4ED8' }, { id:'citizen', name:'市民永續', short:'市', ind:'ESG', tint:'#15803D' },
-  { id:'fengcha', name:'奉茶行動', short:'奉', ind:'ESG', tint:'#166534' }, { id:'xingya', name:'星芽', short:'星', ind:'ESG', tint:'#4D7C0F' },
-  { id:'chongzi', name:'寵資', short:'寵', ind:'毛孩經濟', tint:'#A16207' }, { id:'golface', name:'綠夾克 Golface', short:'G', ind:'其他', tint:'#14532D' },
-  { id:'popworld', name:'popworld', short:'P', ind:'其他', tint:'#DB2777' }, { id:'hele', name:'禾樂映像', short:'禾', ind:'其他', tint:'#525252' }
+  { id:'baoxian', name:'保險感', short:'保', ind:'金融科技', tint:'#3F3AA9' }, { id:'chenguang', name:'晨光保險經紀', short:'晨', ind:'金融科技', tint:'#334155' },
+  { id:'yuanfan', name:'遠帆財富管理', short:'遠', ind:'金融科技', tint:'#7C2D12' }, { id:'qinghe', name:'青禾生技', short:'青', ind:'大健康', tint:'#C2185B' },
+  { id:'morikawa', name:'森川眼鏡', short:'森', ind:'零售', tint:'#B45309', brand:'森川 MORI' }, { id:'shiguang', name:'拾光選物', short:'拾', ind:'零售', tint:'#BE185D' },
+  { id:'islandgo', name:'島嶼漫遊', short:'島', ind:'區域經濟', tint:'#1FA67A' }, { id:'tudian', name:'途電', short:'途', ind:'區域經濟', tint:'#0E7490' },
+  { id:'xiangkou', name:'巷口好鄰', short:'巷', ind:'區域經濟', tint:'#65A30D' }, { id:'huanzhan', name:'環站', short:'環', ind:'區域經濟', tint:'#0891B2' },
+  { id:'zaidi', name:'在地數據實驗室', short:'在', ind:'區域經濟', tint:'#EA580C' }, { id:'fanggan', name:'房感不動產科技', short:'房', ind:'房產生活', tint:'#B45309' },
+  { id:'gongfang', name:'工坊聯盟', short:'工', ind:'房產生活', tint:'#78350F' }, { id:'haiwan', name:'海灣建設', short:'灣', ind:'房產生活', tint:'#155E75' },
+  { id:'lensense', name:'聯想感', short:'聯', ind:'行銷科技', tint:'#4338CA' }, { id:'shengliang', name:'聲量研究室', short:'聲', ind:'行銷科技', tint:'#6D28D9' },
+  { id:'sfinfo', name:'股感資訊', short:'資', ind:'行銷科技', tint:'#1D4ED8' }, { id:'lvxunhuan', name:'綠循環行動', short:'綠', ind:'ESG', tint:'#15803D' },
+  { id:'haocha', name:'好茶公益', short:'茶', ind:'ESG', tint:'#166534' }, { id:'xinya', name:'新芽社企', short:'芽', ind:'ESG', tint:'#4D7C0F' },
+  { id:'maohai', name:'毛孩數據', short:'毛', ind:'毛孩經濟', tint:'#A16207' }, { id:'lvye', name:'綠野高爾夫', short:'野', ind:'其他', tint:'#14532D' },
+  { id:'shanshan', name:'快閃製造所', short:'快', ind:'其他', tint:'#DB2777' }, { id:'guangying', name:'光影映像', short:'光', ind:'其他', tint:'#525252' }
 ];
 const coById = (id) => COMPANIES.find(c => c.id === id);
 const MY_PROFILE = {
@@ -267,35 +303,35 @@ const MY_PROFILE = {
   meet:'企業福委會或人資主管，以及健康檢查、保險相關品牌的行銷負責人。',
   stats:{ events:3, clubs:2, met:18 }
 };
-const SLOT = { noon:'中午 12:00–14:00', night:'晚上 19:00–21:00', day:'週六 半日' };
+const SLOT = { noon:'中午 12:00–14:00', night:'晚上 19:00–21:00', day:'上午 07:30–12:30' };
 const EV_TYPE = { insight:'學院講座', day:'主題式交流聚會' };
 const EVENTS = [
-  { d:'2026-10-20', slot:'noon',  type:'insight', series:'SENSE INSIGHT 學院 EP04', title:'趨勢判斷｜關稅變局下的佈局抉擇', host:'經濟研究機構 首席經濟學家', cap:40, status:'joined' },
-  { d:'2026-11-10', slot:'night', type:'insight', series:'SENSE INSIGHT 學院 EP05', title:'成長策略｜成長停滯時，找出企業的第二條成長曲線', host:'知名零售品牌 行銷長', cap:40, status:'joined' },
-  { d:'2026-11-21', slot:'day',   type:'day',     series:'SENSE DAY', title:'運動社交日：高爾夫', host:'綠夾克 Golface', cap:32, status:'joined' },
-  { d:'2026-12-08', slot:'noon',  type:'insight', series:'SENSE INSIGHT 學院 EP06', title:'資本布局｜併購是捷徑，還是陷阱', host:'會計師事務所 併購諮詢合夥人', cap:40, status:'open' },
-  { d:'2027-01-12', slot:'night', type:'insight', series:'SENSE INSIGHT 學院 EP07', title:'AI 與數據｜資料沉睡，AI 也救不了', host:'國際管理顧問公司 數據策略合夥人', cap:40, status:'soon' },
-  { d:'2027-02-09', slot:'noon',  type:'insight', series:'SENSE INSIGHT 學院 EP08', title:'經營領導｜接班不是交棒，是重新創業', host:'傳產二代企業家 總經理', cap:40, status:'soon' }
+  { d:'2026-10-20', slot:'noon',  type:'insight', series:'SENSE INSIGHT 學院 EP04', title:'趨勢判斷｜關稅變局下的佈局抉擇', host:'經濟研究機構 首席經濟學家', cap:40, status:'joined', dl:'2026-10-16 23:59', left:8 },
+  { d:'2026-11-10', slot:'night', type:'insight', series:'SENSE INSIGHT 學院 EP05', title:'成長策略｜成長停滯時，找出企業的第二條成長曲線', host:'知名零售品牌 行銷長', cap:40, status:'joined', dl:'2026-11-06 23:59', left:12 },
+  { d:'2026-11-21', slot:'day',   type:'day',     series:'SENSE DAY', title:'運動社交日：高爾夫', host:'綠野高爾夫', cap:32, status:'open', dl:'2026-11-14 23:59', left:6 },
+  { d:'2026-12-08', slot:'noon',  type:'insight', series:'SENSE INSIGHT 學院 EP06', title:'資本布局｜併購是捷徑，還是陷阱', host:'會計師事務所 併購諮詢合夥人', cap:40, status:'joined', dl:'2026-12-04 23:59', left:6 },
+  { d:'2027-01-12', slot:'night', type:'insight', series:'SENSE INSIGHT 學院 EP07', title:'AI 與數據｜資料沉睡，AI 也救不了', host:'國際管理顧問公司 數據策略合夥人', cap:40, status:'open', dl:'2027-01-08 23:59', left:25 },
+  { d:'2027-02-09', slot:'noon',  type:'insight', series:'SENSE INSIGHT 學院 EP08', title:'經營領導｜接班不是交棒，是重新創業', host:'傳產二代企業家 總經理', cap:40, status:'soon', dl:'2027-02-05 23:59', left:40 }
 ];
 const EV_STATUS = { open:['open', '開放報名'], soon:['soon', '即將開放'] };
 const RECAPS = [
   { d:'2026-09-08', type:'insight', title:'數位轉型｜導入新系統前，先問對三個問題', host:'上市科技公司 資訊長', photos:16, video:true, g:'linear-gradient(135deg,#99C7FB,#B6BDFF)' },
   { d:'2026-08-11', type:'insight', title:'品牌經營｜小品牌如何在社群時代被記住', host:'設計顧問公司 創意總監', photos:18, video:true, g:'linear-gradient(135deg,#B6E6E4,#99C7FB)' },
   { d:'2026-07-14', type:'insight', title:'市場展望｜2026 下半年，經營者該關注的五個訊號', host:'投資研究機構 首席分析師', photos:21, video:false, g:'linear-gradient(135deg,#B6BDFF,#FFB080)' },
-  // SENSE DAY 每半年一次（會議記錄 2026-10-13）：上一場 5 月，下一場 11/21
-  { d:'2026-05-23', type:'day', title:'標竿場域參訪：走進生態圈夥伴的第一線', host:'popworld／禾樂映像', photos:24, video:true, g:'linear-gradient(135deg,#FFB080,#FFDD80)' }
+  // SENSE DAY 每半年一次：上一場 5 月，下一場 11/21
+  { d:'2026-05-23', type:'day', title:'標竿場域參訪：走進生態圈夥伴的第一線', host:'快閃製造所／光影映像', photos:24, video:true, g:'linear-gradient(135deg,#FFB080,#FFDD80)' }
 ];
 const CLUBS = [
   { id:'martech', name:'MarTech 實務社', type:'需求社', icon:'◎', founder:'lensense', members:8, news:3, deals:1, joined:true },
-  { id:'golf', name:'高爾夫社', type:'興趣社', icon:'⛳', founder:'golface', members:11, news:1, deals:2, joined:true },
-  { id:'adv', name:'廣告主交流社', type:'需求社', founder:'stockfeel', members:9 }, { id:'sponsor', name:'贊助交流社', type:'需求社', founder:'shangshu', members:6 },
+  { id:'golf', name:'高爾夫社', type:'興趣社', icon:'⛳', founder:'lvye', members:11, news:1, deals:2, joined:true },
+  { id:'adv', name:'廣告主交流社', type:'需求社', founder:'stockfeel', members:9 }, { id:'sponsor', name:'贊助交流社', type:'需求社', founder:'shengliang', members:6 },
   { id:'nccu', name:'政大校友社', type:'校友社', founder:'stockfeel', members:12 }, { id:'ntu', name:'台大校友社', type:'校友社', founder:'fanggan', members:10 },
-  { id:'charity', name:'公益社', type:'興趣社', founder:'citizen', members:7 }
+  { id:'charity', name:'公益社', type:'興趣社', founder:'lvxunhuan', members:7 }
 ];
 const CLUB_FEED = [
-  { kind:'deal', co:'golface', club:'golf', at:'2 天前', text:'會員企業包場 9 折，11 月平日適用，可搭配 SENSE DAY 球敘。' },
+  { kind:'deal', co:'lvye', club:'golf', at:'2 天前', text:'會員企業包場 9 折，11 月平日適用，可搭配 SENSE DAY 球敘。' },
   { kind:'news', co:'lensense', club:'martech', at:'3 天前', text:'第一方數據應用工作坊 11 月開放社員報名，限 15 家企業。' },
-  { kind:'deal', co:'zocha', club:'golf', at:'5 天前', text:'俱樂部成員的員工旅遊租車享 85 折，花東與離島據點適用。' }
+  { kind:'deal', co:'islandgo', club:'golf', at:'5 天前', text:'俱樂部成員的員工旅遊租車享 85 折，花東與離島據點適用。' }
 ];
 
 const fmt = (s) => { const d = new Date(s + 'T00:00:00+08:00'); return { y:d.getFullYear(), m:d.getMonth() + 1, d:d.getDate(), w:WEEK[d.getDay()] }; };
@@ -312,17 +348,9 @@ const DEMO_LOGO = `<svg class="logo" viewBox="0 0 112 112" role="img" aria-label
   <g fill="none" stroke="${me.tint}" stroke-width="5" stroke-linecap="round">
     <circle cx="36" cy="50" r="15"/><circle cx="76" cy="50" r="15"/><path d="M51 48q5-5 10 0M21 47l-7-6M91 47l7-6"/>
   </g>
-  <text x="56" y="90" text-anchor="middle" font-family="Roboto Condensed, sans-serif" font-size="17" font-weight="700" letter-spacing="1.5" fill="${me.tint}">iDai</text>
+  <text x="56" y="90" text-anchor="middle" font-family="Roboto Condensed, sans-serif" font-size="17" font-weight="700" letter-spacing="1.5" fill="${me.tint}">MORI</text>
 </svg>`;
 const BADGE = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#4DB8EE"/><path d="M6.8 12.4l3.4 3.4 7-7.2" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="square"/></svg>';
-const IC = (d) => `<span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${d}</svg></span>`;
-const ICONS = {
-  intro:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/>',
-  region:'<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
-  has:'<path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>',
-  need:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5"/>',
-  meet:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6 6 0 0 1 3.5 5.5"/>'
-};
 const years = Number(TODAY.slice(0, 4)) - P.founded;
 // 斜紋：45 度，粗帶（藍→青）在內、細帶（黃→橘）在外
 // 動態模糊：沿斜紋方向（45 度）模糊較多、垂直方向微微柔化；每條程度不同。
@@ -344,10 +372,9 @@ const pcDeco = (pos) => {
     ${band(1, '0,76 76,0 84,0 0,84', `url(#pcd-${pos}-2)`, '.9')}
   </svg>`;
 };
-const bullets = (arr) => `<ul class="ro-list">${arr.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
+// 整張名片連到側邊欄的「公司資料」頁（詳細資料改在該頁查看）
 document.getElementById('me-card').innerHTML = `
-  <div class="pc-head">
-  <div class="pc-card">
+  <a class="pc-card" href="company-details.html" aria-label="查看公司資料：${esc(me.name)}">
     ${pcDeco('tl')}${pcDeco('br')}
     <div class="pc-id">
       <span class="pc-logo">${DEMO_LOGO}<span class="badge" title="已認證商家" role="img" aria-label="已認證商家">${BADGE}</span></span>
@@ -359,23 +386,7 @@ document.getElementById('me-card').innerHTML = `
       <div><dd>${esc(P.size)}</dd><dt>公司規模</dt></div>
       <div><dd>${years} 年</dd><dt>成立（${P.founded}）</dt></div>
     </dl>
-  </div>
-  <button type="button" class="btn-outline pc-toggle" aria-expanded="false" aria-controls="pc-list"><span>查看公司詳細資料</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l5 5 5-5"/></svg></button>
-  </div>
-  <ul class="pc-list" id="pc-list" hidden>
-    <li>${IC(ICONS.intro)}<div><h3>公司簡介</h3><p>${esc(P.intro)}</p></div></li>
-    <li>${IC(ICONS.region)}<div><h3>營運地區</h3><p>${esc(P.region)}</p></div></li>
-    <li>${IC(ICONS.has)}<div><h3>已有資源</h3>${bullets(P.has)}</div></li>
-    <li>${IC(ICONS.need)}<div><h3>需要資源</h3>${bullets(P.need)}</div></li>
-    <li>${IC(ICONS.meet)}<div><h3>想認識</h3><p>${esc(P.meet)}</p><span class="private-note">🔒 僅你與股感團隊可見，用於活動中為你引薦</span></div></li>
-  </ul>`;
-
-document.querySelector('.pc-toggle').addEventListener('click', (e) => {
-  const btn = e.currentTarget, open = btn.getAttribute('aria-expanded') !== 'true';
-  btn.setAttribute('aria-expanded', open);
-  btn.querySelector('span').textContent = open ? '收合公司詳細資料' : '查看公司詳細資料';
-  document.getElementById('pc-list').hidden = !open;
-});
+  </a>`;
 
 /* ═════════ 近期活動 ═════════ */
 // 會員已繳年費，活動全部免費；報名為示意（正式版經參與感 API 免跳頁完成）
@@ -429,7 +440,8 @@ const drawTicket = (dir = 0) => {
     : `<div class="tk-dots" role="group" aria-label="切換已報名的活動">${list.map((e, i) => { const f = fmt(e.d);
         return `<button type="button" data-tk="${i}" aria-label="第 ${i + 1} 場：${f.m}/${f.d} ${esc(e.title)}" aria-current="${i === tkIdx}"></button>`; }).join('')}</div>`;
   slot.innerHTML = `
-    <div class="tk-carousel${many ? '' : ' single'}" aria-roledescription="輪播" aria-label="我已報名的活動（共 ${list.length} 場）">
+    <h3 class="pr-subhead" id="h-tk">已報名</h3>
+    <div class="tk-carousel${many ? '' : ' single'}" aria-roledescription="輪播" aria-label="已報名（共 ${list.length} 場）">
       ${many ? `<button type="button" class="tk-nav" data-tk-step="-1" aria-label="上一場"${tkIdx === 0 ? ' disabled' : ''}>${ARROW('M10 3L5 8l5 5')}</button>` : ''}
       <div class="tk-stack depth-${depth}" style="--pad:${Math.min(2, list.length - 1) * 12}px">${depth > 1 ? ticketHTML(null, 'tk-back k2') : ''}${depth > 0 ? ticketHTML(null, 'tk-back k1') : ''}${ticketHTML(cur, 'tk-front')}</div>
       ${many ? `<button type="button" class="tk-nav" data-tk-step="1" aria-label="下一場"${!hasNext ? ' disabled' : ''}>${ARROW('M6 3l5 5-5 5')}</button>` : ''}
@@ -442,7 +454,31 @@ const drawTicket = (dir = 0) => {
 };
 const goTicket = (i) => { const dir = Math.sign(i - tkIdx); if (!dir) return; tkIdx = i; drawTicket(dir); };
 
-/* 接下來的場次：列出全部場次，已報名的顯示標籤 */
+/* 即將舉辦：左邊是下一場可報名的每月活動（學院講座），右邊是下一場 SENSE DAY（依報名狀態顯示）。
+   名額採折衷：只顯示總名額，剩餘低於兩成才加「即將額滿」 */
+const drawCards = () => {
+  const list = [upcoming.find(e => e.type === 'insight' && e.status === 'open'), upcoming.find(e => e.type === 'day')].filter(Boolean),
+        wrap = document.getElementById('ev-cards');
+  if (!list.length){ wrap.innerHTML = ''; return; }
+  wrap.innerHTML = `<h3 class="pr-subhead" id="h-ev-cards">即將舉辦</h3><div class="ev-cards">${list.map(e => {
+    const f = fmt(e.d), dl = fmt(e.dl.slice(0, 10));
+    const [cat, main] = e.title.includes('｜') ? e.title.split('｜') : [e.title.split('：')[0], e.title];
+    const band = e.type === 'day' ? 'SENSE DAY｜主題式交流聚會' : '學院講座｜SENSE INSIGHT 學院';
+    return `<article class="ev-card" aria-label="${f.m}/${f.d} ${esc(e.title)}">
+      <div class="ev-band ${e.type}">${band}</div>
+      <div class="ev-body">
+        <div class="ev-thumb ${e.type}" role="img" aria-label="活動縮圖（示意）"><span>示意圖</span></div>
+        <div class="ev-meta"><b>${f.m}/${f.d}（${f.w}）</b><span>${esc(cat)}</span></div>
+        <h3>${esc(main)}</h3>
+        <p class="ev-host">${e.type === 'day' ? '合作夥伴' : '講者'}｜${esc(e.host)}</p>
+        <div class="ev-seats"><span>共 ${e.cap} 名</span>${e.left / e.cap <= 0.2 ? '<span class="ev-full">即將額滿</span>' : ''}</div>
+        <p class="ev-deadline">${META_ICON.clock}報名截止 ${dl.m}/${dl.d}（${dl.w}）${e.dl.slice(11)}</p>
+        <div class="ev-actions">${e.status === 'joined' ? `<span class="ev-joined">${CHECK}已報名</span>` : `<button type="button" class="btn pr-btn-outline" data-reg="${e.d}">立即報名</button>`}<button type="button" class="btn btn-secondary" data-toast="活動詳情頁尚未製作">活動詳情</button></div>
+      </div>
+    </article>`; }).join('')}</div>`;
+};
+
+/* 所有活動：列出全部場次，已報名的顯示標籤 */
 const drawEvents = () => {
   document.getElementById('ev-table').innerHTML = `<thead><tr><th>日期</th><th>活動</th><th>類型</th><th>名額</th><th>狀態</th></tr></thead><tbody>${
     upcoming.length ? upcoming.map(e => { const f = fmt(e.d); return `<tr><td style="white-space:nowrap">${f.m}/${f.d}（${f.w}）</td><td>${esc(e.title)}<br><small style="color:var(--black-500)">${esc(e.host)}</small></td><td style="white-space:nowrap">${EV_TYPE[e.type]}</td><td style="white-space:nowrap">${e.cap} 人</td><td>${e.status === 'open' ? regBtn(e) : e.status === 'joined' ? `<span class="ev-joined">${CHECK}已報名</span>` : status(e.status)}</td></tr>`; }).join('')
@@ -453,7 +489,7 @@ document.addEventListener('click', (e) => {
   if (reg){
     const ev = EVENTS.find(x => x.d === reg.dataset.reg); ev.status = 'joined';
     tkIdx = upcoming.filter(x => x.status === 'joined').indexOf(ev);  // 報名後直接切到這一張
-    drawTicket(); drawEvents(); SenseShell.toast('已完成報名（示意）'); return;
+    drawTicket(); drawCards(); drawEvents(); SenseShell.toast('已完成報名（示意）'); return;
   }
   const step = e.target.closest('[data-tk-step]');
   if (step){ goTicket(tkIdx + Number(step.dataset.tkStep)); return; }
@@ -477,6 +513,7 @@ tkSlot.addEventListener('pointerup', (e) => {
   if (Math.abs(dx) > 40){ const next = tkIdx + (dx < 0 ? 1 : -1); if (next >= 0 && next < n) goTicket(next); }
 });
 drawTicket();
+drawCards();
 drawEvents();
 
 /* ═════════ 公司名冊：依產業篩選 ═════════ */

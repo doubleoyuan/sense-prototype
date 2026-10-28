@@ -43,7 +43,8 @@
 
   const SECTIONS = [
     { label:'我的專屬內容', c:'#49BFBB', line:'#DBF2F1', strong:'#2E8F8B',
-      links:[ '我的上架', '受眾包管理', '我的合作', '公司資料' ] },
+      // 連結可寫成字串（尚未製作）或 { key, label, href }；頁面 data-module="mine" 且 data-page 等於 key 時標示目前位置
+      links:[ '我的上架', '受眾包管理', '我的合作', { key:'company', label:'公司資料', href:'company-details.html' } ] },
     { label:'後台管理', c:'var(--black-400)', line:'var(--black-200)', strong:'var(--black-800)',
       links:[ '單位管理', '帳號管理', '鑰匙管理' ] }
   ];
@@ -145,7 +146,12 @@
 
     SECTIONS.forEach(s => {
       h += `<div class="sb-sec" style="--c:${s.c}"><span>${s.label}</span><img src="${A('nav-group-mask.svg')}" alt=""></div>`;
-      s.links.forEach(l => { h += `<button class="sb-link" style="--line:${s.line};--strong:${s.strong}" data-todo="${l}">${l}</button>`; });
+      s.links.forEach(l => {
+        const st = `style="--line:${s.line};--strong:${s.strong}"`;
+        if (typeof l === 'string'){ h += `<button class="sb-link" ${st} data-todo="${l}">${l}</button>`; return; }
+        const active = mod === 'mine' && page === l.key;
+        h += `<a class="sb-link${active ? ' active' : ''}" ${st} href="${l.href}"${active ? ' aria-current="page"' : ''}>${l.label}</a>`;
+      });
     });
     h += `</div>
       <div class="sb-user">
@@ -160,6 +166,12 @@
   function crumbs(app){
     const m = MODULES.find(x => x.key === app.dataset.module);
     const list = [ { label:'SENSE', href:ROOT_HREF, todo:'後台首頁' } ];
+    // 我的專屬內容（側欄下方連結）：SENSE / 頁面名稱
+    if (app.dataset.module === 'mine'){
+      const l = SECTIONS[0].links.find(x => x.key === app.dataset.page);
+      list.push({ label:app.dataset.crumb || (l ? l.label : app.dataset.page) });
+      return list;
+    }
     if (!m) return list;
     list.push({ label:m.label, href:m.href, todo:m.label });
     const page = app.dataset.page;

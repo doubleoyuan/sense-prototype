@@ -2,6 +2,7 @@
 /*
 !/.gitignore
 !/index.html
+!/CLAUDE.md
 
 !/prototype/
 /prototype/*
@@ -11,3 +12,4 @@
 !/prototype/product-sense-add-product.html
 !/prototype/finance-sense.html
 !/prototype/landing-wireframe.html
+!/prototype/company-details.html

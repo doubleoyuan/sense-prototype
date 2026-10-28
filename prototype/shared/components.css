@@ -97,6 +97,7 @@ a.sb-mod-label:hover{color:var(--strong)}
 .sb-link{display:block;width:100%;padding:0 0 4px 10px;border-bottom:1px solid var(--line);font-size:12px;font-weight:500;line-height:24px;
   text-decoration:none;color:inherit;transition:color .15s,border-color .15s}
 .sb-link:hover{color:var(--strong)}
+.sb-link.active{color:var(--strong);font-weight:600;border-bottom-color:var(--strong)}
 
 /* 使用者 */
 .sb-user{background:var(--white);border-radius:var(--r-20);padding:20px;display:flex;align-items:center;gap:20px;flex:none}
@@ -212,7 +213,7 @@ a.sb-mod-label:hover{color:var(--strong)}
   clip-path:path("M8.499 1.757C8.622 0.754 9.474 0 10.484 0H12.74C13.941 0 14.871 1.051 14.725 2.243L13.501 12.243C13.378 13.246 12.526 14 11.516 14H9.26C8.059 14 7.129 12.949 7.275 11.757Z")}
 @keyframes title-deco-in{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){ .section-title::before,.section-title::after{animation:none} }
-.section-title h2{flex:1;min-width:0;font-size:16px;font-weight:700;line-height:32px;letter-spacing:var(--tracking-ultra)}
+.section-title h2{flex:1;min-width:0;font-size:18px;font-weight:700;line-height:32px;letter-spacing:var(--tracking-ultra)}
 
 /* TitleButton：放在區塊標題右側的主要操作（Figma 4107:690） */
 .title-btn{flex:none;display:inline-flex;align-items:center;gap:4px;padding:6px 20px 6px 16px;text-decoration:none;
