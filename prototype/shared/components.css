@@ -97,7 +97,7 @@ a.sb-mod-label:hover{color:var(--strong)}
 .sb-link{display:block;width:100%;padding:0 0 4px 10px;border-bottom:1px solid var(--line);font-size:12px;font-weight:500;line-height:24px;
   text-decoration:none;color:inherit;transition:color .15s,border-color .15s}
 .sb-link:hover{color:var(--strong)}
-.sb-link.active{color:var(--strong);font-weight:600;border-bottom-color:var(--strong)}
+.sb-link.active{color:var(--strong);font-weight:600}
 
 /* 使用者 */
 .sb-user{background:var(--white);border-radius:var(--r-20);padding:20px;display:flex;align-items:center;gap:20px;flex:none}
