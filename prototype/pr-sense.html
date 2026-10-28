@@ -117,21 +117,20 @@
   /* 預留空間依「最多會疊幾層」固定（--pad），切換時前方票券不會忽寬忽窄 */
   .tk-stack{--pad:0px;position:relative;padding:var(--pad) var(--pad) 0 0}
   .tk-stack .tk-back{position:absolute;width:auto;pointer-events:none}
-  .tk-stack .tk-back.k1{--ticket:#E1D0C0;opacity:.8;z-index:1;top:calc(var(--pad) - 12px);right:calc(var(--pad) - 12px);bottom:12px;left:12px}
-  .tk-stack .tk-back.k2{--ticket:#CDB8A3;opacity:.6;top:calc(var(--pad) - 24px);right:calc(var(--pad) - 24px);bottom:24px;left:24px}
+  .tk-stack .tk-back.k1{--ticket:#E1D0C0;z-index:1;top:calc(var(--pad) - 12px);right:calc(var(--pad) - 12px);bottom:12px;left:12px}
+  .tk-stack .tk-back.k2{--ticket:#CDB8A3;top:calc(var(--pad) - 24px);right:calc(var(--pad) - 24px);bottom:24px;left:24px}
   .tk-stack .tk-front{position:relative;z-index:2}
-  /* 上方缺口露出的是後面那張票：前方缺口用第二張的顏色、第二張缺口用第三張的顏色，最後面那張維持白色。
-     做法：藏起原本的白色缺口圖，在撕線頂端畫一個同尺寸的 V（深 7.28px、45 度斜邊），填上後面那張的顏色 */
-  .tk-cut{display:none;position:absolute;top:0;left:50%;width:14.56px;height:7.28px;transform:translateX(-50%);
-    background:var(--cut);clip-path:polygon(0 0,100% 0,50% 100%)}
-  /* 後方票券半透明（第二張 80%、第三張 60%），缺口顏色用疊合後實際看到的顏色 */
-  .tk-stack.depth-1 .tk-front{--cut:#E7D9CD}  /* 第二張 80% 疊在白底 */
-  .tk-stack.depth-2 .tk-front{--cut:#E1D1C2}  /* 第二張 80% 疊在（第三張 60% 疊在白底）上 */
-  .tk-stack.depth-2 .k1{--cut:#E1D4C8}        /* 第三張 60% 疊在白底 */
-  .tk-stack:is(.depth-1,.depth-2) .tk-front .tk-cut,
-  .tk-stack.depth-2 .k1 .tk-cut{display:block}
-  .tk-stack:is(.depth-1,.depth-2) .tk-front .ticket-notch.top,
-  .tk-stack.depth-2 .k1 .ticket-notch.top{display:none}
+  /* 每張票券右下方的淡陰影：用 drop-shadow 才會沿著缺角與缺口的實際外形 */
+  .tk-stack .ticket{filter:drop-shadow(3px 4px 6px rgba(0,0,0,.08))}
+  /* 撕線上下的 V 形缺口直接從票身挖空（不再蓋白色圖），陰影與後方票券都會從缺口透出來。
+     V 的尖端對準撕線：票根 176px＋間距 24px＋撕線半寬 1px；深度依 Figma（上 7.28、下 7.64），45 度斜邊 */
+  @media (min-width:768px){
+    .tk-stack .ticket-body{--nx:calc(100% - 201px);
+      -webkit-mask:conic-gradient(from -45deg at var(--nx) 7.28px,transparent 90deg,#000 0) top/100% 51% no-repeat,
+                   conic-gradient(from 135deg at var(--nx) calc(100% - 7.64px),transparent 90deg,#000 0) bottom/100% 51% no-repeat;
+              mask:conic-gradient(from -45deg at var(--nx) 7.28px,transparent 90deg,#000 0) top/100% 51% no-repeat,
+                   conic-gradient(from 135deg at var(--nx) calc(100% - 7.64px),transparent 90deg,#000 0) bottom/100% 51% no-repeat}
+  }
   .tk-nav{width:40px;height:40px;border-radius:50%;border:1px solid var(--black-200);background:var(--white);display:grid;place-items:center;color:var(--black-600);
     filter:drop-shadow(0 2px 0 var(--black-200));transition:background .15s,color .15s}
   .tk-nav:hover:not([disabled]){background:var(--black-50);color:var(--black-800)}
@@ -396,9 +395,7 @@ const regBtn = (e, big) => big
   ? `<button type="button" class="btn btn-primary" data-reg="${e.d}">立即報名</button>`
   : `<button type="button" class="reg-btn" data-reg="${e.d}">立即報名</button>`;
 const CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="currentColor"/><path d="M6.8 12.4l3.4 3.4 7-7.2" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="square"/></svg>';
-const PERF = `<span class="ticket-perf" aria-hidden="true"><span class="tk-cut"></span>
-  <span class="ticket-notch top"><span><img src="shared/assets/ticket-notch-top.svg" alt=""></span></span>
-  <span class="ticket-notch bottom"><span><img src="shared/assets/ticket-notch-bottom.svg" alt=""></span></span></span>`;
+const PERF = '<span class="ticket-perf" aria-hidden="true"></span>';
 
 /* 已報名入場券：每場報名一張，依日期排序；多張時可用箭頭、點點或滑動切換。沒有報名時不顯示 */
 const META_ICON = {
