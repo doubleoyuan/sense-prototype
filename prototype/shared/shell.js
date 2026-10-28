@@ -19,7 +19,8 @@
   const MODULES = [
     { key:'product',   label:'商品SENSE', c:'var(--mod-product)',   strong:'var(--mod-product-strong)',   href:'product-sense.html',
       subs:[ { key:'new', label:'新增商品', href:'product-sense-add-product.html' }, { key:'browse', label:'瀏覽商品', href:'product-sense.html#browse' } ] },
-    { key:'marketing', label:'行銷SENSE', c:'var(--mod-marketing)', strong:'var(--mod-marketing-strong)', href:null, subs:[] },
+    { key:'marketing', label:'行銷SENSE', c:'var(--mod-marketing)', strong:'var(--mod-marketing-strong)', href:'marketing-sense.html',
+      subs:[ { key:'browse', label:'瀏覽受眾包', href:'marketing-sense.html#browse' } ] },
     { key:'strategy',  label:'策略SENSE', c:'var(--mod-strategy)',  strong:'var(--mod-strategy-strong)',  href:null, subs:[] },
     { key:'pr',        label:'公關SENSE', c:'var(--mod-pr)',        strong:'var(--mod-pr-strong)',        href:'pr-sense.html',
       // 子頁尚未製作，先跳到一覽頁的對應區塊
