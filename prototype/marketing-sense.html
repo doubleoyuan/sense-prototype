@@ -38,8 +38,9 @@
   /* 上內距縮為 10：頁籤底部已有 12 的內距，標題不必再離 logo 太遠 */
   .ms-card-body{flex:1;display:flex;flex-direction:column;gap:20px;padding:10px 20px 20px;background:var(--white);border:1px solid var(--ms-line);
     border-radius:0 0 var(--r-30) var(--r-30)}
+  /* 標題只顯示一行，超出以「…」截斷（完整標題放在 title） */
   .ms-card-title{font-size:16px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-super);color:var(--black-800);
-    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   /* 受眾規模：沿用 ResourceCard 的指標區，標籤與數值排成一行（標籤靠左、數值靠右），數字放大、「人」維持原字級 */
   .ms-card .r-card-metrics .metric{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
   .ms-card .r-card-metrics .metric em{font-size:18px;font-style:normal}
@@ -157,7 +158,7 @@ function audienceCard(a){
         <div class="ms-tab-views" aria-label="瀏覽數 ${a.views}"><img src="${SenseShell.asset('ic-eye.svg')}" alt="">${SenseUI.compact(a.views)}</div>
       </div>
       <div class="ms-card-body">
-        <h3 class="ms-card-title">${esc(a.title)}</h3>
+        <h3 class="ms-card-title" title="${esc(a.title)}">${esc(a.title)}</h3>
         <span class="r-card-metrics"><span class="metric"><small>受眾規模</small><b><em>${num(a.size)}</em> 人</b></span></span>
         <table class="ms-channels">
           <thead><tr><th scope="col">通路</th><th scope="col">可觸及</th><th scope="col">每千次</th></tr></thead>
