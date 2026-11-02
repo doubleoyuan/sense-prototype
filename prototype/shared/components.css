@@ -89,11 +89,13 @@ a.sb-mod-label:hover{color:var(--strong)}
 .sb-sub-item.active span{color:var(--strong);font-weight:600;border-bottom-color:var(--c)}
 
 /* 分區標題（我的專屬內容／後台管理） */
-.sb-sec{position:relative;width:100%;height:28px;display:flex;gap:4px;flex:none}
+/* 色塊延伸到右側，尾端保留 30px 空白 */
+.sb-sec{position:relative;width:100%;height:28px;display:flex;gap:4px;flex:none;padding-right:30px}
 .sb-sec::before{content:"";width:4px;border-radius:1px;background:var(--c);flex:none}
+/* 斜角遮罩緊貼在色塊尾端（img 往左疊 9px＋gap 4px） */
 .sb-sec span{flex:1;min-width:0;background:var(--c);border-radius:1px;padding:0 10px;display:flex;align-items:center;
   color:var(--white);font-size:14px;font-weight:600;line-height:24px}
-.sb-sec img{position:absolute;right:0;top:0;width:9px;height:28px}
+.sb-sec img{flex:none;margin-left:-13px;width:9px;height:28px}
 .sb-link{display:block;width:100%;padding:0 0 4px 10px;border-bottom:1px solid var(--line);font-size:12px;font-weight:500;line-height:24px;
   text-decoration:none;color:inherit;transition:color .15s,border-color .15s}
 .sb-link:hover{color:var(--strong)}
@@ -107,6 +109,18 @@ a.sb-mod-label:hover{color:var(--strong)}
 .sb-logout{border:1px solid var(--black-200);border-radius:var(--r-10);box-shadow:0 1px 0 0 var(--black-200);padding:0 16.8px 0 20px;background:var(--white);
   font-size:12px;font-weight:500;line-height:24px;white-space:nowrap;color:var(--black-400)}
 .sb-logout:hover{background:var(--black-50);color:var(--black-600)}
+/* 使用者區塊置底：項目少時推到最下方，項目多時黏在底部，上方選單從它後面捲過 */
+.sb-user{position:sticky;bottom:0;margin-top:auto;z-index:1}
+/* 白卡改由 ::after 畫，外圈 20px 灰色陰影（跟著圓角）蓋住四個圓角外側與下方 20px 內距（sticky 以內距內緣為準），
+   捲動中的選單不會從圓角或縫裡露出來；z-index:-1 只在 .sb-user 自己的堆疊層內，仍蓋在選單上 */
+.sb-user{background:none}
+.sb-user::after{content:"";position:absolute;inset:0;border-radius:inherit;background:var(--white);
+  box-shadow:0 0 0 20px var(--black-200);z-index:-1}
+/* 下方還有沒捲到的項目時，使用者區塊上方漸層淡出（.has-more 由 shell.js 依捲動位置切換） */
+/* 往下延伸到卡片頂部 20px，補滿灰圈外側圓角留下的小缺口 */
+.sb-user::before{content:"";position:absolute;left:-20px;right:-20px;bottom:calc(100% - 20px);height:88px;pointer-events:none;z-index:-1;
+  background:linear-gradient(rgba(238,238,238,0),var(--black-200) 48px);opacity:0;transition:opacity .15s}
+.sidebar.has-more .sb-user::before{opacity:1}
 
 /* ── Header ── */
 .header{position:sticky;top:0;z-index:30;background:var(--white);border-bottom:1px solid var(--black-200);padding:20px 40px;

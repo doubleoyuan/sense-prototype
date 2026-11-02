@@ -21,7 +21,8 @@
       subs:[ { key:'new', label:'新增商品', href:'product-sense-add-product.html' }, { key:'browse', label:'瀏覽商品', href:'product-sense.html#browse' } ] },
     { key:'marketing', label:'行銷SENSE', c:'var(--mod-marketing)', strong:'var(--mod-marketing-strong)', href:'marketing-sense.html',
       subs:[ { key:'browse', label:'瀏覽受眾包', href:'marketing-sense.html#browse' } ] },
-    { key:'strategy',  label:'策略SENSE', c:'var(--mod-strategy)',  strong:'var(--mod-strategy-strong)',  href:null, subs:[] },
+    { key:'strategy',  label:'策略SENSE', c:'var(--mod-strategy)',  strong:'var(--mod-strategy-strong)',  href:'strategy-sense.html',
+      subs:[ { key:'browse', label:'瀏覽策略', href:'strategy-sense.html#browse' } ] },
     { key:'pr',        label:'公關SENSE', c:'var(--mod-pr)',        strong:'var(--mod-pr-strong)',        href:'pr-sense.html',
       // 子頁尚未製作，先跳到一覽頁的對應區塊
       subs:[ { key:'directory', label:'公司名冊', href:'pr-sense.html#directory' },
@@ -46,8 +47,10 @@
     { label:'我的專屬內容', c:'#49BFBB', line:'#DBF2F1', strong:'#2E8F8B',
       // 連結可寫成字串（尚未製作）或 { key, label, href }；頁面 data-module="mine" 且 data-page 等於 key 時標示目前位置
       links:[ '我的上架', '受眾包管理', '我的合作', { key:'company', label:'公司資料', href:'company-details.html' } ] },
+    { label:'代管單位內容', c:'#49BFBB', line:'#DBF2F1', strong:'#2E8F8B',
+      links:[ '上架管理', '受眾包管理', '合作管理', '帳戶與結算', '公司資料', '成員與角色' ] },
     { label:'後台管理', c:'var(--black-400)', line:'var(--black-200)', strong:'var(--black-800)',
-      links:[ '單位管理', '帳號管理', '鑰匙管理' ] }
+      links:[ '單位管理', '商家帳號', '平台人員', '平台角色', '權限目錄', '鑰匙管理', '提領查帳' ] }
   ];
 
   const USER = { name:'使用者名稱', badge:'已認證商家' };
@@ -160,6 +163,13 @@
         <button class="sb-logout" data-todo="登出">登出</button>
       </div>`;
     document.getElementById('sidebar').innerHTML = h;
+    updateSidebarFade();
+  }
+
+  // 使用者區塊固定在側欄底部；下方還有項目沒捲到時，在它上方加一層漸層提示（.has-more）
+  function updateSidebarFade(){
+    const sb = document.getElementById('sidebar');
+    sb.classList.toggle('has-more', sb.scrollTop + sb.clientHeight < sb.scrollHeight - 1);
   }
 
   /* 麵包屑：SENSE / 模組 / 子頁。入口頁到模組為止；子頁名稱取自 subs，
@@ -226,6 +236,9 @@
     renderSidebar(app, open);
     renderHeader(app);
 
+    document.getElementById('sidebar').addEventListener('scroll', updateSidebarFade, { passive:true });
+    window.addEventListener('resize', updateSidebarFade);
+
     if (!document.querySelector('.backdrop')){
       const bd = document.createElement('div'); bd.className = 'backdrop'; bd.dataset.navToggle = ''; app.appendChild(bd);
     }
@@ -240,6 +253,7 @@
         clearTimeout(animTimer); animTimer = setTimeout(() => app.classList.remove('nav-anim'), 250);
         const on = app.classList.toggle('nav-collapsed');
         saveCollapsed(on);
+        updateSidebarFade();
         // 用鍵盤按的（click 的 detail 為 0）才把焦點移到另一顆鈕，可以直接再按回來；滑鼠點擊不移，避免出現焦點框
         if (e.detail === 0) document.querySelector(on ? '.sb-expand' : '.sb-collapse').focus();
       } else if (t.dataset.toggle){
