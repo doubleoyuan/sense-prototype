@@ -41,6 +41,72 @@
 
   .ss-foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:4px}
   .ss-foot .mode{font-size:13px;line-height:20px;color:var(--black-500)}
+
+  /* ── 新版 StrategyCard（比較用）：套行銷 SENSE 受眾包卡片的頁籤模板，右上頁籤改顯示交換方式 ── */
+  .ss-tcard{--ss-line:var(--black-300);display:flex;flex-direction:column;cursor:pointer;filter:drop-shadow(0 4px 0 var(--black-200))}
+  /* hover 換框線色不做轉場：凹圓角是漸層，無法跟框線一起漸變 */
+  .ss-tcard:hover,.ss-tcard:focus-visible{--ss-line:var(--hover-teal);outline:0}
+  .ss-tabs{position:relative;z-index:1;display:flex;align-items:flex-end;margin-bottom:-1px}
+  /* 公司頁籤：logo＋名稱＋版本＋認證標章。只有名稱會以「…」截斷，版本與認證標章固定顯示在最後 */
+  .ss-tab{position:relative;z-index:1;flex:1;min-width:0;padding:14px 20px 12px;display:flex;align-items:center;gap:10px;
+    background:var(--white);border:1px solid var(--ss-line);border-bottom:0;border-radius:var(--r-20) var(--r-20) 0 0}
+  .ss-tab .org-name{min-width:0;font-size:14px;line-height:20px;letter-spacing:var(--tracking-super);color:var(--black-700);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ss-tab .ver{flex:none;margin-left:-6px;font-size:12px;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--black-500);white-space:nowrap}
+  .ss-tab .ss-verified{margin-left:-6px}
+  /* 公司頁籤右下的內凹圓角，畫法同行銷 SENSE 受眾包卡片 */
+  .ss-tab::after{content:"";position:absolute;left:100%;bottom:0;width:21px;height:21px;
+    background:radial-gradient(circle at 100% 0,transparent 19.6px,var(--ss-line) 20px,var(--ss-line) 20.6px,var(--white) 21px)}
+  /* 交換方式頁籤：取代受眾包卡片的瀏覽數頁籤，圖示＋「單向／雙向」 */
+  .ss-tab-mode{flex:none;height:40px;margin-bottom:1px;padding:0 21px;display:flex;align-items:center;justify-content:center;gap:4px;
+    background:var(--black-50);border:1px solid var(--ss-line);border-left:0;border-bottom:0;border-radius:0 var(--r-10) 0 0;
+    font-size:14px;font-weight:500;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--black-600);white-space:nowrap}
+  /* 交換方式圖示：上方箭頭往右（去）、下方箭頭往左（回）。單向時「回」為淡灰，雙向時兩支同色 */
+  .ss-mode-ic{width:16px;height:16px;flex:none;overflow:visible}
+  .ss-mode-ic path{fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .ss-tab-mode[data-mode="oneway"] .ss-mode-ic .back{stroke:var(--black-300)}
+  /* 動畫：進入畫面播一次（.is-play，播完移除），hover／鍵盤聚焦卡片時再播。
+     去的箭頭從左側淡入、往右滑到定位；雙向時回的箭頭同時從右側淡入、往左滑；單向的淡灰箭頭不動。只動一次 */
+  .ss-tab-mode.is-play .fwd,.ss-tcard:hover .ss-tab-mode .fwd,.ss-tcard:focus-visible .ss-tab-mode .fwd{animation:ss-arrow-r .6s ease-out}
+  .ss-tab-mode[data-mode="twoway"].is-play .back,.ss-tcard:hover .ss-tab-mode[data-mode="twoway"] .back,
+  .ss-tcard:focus-visible .ss-tab-mode[data-mode="twoway"] .back{animation:ss-arrow-l .6s ease-out}
+  @keyframes ss-arrow-r{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+  @keyframes ss-arrow-l{from{opacity:0;transform:translateX(6px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){ .ss-mode-ic path{animation:none !important} }
+  .ss-tbody{flex:1;display:flex;flex-direction:column;gap:20px;padding:10px 20px 20px;background:var(--white);border:1px solid var(--ss-line);
+    border-radius:0 0 var(--r-30) var(--r-30)}
+  .ss-ttitle{font-size:16px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-super);color:var(--black-800);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* 標題＋條件標籤＋說明：說明至多兩行，超出以「…」截斷 */
+  .ss-tintro{display:flex;flex-direction:column;gap:4px}
+  .ss-tdesc{font-size:14px;line-height:22px;letter-spacing:var(--tracking-wider);color:var(--black-600);
+    display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
+  /* 人數與價格合成一個框：沿用受眾包卡片受眾規模列的淡橘底（ResourceCard 指標區），上方人數、下方兩列價格 */
+  .ss-tcard .r-card-metrics{flex-direction:column;align-items:stretch;gap:0;border-radius:var(--r-10)}
+  .ss-tcard .r-card-metrics .metric{flex:none;flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+  .ss-tcard .r-card-metrics .metric em{font-size:18px;font-style:normal}
+  .ss-prices{width:100%;margin-top:10px;border-collapse:collapse;border-top:1px solid var(--black-300);font-size:12px;line-height:16px;letter-spacing:var(--tracking-wider);white-space:nowrap}
+  .ss-prices th{padding:10px 0 0;font-weight:600;color:var(--black-500);text-align:left}
+  /* 價格數值同上方人數的樣式：數字放大、單位（NT$）維持原字級並放在數字後 */
+  .ss-prices td{padding:10px 0 0 12px;font-size:14px;font-weight:500;line-height:24px;letter-spacing:var(--tracking-super);color:var(--black-700);text-align:right}
+  .ss-prices td em{font-size:18px;font-style:normal}
+  /* 條件標籤：同受眾包卡片的 AI 標籤列（單行、左右捲動、兩側淡出） */
+  .ss-tags{min-width:0;display:flex;gap:20px;margin:0;padding:0;list-style:none;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;cursor:grab}
+  .ss-tags::-webkit-scrollbar{display:none}
+  .ss-tags.is-dragging{cursor:grabbing;user-select:none}
+  .ss-tags{--fade-l:0px;--fade-r:0px;
+    -webkit-mask-image:linear-gradient(to right,transparent,black var(--fade-l),black calc(100% - var(--fade-r)),transparent);
+    mask-image:linear-gradient(to right,transparent,black var(--fade-l),black calc(100% - var(--fade-r)),transparent)}
+  .ss-tags.fade-l{--fade-l:32px}
+  .ss-tags.fade-r{--fade-r:32px}
+  /* 每個標籤：實心 tag 圖示＋文字，同為淺藍（目前模組的 --accent），不加底色 */
+  .ss-tags li{flex:none;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;padding:4px 0;
+    color:var(--accent);font-size:13px;line-height:20px;letter-spacing:var(--tracking-wider)}
+  .ss-tags li svg{width:14px;height:14px;flex:none}
+  /* 發起媒合預估：outline 按鈕，樣式照財務 SENSE 的 .fs-btn-outline（該元件在財務頁內，尚未抽到 shared/），撐滿卡片寬度、貼齊卡片底部 */
+  .ss-btn-outline{background:var(--white);border:1px solid #CFE3FD;color:var(--accent-border);filter:drop-shadow(0 4px 0 #E3EEFD)}
+  .ss-btn-outline:hover{background:#F5F9FF}
+  .ss-tbody .ss-btn-outline{width:100%;margin-top:auto}
 </style>
 </head>
 <body>
@@ -65,6 +131,14 @@
         <div class="card-grid" id="grid" aria-live="polite"></div>
         <div class="pager" id="pager"></div>
       </section>
+
+      <!-- 區塊：新版卡片（比較用，跟上方列表共用搜尋與排序） -->
+      <section class="content-section" aria-labelledby="compare-title">
+        <div class="section-title" id="compare">
+          <h2 id="compare-title">新版卡片（比較用）</h2>
+        </div>
+        <div class="card-grid" id="grid-new" aria-live="polite"></div>
+      </section>
     </main>
   </div>
 </div>
@@ -80,20 +154,20 @@ const ORGS = {
 
 const CATEGORIES = [ { key:'all', label:'ALL' } ];
 
-// ver 為策略版本；tags 為「同時具備以下全部條件」的會員標籤；price 為每千人費用、min 為最低起價；mode 為交換方式
+// ver 為策略版本；tags 為「同時具備以下全部條件」的會員標籤；price 為每千人費用、min 為最低起價；mode 為交換方式（見 MODES）
 const STRATEGIES = [
   { id:'s1', org:'sf', ver:'v3 MA', title:'金融理財_郵件', size:200, order:3,
     desc:'需求方付費並於 DCR 內取得標籤；數據方取得分潤、不取得需求方名單。',
     fit:['金融保險', '投資理財', '數位行銷', '證券交易'],
-    tags:['金融市場', '投資資訊', '行銷內容'], price:500, min:8000, mode:'單向交換' },
+    tags:['金融市場', '投資資訊', '行銷內容'], price:500, min:8000, mode:'oneway' },
   { id:'s2', org:'lx', ver:'v3', title:'茶飲品牌_郵件', size:10, order:2,
     desc:'需求方付費並於 DCR 內取得標籤；數據方取得分潤、不取得需求方名單。',
     fit:['茶飲產業', '食品飲料', '電子商務', '品牌行銷'],
-    tags:['茶飲愛好者', '郵件行銷', '品牌推廣'], price:500, min:8000, mode:'單向交換' },
+    tags:['茶飲愛好者', '郵件行銷', '品牌推廣'], price:500, min:8000, mode:'twoway' },
   { id:'s3', org:'lx', ver:'v3', title:'茶飲品牌_測試2', size:10, order:1,
     desc:'需求方付費並於 DCR 內取得標籤；數據方取得分潤、不取得需求方名單。',
     fit:['飲品業', '餐飲服務', '社交平台', '文化推廣'],
-    tags:['茶飲文化', '創新飲品', '社交體驗'], price:500, min:8000, mode:'單向交換' }
+    tags:['茶飲文化', '創新飲品', '社交體驗'], price:500, min:8000, mode:'oneway' }
 ];
 
 const SORTS = [
@@ -103,6 +177,14 @@ const SORTS = [
 const PER_PAGE = 12;
 
 const VERIFIED = '<svg class="ss-verified" viewBox="0 0 16 16" aria-label="已認證"><path fill="currentColor" d="M8 .8l1.7 1.3 2.1-.2.8 2 1.9 1-.3 2.1L15.2 8 14 9.7l.3 2.1-1.9 1-.8 2-2.1-.2L8 15.2l-1.7-1.3-2.1.2-.8-2-1.9-1 .3-2.1L.8 8 2 6.3 1.7 4.2l1.9-1 .8-2 2.1.2z"/><path d="M5.3 8.2l1.8 1.8 3.6-3.7" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+// 交換方式：單向與雙向共用同一個圖示（上去下回的半箭頭），單向時「回」的箭頭淡灰，由 CSS 依 data-mode 切換
+const MODES = {
+  oneway: { label:'單向', full:'單向交換' },
+  twoway: { label:'雙向', full:'雙向交換' }
+};
+const MODE_IC = '<svg class="ss-mode-ic" viewBox="0 0 16 16" aria-hidden="true"><path class="back" d="M12 10.5H3l2.5 2.5"/><path class="fwd" d="M4 5.5h9l-2.5-2.5"/></svg>';
+// 實心 tag 圖示，孔洞以 evenodd 挖空
+const TAG = '<svg viewBox="0 0 16 16" fill="currentColor" fill-rule="evenodd" aria-hidden="true"><path d="M2 3.5A1.5 1.5 0 0 1 3.5 2h4.1a1.5 1.5 0 0 1 1.06.44l5.2 5.2a1.5 1.5 0 0 1 0 2.12l-4.1 4.1a1.5 1.5 0 0 1-2.12 0l-5.2-5.2A1.5 1.5 0 0 1 2 7.6zM5.75 4.4a1.35 1.35 0 1 0 0 2.7 1.35 1.35 0 0 0 0-2.7z"/></svg>';
 const CHECK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5 6.5 12 13 4.5"/></svg>';
 
 /* ═════════ 卡片 ═════════ */
@@ -124,8 +206,37 @@ function strategyCard(s){
         <span class="ss-price">NT$ ${num(s.price)} / 千人・最低起價 NT$ ${num(s.min)}</span>
       </div>
       <div class="ss-foot">
-        <span class="mode">${esc(s.mode)}</span>
+        <span class="mode">${MODES[s.mode].full}</span>
         <button class="btn btn-primary" data-estimate="${s.id}">發起媒合預估</button>
+      </div>
+    </article>`;
+}
+
+/* 新版卡片：受眾包卡片模板。標題 → 條件標籤 → 說明（至多兩行）→ 人數與價格框 → 按鈕；適合產業不顯示 */
+function strategyTabCard(s){
+  const org = ORGS[s.org], mode = MODES[s.mode];
+  return `
+    <article class="ss-tcard" data-card="${s.id}" tabindex="0" aria-label="${esc(s.title)}，${esc(org.name)}">
+      <div class="ss-tabs">
+        <div class="ss-tab" title="${esc(org.name)}（${esc(s.ver)}）">${SenseUI.orgLogo(org)}<span class="org-name">${esc(org.name)}</span><span class="ver">(${esc(s.ver)})</span>${VERIFIED}</div>
+        <div class="ss-tab-mode" data-mode="${s.mode}" aria-label="${mode.full}">${MODE_IC}${mode.label}</div>
+      </div>
+      <div class="ss-tbody">
+        <div class="ss-tintro">
+          <h3 class="ss-ttitle" title="${esc(s.title)}">${esc(s.title)}</h3>
+          <ul class="ss-tags" tabindex="0" aria-label="同時具備以下全部條件">${s.tags.map(t => `<li>${TAG}${esc(t)}</li>`).join('')}</ul>
+          <p class="ss-tdesc" title="${esc(s.desc)}">${esc(s.desc)}</p>
+        </div>
+        <div class="r-card-metrics">
+          <span class="metric"><small>符合人數</small><b><em>${num(s.size)}</em> 人</b></span>
+          <table class="ss-prices">
+            <tbody>
+              <tr><th scope="row">每千人</th><td><em>${num(s.price)}</em> NT$</td></tr>
+              <tr><th scope="row">最低起價</th><td><em>${num(s.min)}</em> NT$</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <button class="btn ss-btn-outline" data-estimate="${s.id}">發起媒合預估</button>
       </div>
     </article>`;
 }
@@ -153,7 +264,31 @@ function renderList(){
     ? slice.map(strategyCard).join('')
     : `<p class="empty" style="grid-column:1/-1">找不到符合「${esc(state.query)}」的策略<br>換個關鍵字試試看</p>`;
   document.getElementById('pager').innerHTML = SenseUI.pagination(state.page, pages);
+  document.getElementById('grid-new').innerHTML = slice.map(strategyTabCard).join('');
+  updateFades();
+  document.querySelectorAll('.ss-tab-mode').forEach(el => modeIO ? modeIO.observe(el) : null);
 }
+
+/* 交換方式圖示：卡片進入畫面時播一次動畫，播完移除 class，之後 hover 時由 CSS 再播 */
+const modeIO = 'IntersectionObserver' in window ? new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    modeIO.unobserve(e.target);
+    e.target.classList.add('is-play');
+    e.target.querySelector('.fwd').addEventListener('animationend', () => e.target.classList.remove('is-play'), { once:true });
+  });
+}, { threshold:1 }) : null;
+
+/* 標籤列兩側淡出：左邊有捲過才淡出左側，右邊還有內容才淡出右側 */
+function updateFade(list){
+  const max = list.scrollWidth - list.clientWidth;
+  list.classList.toggle('fade-l', list.scrollLeft > 1);
+  list.classList.toggle('fade-r', list.scrollLeft < max - 1);
+}
+function updateFades(){ document.querySelectorAll('.ss-tags').forEach(updateFade); }
+document.addEventListener('scroll', (e) => { if (e.target.classList && e.target.classList.contains('ss-tags')) updateFade(e.target); }, true);
+window.addEventListener('resize', updateFades);
+if (document.fonts) document.fonts.ready.then(updateFades);  // 字型載入後寬度會變
 
 SenseShell.mount();
 
@@ -171,13 +306,36 @@ document.getElementById('pager').addEventListener('click', (e) => {
   state.page = +b.dataset.page; renderList();
   document.getElementById('browse').scrollIntoView({ behavior:'smooth', block:'start' });
 });
-const grid = document.getElementById('grid');
-grid.addEventListener('click', (e) => {
-  if (e.target.closest('[data-estimate]')) return SenseShell.notYet('發起媒合預估');
-  if (e.target.closest('[data-card]')) SenseShell.notYet('策略詳情頁');
+document.querySelectorAll('#grid, #grid-new').forEach(grid => {
+  grid.addEventListener('click', (e) => {
+    if (e.target.closest('[data-estimate]')) return SenseShell.notYet('發起媒合預估');
+    if (e.target.closest('[data-card]')) SenseShell.notYet('策略詳情頁');
+  });
+  grid.addEventListener('keydown', (e) => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-card]')){ e.preventDefault(); SenseShell.notYet('策略詳情頁'); }
+  });
 });
-grid.addEventListener('keydown', (e) => {
-  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-card]')){ e.preventDefault(); SenseShell.notYet('策略詳情頁'); }
+
+/* 標籤列用滑鼠拖曳捲動（觸控與觸控板用原生捲動）；拖過就不觸發卡片點擊 */
+let drag = null;
+document.addEventListener('pointerdown', (e) => {
+  const list = e.target.closest('.ss-tags');
+  if (!list || e.pointerType !== 'mouse' || e.button !== 0) return;
+  drag = { list, x:e.clientX, left:list.scrollLeft, moved:false };
+});
+document.addEventListener('pointermove', (e) => {
+  if (!drag) return;
+  const dx = e.clientX - drag.x;
+  if (!drag.moved && Math.abs(dx) < 4) return;
+  drag.moved = true;
+  drag.list.classList.add('is-dragging');
+  drag.list.scrollLeft = drag.left - dx;
+});
+document.addEventListener('pointerup', () => {
+  if (!drag) return;
+  drag.list.classList.remove('is-dragging');
+  if (drag.moved) document.addEventListener('click', (e) => e.stopPropagation(), { capture:true, once:true });
+  drag = null;
 });
 
 renderList();
