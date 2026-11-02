@@ -1,5 +1,7 @@
 /* SENSE 共用元件（依 Figma：Sense - Master File · node 4007:6553） */
 *{box-sizing:border-box}
+/* 有側欄的頁面固定預留捲軸寬度：頁面長短不同（有／無捲軸）時，內容區不會左右位移 */
+html:has(.app){scrollbar-gutter:stable}
 body{margin:0;background:var(--white);color:var(--black-800);font-family:var(--font);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
 h1,h2,h3,p{margin:0}
 button,input,select{font:inherit;color:inherit;letter-spacing:inherit}
@@ -237,6 +239,8 @@ a.sb-mod-label:hover{color:var(--strong)}
 .title-btn:hover{filter:drop-shadow(0 4px 0 var(--black-200)) drop-shadow(0 2px 0 var(--black-200)) brightness(1.06)}
 .title-btn img{width:24px;height:24px;flex:none}
 .title-btn span{margin-right:calc(-1 * var(--tracking-ultra))}
+/* 放在區塊標題列時往上移 4px：按鈕底部與標題文字切齊、離底線遠一點，不影響標題與底線的間距 */
+.section-title .title-btn{position:relative;top:-4px}
 
 /* ListToolbar：左邊分類 chips，右邊搜尋（展開輸入框）＋排序（下拉） */
 .list-toolbar{width:100%;display:flex;align-items:flex-start;gap:20px}
