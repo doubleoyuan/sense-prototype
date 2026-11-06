@@ -23,6 +23,8 @@
       subs:[ { key:'browse', label:'瀏覽受眾包', href:'marketing-sense.html#browse' } ] },
     { key:'strategy',  label:'策略SENSE', c:'var(--mod-strategy)',  strong:'var(--mod-strategy-strong)',  href:'strategy-sense.html',
       subs:[ { key:'browse', label:'瀏覽策略', href:'strategy-sense.html#browse' } ] },
+    { key:'points',    label:'點數SENSE', c:'var(--mod-points)',    strong:'var(--mod-points-strong)',    href:'points-sense.html',
+      subs:[ { key:'browse', label:'瀏覽企業', href:'points-sense.html#browse' } ] },
     { key:'pr',        label:'公關SENSE', c:'var(--mod-pr)',        strong:'var(--mod-pr-strong)',        href:'pr-sense.html',
       // 子頁尚未製作，先跳到一覽頁的對應區塊
       subs:[ { key:'directory', label:'公司名冊', href:'pr-sense.html#directory' },

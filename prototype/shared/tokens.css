@@ -18,7 +18,8 @@
 
   /* 平台共用色 */
   --cta-orange:#FF6100;          /* 找商務合作 */
-  --hover-teal:#49BFBB;          /* 卡片 hover 外框 */
+  --hover-teal:#49BFBB;          /* 湖綠強調（財務頁連結 hover、追蹤中） */
+  --hover-line:#99C7FB;          /* 卡片 hover 外框（淡藍，2026-11-06 由湖綠改） */
   --badge-blue:#4DB8EE;          /* 已認證商家、分頁選取 */
   --ticket:#F3EBE4;              /* 入口頁票券 */
   --metric-bg:#FFF7F2;           /* 卡片指標區 */
@@ -29,6 +30,8 @@
   --mod-strategy:#FFB080;  --mod-strategy-strong:#E0702A;
   --mod-pr:#B6BDFF;        --mod-pr-strong:#4C56C9;
   --mod-finance:#FFDD80;   --mod-finance-strong:#B8860B;
+  /* 點數 SENSE 模組色暫用灰階（2026-11-06），正式色待定 */
+  --mod-points:var(--black-400); --mod-points-strong:var(--black-700);
 
   /* 目前模組的強調色（各頁在 .app[data-module] 覆寫） */
   --accent:#4D9DF8; --accent-border:#1A81F6;

@@ -1,0 +1,935 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>點數 SENSE</title>
+<link rel="icon" type="image/svg+xml" href="shared/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="shared/tokens.css?v=20261106b">
+<link rel="stylesheet" href="shared/components.css?v=20261106a">
+<link rel="stylesheet" href="shared/forms.css?v=20261028d">
+<style>
+  /* ── 點數 SENSE 頁內元件：UI Library 尚未收錄，需求確認後再決定是否抽到 shared/ ── */
+
+  /* 右下角固定按鈕會蓋住內容，底部多留空間 */
+  .content{padding-bottom:120px}
+
+  /* ── 數據盤（試做）：左為累計交換點數球體，右為指標列 ──
+     --pt-c1～c4 取自 --accent-ring 的四個色標，試做中，確認後再決定是否加進 tokens.css */
+  .app[data-module="points"]{--pt-c1:#0073F5;--pt-c2:#71D1A6;--pt-c3:#FAB431;--pt-c4:#FF5B26}
+  /* 三個並排：球體固定 300px（280＋內距 10×2），兩張數據卡平分剩下寬度 */
+  .pt-dash{width:100%;display:grid;grid-template-columns:300px repeat(2,minmax(0,1fr));gap:20px}
+  .pt-orb-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:10px}  /* 不加外框，球體直接放在頁面上 */
+  .pt-orb{position:relative;width:100%;max-width:280px;aspect-ratio:1}
+  .pt-orb-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+  .pt-orb-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center}
+  .pt-orb-text b{display:flex;align-items:baseline;gap:4px;font-weight:500;color:var(--black-800);white-space:nowrap}
+  .pt-orb-text b em{font-size:36px;font-style:italic;line-height:48px;letter-spacing:0}
+  .pt-orb-text b small{font-size:14px;letter-spacing:var(--tracking-wider);color:var(--black-600)}
+  /* 只有金額數字用漸層的藍色，NT$ 與「萬」維持灰色 */
+  .pt-orb-text b em{color:var(--pt-c1)}
+  .pt-orb-text .label{font-size:12px;font-weight:700;line-height:20px;letter-spacing:var(--tracking-super);color:var(--black-700)}
+
+  /* 右側數據卡：左上圖示＋名稱、左下大數字、右下迷你長條圖（最新一個月為實色，其餘淡色） */
+  .pt-stat-list{display:contents}  /* 兩張卡片直接排進 .pt-dash 的格子 */
+  .pt-stat{height:140px;align-self:center;display:flex;flex-direction:column;justify-content:space-between;gap:20px;padding:16px 20px 20px;
+    border:1px solid var(--black-200);border-radius:var(--r-20);background:var(--white)}
+  .pt-stat-head{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+  .pt-stat-head .ic{width:18px;height:18px;flex:none;color:var(--black-400)}
+  .pt-stat-head span{flex:1;min-width:0}
+  .pt-stat-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:20px}  /* 數字靠左、圖形置右 */
+  .pt-stat-foot b{display:flex;align-items:baseline;gap:6px;font-size:16px;font-weight:500;letter-spacing:var(--tracking-wider);color:var(--black-600);white-space:nowrap}
+  .pt-stat-foot b em{font-size:36px;font-style:normal;font-weight:700;line-height:40px;letter-spacing:0;color:var(--pt-c1)}  /* 只有數字用藍色，同球體金額；單位維持灰色 */
+  /* 總寬對齊下方點陣圖（9 欄 × 6px＋8 個 3px 間距 = 78px），柱寬平分 */
+  .pt-spark{width:calc(9 * 6px + 8 * 3px);height:40px;display:flex;align-items:flex-end;gap:4px}
+  .pt-spark i{flex:1;border-radius:2px;background:color-mix(in srgb,var(--c) 30%,var(--white))}
+  .pt-spark i.now{background:var(--c)}
+  /* 動畫：進場時柱子從底部依序長出（各錯開 0.1 秒，只播一次） */
+  .pt-spark i{transform-origin:bottom}
+  .pt-spark.is-wait i{transform:scaleY(0)}
+  .pt-spark.is-in i{animation:pt-grow .6s cubic-bezier(.22,.61,.36,1) calc(var(--i) * .1s) both}
+  @keyframes pt-grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+  @media (prefers-reduced-motion:reduce){ .pt-spark i{animation:none !important;transform:none !important} }
+  /* 點陣圖：淡色為所有可能組合，實色為已開通 */
+  .pt-waffle{display:grid;grid-template-columns:repeat(var(--cols),6px);gap:3px}
+  .pt-waffle i{width:6px;height:6px;border-radius:50%;background:color-mix(in srgb,var(--c) 22%,var(--white))}
+  /* 已開通：由卡片色（左下）漸變到較淺的卡片色 */
+  .pt-waffle i.on{background:color-mix(in srgb,color-mix(in srgb,var(--c) 45%,var(--white)) var(--k),var(--c));animation:pt-breathe 4s ease-in-out var(--d) infinite}
+  /* 呼吸：變淡再回來（不縮放），各點依序錯開，看起來像一波光從左下往上流 */
+  @keyframes pt-breathe{0%,100%{opacity:1}50%{opacity:.5}}
+  @media (prefers-reduced-motion:reduce){ .pt-waffle i.on{animation:none} }
+
+
+  /* PointsCard：企業卡片。沿用策略 SENSE 策略卡片的頁籤模板，右上頁籤改顯示「與我方的交換狀態」 */
+  .pt-card{--pt-line:var(--black-300);display:flex;flex-direction:column;cursor:pointer;filter:drop-shadow(0 4px 0 var(--black-200))}
+  .pt-card:hover,.pt-card:focus-visible{--pt-line:var(--hover-line);outline:0}
+  .pt-tabs{position:relative;z-index:1;display:flex;align-items:flex-end;margin-bottom:-1px}
+  .pt-tab{position:relative;z-index:1;flex:1;min-width:0;padding:14px 20px 12px;display:flex;align-items:center;gap:10px;
+    background:var(--white);border:1px solid var(--pt-line);border-bottom:0;border-radius:var(--r-20) var(--r-20) 0 0}
+  .pt-tab .org-name{min-width:0;font-size:14px;line-height:20px;letter-spacing:var(--tracking-super);color:var(--black-700);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pt-verified{width:16px;height:16px;flex:none;margin-left:-6px;color:var(--badge-blue)}
+  /* 公司頁籤右下的內凹圓角；沒有狀態頁籤時不畫 */
+  .pt-tab::after{content:"";position:absolute;left:100%;bottom:0;width:21px;height:21px;
+    background:radial-gradient(circle at 100% 0,transparent 19.6px,var(--pt-line) 20px,var(--pt-line) 20.6px,var(--white) 21px)}
+  .pt-tab:last-child::after{display:none}
+  /* 交換方式頁籤：顯示單向／雙向圖示 */
+  .pt-tab-mode{flex:none;height:40px;margin-bottom:1px;padding:0 21px;display:flex;align-items:center;justify-content:center;gap:4px;
+    background:var(--black-50);border:1px solid var(--pt-line);border-left:0;border-bottom:0;border-radius:0 var(--r-10) 0 0;
+    font-size:14px;font-weight:500;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--black-600);white-space:nowrap}
+
+  /* 交換方式圖示（同策略 SENSE）：上方箭頭往右（去）、下方箭頭往左（回）。單向時「回」為淡灰，雙向時兩支同色。
+     單向且方向為「對方 → 我方」時左右翻轉，亮的箭頭改指向我方 */
+  .pt-mode-ic{width:16px;height:16px;flex:none;overflow:visible}
+  .pt-mode-ic path{fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  [data-mode="oneway"] .pt-mode-ic .back{stroke:var(--black-300)}
+  [data-dir="in"] .pt-mode-ic{transform:scaleX(-1)}
+  /* 動畫：進入畫面播一次（.is-play，播完移除），hover／鍵盤聚焦卡片時再播 */
+  .is-play .pt-mode-ic .fwd,.pt-card:hover .pt-mode-ic .fwd,.pt-card:focus-visible .pt-mode-ic .fwd{animation:pt-arrow-r .6s ease-out}
+  [data-mode="twoway"].is-play .pt-mode-ic .back,.pt-card:hover [data-mode="twoway"] .pt-mode-ic .back,
+  .pt-card:focus-visible [data-mode="twoway"] .pt-mode-ic .back{animation:pt-arrow-l .6s ease-out}
+  @keyframes pt-arrow-r{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+  @keyframes pt-arrow-l{from{opacity:0;transform:translateX(6px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){ .pt-mode-ic path{animation:none !important} }
+
+  .pt-card-body{flex:1;display:flex;flex-direction:column;gap:20px;padding:10px 20px 20px;background:var(--white);border:1px solid var(--pt-line);
+    border-radius:0 0 var(--r-30) var(--r-30)}
+  .pt-card-intro{display:flex;flex-direction:column;gap:4px}
+  .pt-card-title{font-size:16px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-super);color:var(--black-800);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pt-industry{display:inline-flex;align-items:center;gap:4px;padding:4px 0;color:var(--accent);font-size:13px;line-height:20px;letter-spacing:var(--tracking-wider)}
+  .pt-industry svg{width:14px;height:14px;flex:none}
+  .pt-desc{font-size:14px;line-height:22px;letter-spacing:var(--tracking-wider);color:var(--black-600);
+    display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
+  /* 兌台幣比值與會員規模合成一個框：同策略卡片的指標框 */
+  .pt-card .r-card-metrics{flex-direction:column;align-items:stretch;gap:10px;margin-top:auto;border-radius:var(--r-10)}
+  .pt-card .r-card-metrics .metric{flex:none;flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+  .pt-card .r-card-metrics .metric em{font-size:18px;font-style:normal}
+  .pt-card .r-card-metrics .metric + .metric{padding-top:10px;border-top:1px solid var(--black-300)}
+
+  /* 狀態標籤：樣式同財務 SENSE 的 .fs-tag */
+  .pt-tag{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:20px;font-size:12px;font-weight:600;
+    letter-spacing:var(--tracking-wider);white-space:nowrap;background:var(--black-100);color:var(--black-600)}
+  .pt-tag.blue{background:var(--mod-product-tint);color:var(--accent-border)}
+  .pt-tag.orange{background:var(--metric-bg);color:var(--cta-orange)}
+  .pt-tag.red{background:var(--danger-bg);color:var(--danger)}
+  .pt-tag .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+
+  /* ── 企業內頁 ── */
+  .pt-co-head{width:100%;display:flex;align-items:flex-start;gap:20px}
+  .pt-co-head .org-logo{width:64px;height:64px;padding:4px;border-radius:var(--r-10)}
+  .pt-co-head .org-logo .mono{width:54px;height:54px;border-radius:var(--r-8);font-size:24px}
+  .pt-co-title{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+  .pt-co-title h1{display:flex;align-items:center;gap:10px;font-size:24px;font-weight:700;line-height:32px;letter-spacing:var(--tracking-ultra)}
+  .pt-co-title h1 .pt-verified{width:20px;height:20px;margin:0}
+  .pt-co-meta{display:flex;flex-wrap:wrap;gap:8px}
+  .pt-co-intro{font-size:14px;line-height:24px;letter-spacing:1.6px;color:var(--black-700)}
+  .pt-detail{width:100%;display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:40px;align-items:start}
+  .pt-detail > div{display:flex;flex-direction:column;gap:20px;min-width:0}
+  /* 資訊卡：沿用新增商品表單的 .form-card＋.form-group-title；標題列右側可放狀態標籤 */
+  .pt-panel .form-group-title h2{flex:1;min-width:0}
+  .pt-panel-body{display:flex;flex-direction:column;gap:16px}
+  /* 交換點數卡：框線淡藍；標題列為非常淺的藍底、藍字（不加底線），貼齊卡片上緣與左右；內容左右內縮同左側卡片（20＋16） */
+  .pt-xpanel{padding:0;overflow:hidden;border-color:var(--mod-product)}
+  .pt-xp-head{display:flex;align-items:center;gap:12px;padding:14px 20px;background:var(--step-highlight);color:var(--accent-border)}
+  .pt-xp-head h2{flex:1;min-width:0;font-size:18px;font-weight:700;line-height:32px;letter-spacing:var(--tracking-ultra)}
+  .pt-xpanel > .pt-panel-body{padding:20px 36px 24px}
+  /* 底部操作列（拒絕／同意）：上方灰色分隔線，長度同內容區；兩顆按鈕平分 */
+  .pt-xp-foot{position:relative;display:flex;gap:12px;padding:20px 36px}
+  .pt-xp-foot::before{content:"";position:absolute;top:0;left:36px;right:36px;height:1px;background:var(--black-200)}  /* 與內容區的分隔線同色、同長（左右對齊內容） */
+  .pt-xp-foot .btn{flex:1;min-width:0}
+  /* 點數資訊：一列至多兩項，每列下方淺灰細線（最後的點數說明佔整列、不加線）；欄位樣式沿用 .ro-item。
+     欄距用左欄的右內距代替 gap，細線才不會在兩欄之間斷開 */
+  .pt-info{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pt-info .ro-item{padding:16px 0;border-bottom:1px solid var(--black-200)}
+  .pt-info .ro-item:nth-child(-n+2){padding-top:0}
+  .pt-info .ro-item:nth-child(odd){padding-right:20px}
+  /* 會員規模那一列只有一項，線改畫在點數說明上方（佔整列），才不會只有半條 */
+  .pt-info .ro-item:nth-child(3){border-bottom:0}
+  .pt-info .ro-item.span-2{grid-column:1/-1;padding-right:0;border-top:1px solid var(--black-200)}  /* 下方也保留細線 */
+  .pt-note{font-size:13px;line-height:22px;letter-spacing:var(--tracking-wider);color:var(--black-600)}
+  .pt-note.muted{color:var(--black-500)}
+  .pt-block{display:flex;flex-direction:column;gap:10px;padding-top:16px;border-top:1px solid var(--black-200)}
+  .pt-block:first-of-type{padding-top:0;border-top:0}
+  .pt-block-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .pt-block-head h3{font-size:14px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-super)}
+  .pt-panel .btn{width:100%}
+  .pt-btn-row{display:flex;gap:12px}
+  .pt-btn-row .btn{flex:1;min-width:0}
+
+  /* 交換路線：我方點數 ⇄ 對方點數 */
+  .pt-route{display:flex;align-items:center;justify-content:center;gap:12px;padding:14px 16px;border-radius:var(--r-10);background:var(--black-50);
+    font-size:14px;font-weight:600;line-height:24px;letter-spacing:var(--tracking-wider);color:var(--black-800)}
+  .pt-route span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pt-route .pt-mode-ic{width:24px;height:24px;color:var(--accent-border)}
+  .pt-route .pt-mode-ic path{stroke-width:1.4}
+
+  /* 換算比例：同卡片指標框的淡橘底 */
+  .pt-ratio{display:flex;flex-direction:column;gap:6px;padding:10px 20px;border-radius:var(--r-10);background:var(--metric-bg)}
+  .pt-ratio p{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px;font-weight:500;line-height:24px;letter-spacing:var(--tracking-wider);color:var(--black-700)}
+  .pt-ratio p small{font-size:12px;font-weight:600;color:var(--black-500)}
+  .pt-ratio p.off{color:var(--black-400)}
+  .pt-ratio em{font-size:18px;font-style:normal}
+
+  /* ── 對話框：沿用財務 SENSE 的 .fs-dialog ── */
+  .pt-dialog{width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 48px);padding:0;border:0;border-radius:24px;background:var(--white);color:var(--black-800);
+    box-shadow:0 20px 60px rgba(0,0,0,.18);letter-spacing:var(--tracking-ultra)}
+  .pt-dialog.wide{width:min(720px,calc(100vw - 32px))}
+  .pt-dialog::backdrop{background:rgba(0,0,0,.32)}
+  .pt-dialog form{display:flex;flex-direction:column;max-height:calc(100vh - 48px)}
+  .pt-dlg-head{display:flex;align-items:center;gap:12px;padding:18px 24px;border-bottom:1px solid var(--black-200)}
+  .pt-dlg-head h2{flex:1;font-size:17px;font-weight:700;letter-spacing:var(--tracking-super)}
+  .pt-dlg-x{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:20px;color:var(--black-500)}
+  .pt-dlg-x:hover{background:var(--black-100)}
+  .pt-dlg-body{padding:20px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:20px;font-size:14px;line-height:24px;letter-spacing:1.6px}
+  .pt-dlg-foot{display:flex;justify-content:flex-end;gap:12px;padding:16px 24px;border-top:1px solid var(--black-200);flex-wrap:wrap}
+  .pt-dlg-body .field{gap:8px}
+  .pt-dlg-body .field-label{font-size:14px}
+  .pt-dlg-body .form-row{gap:16px}
+  .pt-dlg-body .input[readonly]{background:var(--black-50);color:var(--black-600)}  /* 帶入、不可修改 */
+
+  /* 選項卡：單向／雙向、方向 */
+  .pt-opts{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .pt-opts.stack{grid-template-columns:minmax(0,1fr)}
+  .pt-opt{position:relative;display:flex;align-items:flex-start;gap:10px;padding:14px 16px;border:1px solid var(--black-200);border-radius:var(--r-16);cursor:pointer;
+    transition:border-color .15s,background .15s}
+  .pt-opt:hover{border-color:var(--black-400)}
+  .pt-opt:has(input:checked){border-color:var(--accent-border);background:var(--step-highlight)}
+  .pt-opt:has(input:focus-visible){outline:2px solid var(--accent-border);outline-offset:2px}
+  .pt-opt input{margin:5px 0 0;accent-color:var(--accent-border)}
+  .pt-opt b{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-wider)}
+  .pt-opt small{display:block;font-size:12px;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+  .pt-opt .pt-mode-ic{color:var(--accent-border)}
+
+  /* 從兌換 SENSE 帶入的提示 */
+  .pt-prefill{display:flex;gap:10px;padding:12px 16px;border-radius:var(--r-10);background:var(--step-highlight);font-size:13px;line-height:22px;letter-spacing:var(--tracking-wider);color:var(--black-700)}
+  .pt-prefill svg{width:18px;height:18px;flex:none;margin-top:2px;color:var(--accent-border)}
+  .pt-from{margin-left:6px;padding:0 8px;border-radius:20px;background:var(--mod-product-tint);color:var(--accent-border);font-size:11px;font-weight:600;line-height:20px;letter-spacing:var(--tracking-wider);vertical-align:2px}
+
+  /* 送出完成 */
+  .pt-done{display:flex;flex-direction:column;align-items:center;gap:10px;padding:24px 0 8px;text-align:center}
+  .pt-done-ic{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:var(--mod-product-tint);color:var(--accent-border)}
+  .pt-done-ic svg{width:28px;height:28px}
+  .pt-done h3{font-size:18px;font-weight:700;line-height:32px;letter-spacing:var(--tracking-ultra)}
+  .pt-done p{font-size:14px;line-height:24px;letter-spacing:1.6px;color:var(--black-600)}
+
+  /* 加入點數 SENSE：右下角固定按鈕，沿用 CtaButton。申請送出後改為灰色「加入申請處理中」 */
+  .pt-fab{position:fixed;right:40px;bottom:32px;z-index:45}
+  .pt-fab.is-pending{background:var(--black-100);border-color:var(--black-300);color:var(--black-600)}
+  .pt-fab.is-pending .round-icon{background:linear-gradient(var(--white),var(--white)) padding-box,linear-gradient(var(--black-300),var(--black-300)) border-box}
+  .pt-fab .round-icon svg{position:absolute;left:50%;top:50%;width:24px;height:24px;transform:translate(-50%,-50%);color:var(--black-500)}
+
+  @media (max-width:1279px){ .pt-detail{grid-template-columns:minmax(0,1fr)} }
+  @media (max-width:899px){ .pt-fab{right:16px;bottom:16px} }
+  @media (max-width:767px){
+    .pt-xpanel > .pt-panel-body{padding:20px}
+    .pt-xp-foot{padding:20px}
+    .pt-xp-foot::before{left:20px;right:20px}
+    /* 手機：改成一欄，每項之間加細線 */
+    .pt-info{grid-template-columns:minmax(0,1fr)}
+    .pt-info .ro-item:nth-child(2){padding-top:16px}
+    .pt-info .ro-item:nth-child(odd){padding-right:0}
+    .pt-dash{grid-template-columns:minmax(0,1fr)}
+    .pt-orb{max-width:240px}
+    .pt-co-head .org-logo{width:48px;height:48px;padding:3px}
+    .pt-co-head .org-logo .mono{width:40px;height:40px;font-size:18px}
+    .pt-co-title h1{font-size:20px;line-height:28px}
+  }
+  @media (max-width:559px){
+    .pt-opts{grid-template-columns:minmax(0,1fr)}
+    .pt-dlg-body .form-row{grid-template-columns:minmax(0,1fr)}
+    .pt-route{gap:8px;padding:12px}
+    .pt-fab{padding:10px 24px 10px 60px}
+  }
+</style>
+</head>
+<body>
+<!-- 僅供內部使用，非經許可不得外流。頁面中的公司、點數與數據皆為示意。 -->
+<div class="app" data-module="points" data-page="home">
+  <aside class="sidebar" id="sidebar" aria-label="主選單"></aside>
+  <div class="main">
+    <header class="header" id="header"></header>
+
+    <main class="content" id="view-home">
+      <!-- 區塊：數據盤（數字由平台後台手動設定，此為示意） -->
+      <section class="content-section" aria-labelledby="dash-title">
+        <div class="section-title" id="dashboard">
+          <h2 id="dash-title">點數數據盤</h2>
+        </div>
+        <!-- 三個並排：累計交換球體＋已串接企業數＋可交換組合數 -->
+        <div class="pt-dash">
+          <div class="pt-orb-card" id="dash-total"></div>
+          <div class="pt-stat-list" id="dash-stats"></div>
+        </div>
+      </section>
+
+      <!-- 區塊：企業卡片 -->
+      <section class="content-section" aria-labelledby="browse-title">
+        <div class="section-title" id="browse">
+          <h2 id="browse-title">瀏覽企業</h2>
+        </div>
+        <div class="list-toolbar">
+          <div class="chips" id="chips" role="group" aria-label="產業"></div>
+          <div class="list-actions" id="list-actions"></div>
+        </div>
+        <div class="card-grid" id="grid" aria-live="polite"></div>
+        <div class="pager" id="pager"></div>
+      </section>
+    </main>
+
+    <main class="content" id="view-company" hidden></main>
+  </div>
+</div>
+
+<!-- 加入點數 SENSE：主頁右下角固定按鈕 -->
+<button type="button" class="cta-btn pt-fab" id="fab" hidden></button>
+
+<dialog class="pt-dialog" id="dlg" aria-labelledby="dlg-title"><form method="dialog" id="dlg-form" novalidate></form></dialog>
+
+<script src="shared/shell.js?v=20261106a"></script>
+<script src="shared/components.js?v=20261028d"></script>
+<script>
+/* ═════════ 示意資料（僅供原型展示） ═════════ */
+// 目前登入的企業（我方）。pts 點 = ntd 元
+const ME = { name:'股感媒體', mark:'stockfeel', point:'股感點', pts:100, ntd:1 };
+
+// 數據盤：初期由平台後台手動設定
+// total：累計交換點數換算成台幣（萬元）
+const DASH = {
+  total:2846,
+  companies:9,
+  pairs:28,
+  // 近 6 個月的數量（示意），畫成右下角的迷你長條圖
+  trend:{ companies:[4, 5, 6, 7, 8, 9] }
+};
+
+// 已完成 SSO 與點數串接、可交換點數的企業。members 單位：萬人；order 越大越新加入
+const COMPANIES = [
+  { id:'c1', name:'晨曦銀行', color:'#3C7DD9', industry:'金融', point:'晨曦點', pts:100, ntd:1, members:320, order:9,
+    intro:'提供存款、信用卡與數位帳戶服務，晨曦點可用於刷卡回饋與帳戶優惠。',
+    rule:'信用卡消費每 100 元回饋 1 點；數位帳戶完成指定任務另有加碼。' },
+  { id:'c2', name:'禾豐超市', color:'#3FA66B', industry:'零售', point:'禾豐點', pts:1, ntd:1, members:180, order:8,
+    intro:'全台連鎖生鮮超市，會員在門市與線上購物都能累積與折抵點數。',
+    rule:'消費每 100 元累積 1 點，結帳時 1 點折抵 1 元。' },
+  { id:'c3', name:'凌雲航空', color:'#5B6CD6', industry:'交通', point:'凌雲哩', pts:100, ntd:3, members:95, order:7,
+    intro:'經營國內外航線，凌雲哩可兌換機票、座位升等與機上商品。',
+    rule:'依飛行距離與艙等累積；合作夥伴消費亦可累積。' },
+  { id:'c4', name:'青嶼電信', color:'#1F9DB0', industry:'電信', point:'青嶼幣', pts:10, ntd:1, members:410, order:6,
+    intro:'行動與寬頻服務業者，青嶼幣可折抵月租費與購買加值服務。',
+    rule:'每月帳單金額每 100 元回饋 1 枚，續約與推薦好友另有加碼。' },
+  { id:'c5', name:'拾光百貨', color:'#C2569A', industry:'零售', point:'拾光點', pts:7, ntd:1, members:120, order:5,
+    intro:'都會型百貨公司，會員點數可在全館專櫃與美食街折抵。',
+    rule:'消費每 200 元累積 1 點，週年慶期間點數加倍。' },
+  { id:'c6', name:'暖橘咖啡', color:'#E0822A', industry:'餐飲', point:'暖橘豆', pts:20, ntd:1, members:60, order:4,
+    intro:'連鎖咖啡品牌，會員可用暖橘豆兌換飲品、餐點與周邊商品。',
+    rule:'每消費 50 元累積 1 顆暖橘豆，生日當月加倍。' },
+  { id:'c7', name:'沐森藥妝', color:'#8A6BC9', industry:'美妝', point:'沐森點', pts:50, ntd:1, members:85, order:3,
+    intro:'藥妝與保健通路，沐森點可折抵門市與官網消費。',
+    rule:'消費每 100 元累積 2 點，指定品牌另有加碼。' },
+  { id:'c8', name:'行旅旅行社', color:'#2E8F8B', industry:'交通', point:'行旅點', pts:100, ntd:2, members:40, order:2,
+    intro:'提供團體旅遊、自由行與訂房服務，行旅點可折抵旅遊產品。',
+    rule:'訂購旅遊產品每 1,000 元累積 10 點。' }
+];
+
+/* 我方與各企業的交換關係（示範視角為「已加入」時才有）
+   open：已開通的方向。out＝我方點數換成對方點數、in＝對方點數換成我方點數、both＝雙向
+   req：最近一筆發起。by 發起方（me／them），dirs 申請開通的方向，status pending／rejected */
+const RELATIONS_SEED = {
+  c1: { open:'both', req:null },
+  c2: { open:'out',  req:null },
+  c3: { open:'in',   req:null },
+  c4: { open:'none', req:{ by:'me',   dirs:'both', status:'pending',  date:'2026/11/03' } },
+  c5: { open:'none', req:{ by:'them', dirs:'both', status:'pending',  date:'2026/11/04' } },
+  c6: { open:'none', req:{ by:'me',   dirs:'out',  status:'rejected', date:'2026/10/28' } }
+};
+
+// 已在兌換 SENSE 完成串接的企業：加入表單自動帶入這些資料
+const EXCHANGE_PROFILE = { contact:'王大明', phone:'02-2345-6789', email:'points@example.com', members:'100 萬人以上', point:'股感點',
+  rule:'會員閱讀文章、參加活動可獲得股感點；100 點可折抵 1 元。', launch:'2027 Q1' };
+
+const INDUSTRIES = ['金融','零售','交通','電信','餐飲','美妝'];
+const CATEGORIES = [ { key:'all', label:'ALL' }, ...INDUSTRIES.map(i => ({ key:i, label:i })) ];
+const SORTS = [
+  { key:'newest',  label:'最新加入' },
+  { key:'members', label:'會員規模：多到少' }
+];
+const PER_PAGE = 12;
+const MEMBER_SIZES = ['10 萬人以下','10–50 萬人','50–100 萬人','100 萬人以上'];
+const LAUNCHES = ['2026 Q4','2027 Q1','2027 Q2','2027 Q3','2027 Q4','尚未確定'];
+
+const VERIFIED = '<svg class="pt-verified" viewBox="0 0 16 16" aria-label="已完成串接"><path fill="currentColor" d="M8 .8l1.7 1.3 2.1-.2.8 2 1.9 1-.3 2.1L15.2 8 14 9.7l.3 2.1-1.9 1-.8 2-2.1-.2L8 15.2l-1.7-1.3-2.1.2-.8-2-1.9-1 .3-2.1L.8 8 2 6.3 1.7 4.2l1.9-1 .8-2 2.1.2z"/><path d="M5.3 8.2l1.8 1.8 3.6-3.7" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+// 交換方式圖示：同策略 SENSE（上去下回的半箭頭）
+const MODE_IC = '<svg class="pt-mode-ic" viewBox="0 0 16 16" aria-hidden="true"><path class="back" d="M12 10.5H3l2.5 2.5"/><path class="fwd" d="M4 5.5h9l-2.5-2.5"/></svg>';
+const TAG = '<svg viewBox="0 0 16 16" fill="currentColor" fill-rule="evenodd" aria-hidden="true"><path d="M2 3.5A1.5 1.5 0 0 1 3.5 2h4.1a1.5 1.5 0 0 1 1.06.44l5.2 5.2a1.5 1.5 0 0 1 0 2.12l-4.1 4.1a1.5 1.5 0 0 1-2.12 0l-5.2-5.2A1.5 1.5 0 0 1 2 7.6zM5.75 4.4a1.35 1.35 0 1 0 0 2.7 1.35 1.35 0 0 0 0-2.7z"/></svg>';
+const CLOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>';
+const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+const INFO = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/><path d="M10 9v4.5M10 6.5v.01"/></svg>';
+
+/* ═════════ 狀態（原型示意：固定以「已加入」的企業呈現；操作結果只留在本頁，重新整理後回到初始） ═════════
+   view 保留未加入／申請處理中的分支，之後需要時再開放切換；joinPending：右下角加入申請已送出 */
+const demo = { view:'joined', relations:JSON.parse(JSON.stringify(RELATIONS_SEED)), joinPending:false };
+
+const state = { cat:'all', query:'', sort:'newest', page:1 };
+const joined = () => demo.view === 'joined';
+const rel = (id) => demo.relations[id] || (demo.relations[id] = { open:'none', req:null });
+
+/* ═════════ 換算 ═════════ */
+const { esc } = SenseUI;
+const num = (n) => n.toLocaleString('en-US', { maximumFractionDigits:1 });
+// 依雙方點數兌台幣比值自動換算：from 的 100 點可換多少 to 的點數，四捨五入到小數點後第一位
+const convert = (from, to) => Math.round(100 * (from.ntd / from.pts) / (to.ntd / to.pts) * 10) / 10;
+const rateText = (c) => `${num(c.pts)} 點 = ${num(c.ntd)} 元`;
+const dirLabel = (c, d) => d === 'out' ? `${ME.point} → ${c.point}` : `${c.point} → ${ME.point}`;
+const MODE_TEXT = { both:'雙向', out:'單向', in:'單向' };
+const mergeDirs = (a, b) => (a === 'none' ? b : a === b ? a : 'both');
+const missingDir = (open) => ({ out:'in', in:'out' }[open]);
+
+/* 交換方式圖示＋文字。dirs：out／in／both */
+function modeBadge(dirs, cls = ''){
+  const mode = dirs === 'both' ? 'twoway' : 'oneway';
+  return `<span class="${cls}" data-mode="${mode}" data-dir="${dirs}">${MODE_IC}${MODE_TEXT[dirs]}</span>`;
+}
+
+/* 卡片右上的交換方式頁籤：一律只顯示單向／雙向。已開通用開通的方向；待同意、已拒絕先用發起時的方向示意；
+   還沒有任何交換的企業，用 CARD_MODE_DEMO 示意 */
+const CARD_MODE_DEMO = { c7:'out', c8:'both' };
+function statusTab(c){
+  if (!joined()) return '';
+  const r = rel(c.id), dirs = r.open !== 'none' ? r.open : r.req ? r.req.dirs : CARD_MODE_DEMO[c.id];
+  if (!dirs) return '';
+  const mode = dirs === 'both' ? 'twoway' : 'oneway';
+  const title = dirs === 'both' ? '雙向交換' : `單向交換：${dirLabel(c, dirs)}`;
+  return `<div class="pt-tab-mode" data-mode="${mode}" data-dir="${dirs}" title="${esc(title)}" aria-label="${esc(title)}">${MODE_IC}${MODE_TEXT[dirs]}</div>`;
+}
+
+/* ═════════ 主頁：數據盤 ═════════ */
+/* 累計交換球體：正圓彩色外框，光暈由外框往外淡出；光點留在框內 */
+const RING_R = 82;
+// 框內光點：從外框內側出發、往中心匯聚，在碰到中間文字前淡出，循環播放。固定亂數種子，每次開頁一樣
+function seeded(seed){ return () => { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t ^= t + Math.imul(t ^ t >>> 7, 61 | t); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const RING_DOTS = (() => {
+  const rand = seeded(7), dots = [], START = 74, HALF = { x:74, y:40 };  // 文字區半寬／半高（viewBox 座標，含留白）
+  for (let tries = 0; dots.length < 24 && tries < 4000; tries++){
+    const a = rand() * Math.PI * 2, cos = Math.cos(a), sin = Math.sin(a);
+    // 終點：往中心的射線碰到文字區邊界的位置；路徑太短（文字區左右兩側）就換一個角度
+    const end = Math.min(HALF.x / Math.abs(cos || 1e-6), HALF.y / Math.abs(sin || 1e-6));
+    if (START - end < 22) continue;
+    const f = (v) => +v.toFixed(1), dur = 4 + rand() * 4;
+    dots.push({ x1:f(120 + START * cos), y1:f(120 + START * sin), x2:f(120 + end * cos), y2:f(120 + end * sin),
+      r:f(1 + rand() * 1.6), c:dots.length % 4 + 1, dur:f(dur), begin:f(rand() * dur), peak:[.2, .3, .4][Math.floor(rand() * 3)] });
+  }
+  return dots;
+})();
+function ringSVG(){
+  const motion = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const spin = motion ? '<animateTransform attributeName="gradientTransform" type="rotate" from="0 .5 .5" to="360 .5 .5" dur="24s" repeatCount="indefinite"/>' : '';
+  // 位置由外往內（先慢後快再慢），透明度淡入→停留→淡出；開了減少動態時停在起點
+  const dots = RING_DOTS.map(d => {
+    const t = `dur="${d.dur}s" begin="-${d.begin}s" repeatCount="indefinite"`;
+    const move = (attr, from, to) => `<animate attributeName="${attr}" values="${from};${to}" ${t} calcMode="spline" keyTimes="0;1" keySplines=".4 0 .6 1"/>`;
+    return `<circle cx="${d.x1}" cy="${d.y1}" r="${d.r}" style="fill:var(--pt-c${d.c})" opacity="${motion ? 0 : d.peak}">${motion
+      ? move('cx', d.x1, d.x2) + move('cy', d.y1, d.y2) + `<animate attributeName="opacity" values="0;${d.peak};${d.peak};0" keyTimes="0;.25;.6;1" ${t}/>` : ''}</circle>`;
+  }).join('');
+  const ring = (attrs) => `<circle cx="120" cy="120" r="${RING_R}" fill="none" stroke="url(#pt-ring)" ${attrs}/>`;
+  return `
+    <svg class="pt-orb-svg" viewBox="0 0 240 240" aria-hidden="true">
+      <defs>
+        <linearGradient id="pt-ring" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0" style="stop-color:var(--pt-c1)"/><stop offset=".33" style="stop-color:var(--pt-c2)"/>
+          <stop offset=".75" style="stop-color:var(--pt-c3)"/><stop offset="1" style="stop-color:var(--pt-c4)"/>${spin}
+        </linearGradient>
+        <filter id="pt-halo-far" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="16"/></filter>
+        <filter id="pt-halo-near" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+        <filter id="pt-halo-bias" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="20"/></filter>
+        <!-- 偏向的光暈：遮罩方向與漸層相同（橘色那側最亮），並以同樣的速度一起轉，看起來像一團光繞著圓順時針跑 -->
+        <linearGradient id="pt-bias-g" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0" stop-color="#000"/><stop offset=".45" stop-color="#000"/><stop offset="1" stop-color="#fff"/>${spin}
+        </linearGradient>
+        <mask id="pt-bias" maskUnits="userSpaceOnUse" x="-60" y="-60" width="360" height="360">
+          <rect x="-60" y="-60" width="360" height="360" fill="url(#pt-bias-g)"/>
+        </mask>
+      </defs>
+      <g mask="url(#pt-bias)">${ring('stroke-width="36" filter="url(#pt-halo-bias)" opacity=".6"')}</g>
+      ${ring('stroke-width="26" filter="url(#pt-halo-far)" opacity=".18"')}
+      ${ring('stroke-width="12" filter="url(#pt-halo-near)" opacity=".45"')}
+      <circle cx="120" cy="120" r="${RING_R - 3}" fill="#fff"/>
+      ${ring('stroke-width="6"')}
+      ${dots}
+    </svg>`;
+}
+
+// 右側數據卡：左上圖示＋名稱、左下大數字、右下近 6 個月迷你長條圖
+const STAT_IC = {
+  companies:'<path d="M5 20V6.5L12 4v16M12 9l7 2.5V20M3.5 20h17M8 9h1M8 12h1M8 15h1M15 14h1M15 17h1"/>',
+  pairs:'<path d="M6 8h11l-3-3M18 16H7l3 3"/>'
+};
+// 迷你長條圖：近 6 個月，最新一個月為實色
+function spark(data){
+  const max = Math.max(...data);
+  return `<span class="pt-spark" role="img" aria-label="近 6 個月：${data.join('、')}">${data.map((v, i) =>
+    `<i style="height:${Math.round(v / max * 100)}%;--i:${i}"${i === data.length - 1 ? ' class="now"' : ''}></i>`).join('')}</span>`;
+}
+/* 長條圖進場：捲進畫面時柱子依序往上長，只播一次。先標 is-wait（藏起來），進入畫面後換成 is-in */
+const sparkIO = 'IntersectionObserver' in window ? new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    sparkIO.unobserve(e.target);
+    e.target.classList.replace('is-wait', 'is-in');
+  });
+}, { threshold:.6 }) : null;
+function playSparks(root){
+  if (!sparkIO || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  root.querySelectorAll('.pt-spark').forEach(el => { el.classList.add('is-wait'); sparkIO.observe(el); });
+}
+// 點陣圖：所有可能的企業組合各一點（9 家 → 36 組），已開通的從左下往右、往上填色
+function waffle(filled, total, cols){
+  const rows = Math.ceil(total / cols), dots = [];
+  for (let r = rows - 1; r >= 0; r--) for (let c = 0; c < cols; c++){
+    const i = r * cols + c;          // 由下往上數的序號
+    if (i < total) dots.push({ r:rows - 1 - r, c, on:i < filled });
+  }
+  // 已開通的點：依填色順序由深漸變到淺（--k 為 0～100），並依序錯開呼吸動畫的起點
+  return `<span class="pt-waffle" style="--cols:${cols}" role="img" aria-label="已開通 ${filled} 組">${dots
+    .sort((a, b) => a.r - b.r || a.c - b.c).map(d => {
+      const i = (rows - 1 - d.r) * cols + d.c;
+      return d.on ? `<i class="on" style="--k:${Math.round(i / Math.max(1, filled - 1) * 100)}%;--d:${(i * .25).toFixed(2)}s"></i>` : '<i></i>';
+    }).join('')}</span>`;
+}
+function statCard({ key, color, label, value, unit, chart }){
+  return `
+    <div class="pt-stat" style="--c:var(--pt-c${color})">
+      <div class="pt-stat-head">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${STAT_IC[key]}</svg>
+        <span>${label}</span>
+      </div>
+      <div class="pt-stat-foot">
+        <b><em>${num(value)}</em>${unit}</b>
+        ${chart}
+      </div>
+    </div>`;
+}
+
+function renderDash(){
+  fillDash('dash-total', 'dash-stats');
+}
+function fillDash(totalId, statsId){
+  document.getElementById(totalId).innerHTML = `
+    <div class="pt-orb">
+      ${ringSVG()}
+      <div class="pt-orb-text">
+        <b><small>NT$</small><em>${num(DASH.total)}</em><small>萬</small></b>
+        <span class="label">累計等值點數交換</span>
+      </div>
+    </div>
+`;
+  document.getElementById(statsId).innerHTML =
+    statCard({ key:'companies', color:4, label:'已串接企業', value:DASH.companies, unit:'家', chart:spark(DASH.trend.companies) }) +
+    statCard({ key:'pairs', color:2, label:'可交換組合', value:DASH.pairs, unit:'組', chart:waffle(DASH.pairs, DASH.companies * (DASH.companies - 1) / 2, 9) });
+  playSparks(document.getElementById(statsId));
+}
+
+/* ═════════ 主頁：企業卡片 ═════════ */
+function companyCard(c){
+  return `
+    <article class="pt-card" data-card="${c.id}" tabindex="0" aria-label="${esc(c.name)}，${esc(c.point)}">
+      <div class="pt-tabs">
+        <div class="pt-tab" title="${esc(c.name)}">${SenseUI.orgLogo(c)}<span class="org-name">${esc(c.name)}</span>${VERIFIED}</div>
+        ${statusTab(c)}
+      </div>
+      <div class="pt-card-body">
+        <div class="pt-card-intro">
+          <h3 class="pt-card-title" title="${esc(c.point)}">${esc(c.point)}</h3>
+          <span class="pt-industry">${TAG}${esc(c.industry)}</span>
+          <p class="pt-desc" title="${esc(c.intro)}">${esc(c.intro)}</p>
+        </div>
+        <div class="r-card-metrics">
+          <span class="metric"><small>點數兌台幣</small><b><em>${num(c.pts)}</em> 點 = <em>${num(c.ntd)}</em> 元</b></span>
+          <span class="metric"><small>會員規模</small><b><em>${num(c.members)}</em> 萬人</b></span>
+        </div>
+      </div>
+    </article>`;
+}
+
+function filtered(){
+  const q = state.query.toLowerCase();
+  const list = COMPANIES.filter(c => (state.cat === 'all' || c.industry === state.cat)
+    && (!q || [c.name, c.point, c.industry].some(t => t.toLowerCase().includes(q))));
+  const by = { newest:(a, b) => b.order - a.order, members:(a, b) => b.members - a.members }[state.sort];
+  return list.sort(by);
+}
+
+function renderList(){
+  const list = filtered();
+  const pages = Math.max(1, Math.ceil(list.length / PER_PAGE));
+  state.page = Math.min(state.page, pages);
+  const slice = list.slice((state.page - 1) * PER_PAGE, state.page * PER_PAGE);
+  document.getElementById('grid').innerHTML = slice.length
+    ? slice.map(companyCard).join('')
+    : `<p class="empty" style="grid-column:1/-1">找不到符合「${esc(state.query || state.cat)}」的企業<br>換個關鍵字或產業試試看</p>`;
+  document.getElementById('pager').innerHTML = SenseUI.pagination(state.page, pages);
+  playModes(document.getElementById('grid'));
+}
+
+function renderChips(){ document.getElementById('chips').innerHTML = SenseUI.chips(CATEGORIES, state.cat); }
+
+/* 交換方式圖示：進入畫面時播一次動畫，播完移除 class，之後 hover 時由 CSS 再播 */
+const modeIO = 'IntersectionObserver' in window ? new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    modeIO.unobserve(e.target);
+    e.target.classList.add('is-play');
+    e.target.querySelector('.fwd').addEventListener('animationend', () => e.target.classList.remove('is-play'), { once:true });
+  });
+}, { threshold:1 }) : null;
+function playModes(root){ if (modeIO) root.querySelectorAll('[data-mode]').forEach(el => modeIO.observe(el)); }
+
+/* 右下角「加入點數 SENSE」：原型示意一律在主頁顯示（正式版已加入的企業不顯示）；申請送出後改為「加入申請處理中」 */
+function renderFab(onHome){
+  const fab = document.getElementById('fab');
+  fab.hidden = !onHome;
+  const pending = demo.joinPending;
+  fab.classList.toggle('is-pending', pending);
+  fab.innerHTML = pending
+    ? `<span class="round-icon">${CLOCK}</span><span class="cta-label">加入申請處理中</span>`
+    : `<span class="round-icon"><img src="shared/assets/ic-plus.svg" alt=""></span><span class="cta-label">加入點數 SENSE</span>`;
+}
+
+/* ═════════ 企業內頁 ═════════ */
+// 資訊卡：沿用新增商品表單的分組卡片（.form-card＋.form-group-title），內容包在 .pt-panel-body 內，左右內縮同表單欄位
+function panel(id, title, body, extra = ''){
+  return `
+    <section class="form-card form-group pt-panel" aria-labelledby="${id}">
+      <div class="form-group-title"><h2 id="${id}">${title}</h2>${extra}</div>
+      <div class="pt-panel-body">${body}</div>
+    </section>`;
+}
+// 交換點數卡：上方為淺藍標題列（滿版），中間內容，需要回應時底部另有操作列（foot）
+function xpanel(id, title, body, extra = '', foot = ''){
+  return `
+    <section class="form-card pt-panel pt-xpanel" aria-labelledby="${id}">
+      <div class="pt-xp-head"><h2 id="${id}">${title}</h2>${extra}</div>
+      <div class="pt-panel-body">${body}</div>
+      ${foot ? `<div class="pt-xp-foot">${foot}</div>` : ''}
+    </section>`;
+}
+function exchangePanel(c){
+  // 尚未加入：引導先加入點數 SENSE
+  if (!joined()){
+    const pending = demo.view === 'pending';
+    return xpanel('xp-title', `與 ${esc(c.name)} 交換點數`, `
+        <p class="pt-note">${pending
+          ? '我們已收到你的加入申請，專人將與你聯繫。完成 SSO 與點數串接後，就能向這家企業發起交換。'
+          : '企業需先加入點數 SENSE，並完成 SSO 與點數串接，才能與其他企業交換點數。'}</p>
+        <div class="pt-ratio" aria-label="${esc(c.name)} 的點數兌台幣比值">
+          <p><small>${esc(c.point)}兌台幣</small><span><em>${num(c.pts)}</em> 點 = <em>${num(c.ntd)}</em> 元</span></p>
+        </div>
+        ${pending
+          ? '<button type="button" class="btn btn-secondary" disabled>加入申請處理中</button>'
+          : '<button type="button" class="btn btn-primary" data-act="join">加入點數 SENSE</button>'}`,
+      pending ? '<span class="pt-tag"><span class="dot"></span>加入申請處理中</span>' : '');
+  }
+
+  const r = rel(c.id), q = r.req;
+  const blocks = [];
+  if (r.open !== 'none'){
+    blocks.push(`
+      <div class="pt-block">
+        <div class="pt-block-head"><h3>已開通</h3><span class="pt-tag blue">${MODE_TEXT[r.open]}交換</span></div>
+        ${route(c, r.open)}
+        <p class="pt-note">${r.open === 'both'
+          ? `雙方會員都可以把自己的點數換成對方的點數。`
+          : r.open === 'out' ? `我方會員可以把${esc(ME.point)}換成${esc(c.point)}。` : `${esc(c.name)}的會員可以把${esc(c.point)}換成${esc(ME.point)}。`}</p>
+      </div>`);
+  }
+  if (q && q.status === 'pending' && q.by === 'them'){
+    blocks.push(`
+      <div class="pt-block">
+        <div class="pt-block-head"><h3>${esc(c.name)} 向我方發起</h3><span class="pt-tag orange"><span class="dot"></span>待我方同意</span></div>
+        ${route(c, q.dirs)}
+        <p class="pt-note muted">${q.date} 發起。同意後會自動產生交換頁，雙方會員即可開始交換。</p>
+      </div>`);
+  } else if (q && q.status === 'pending'){
+    blocks.push(`
+      <div class="pt-block">
+        <div class="pt-block-head"><h3>我方發起的交換</h3><span class="pt-tag"><span class="dot"></span>待對方同意</span></div>
+        ${route(c, q.dirs)}
+        <p class="pt-note muted">${q.date} 發起，等待 ${esc(c.name)} 同意。對方同意後會自動開通。</p>
+      </div>`);
+  } else if (q && q.status === 'rejected'){
+    blocks.push(`
+      <div class="pt-block">
+        <div class="pt-block-head"><h3>${q.by === 'me' ? '我方發起的交換' : `${esc(c.name)} 發起的交換`}</h3><span class="pt-tag red">已拒絕</span></div>
+        ${route(c, q.dirs)}
+        <p class="pt-note muted">${q.date} 發起，${q.by === 'me' ? `${esc(c.name)} 已拒絕` : '我方已拒絕'}。可以重新發起。</p>
+      </div>`);
+  }
+
+  // 發起按鈕：尚未開通任何方向、且沒有待處理的發起時才顯示（「開通反方向」先拿掉）
+  const busy = q && q.status === 'pending';
+  let action = '';
+  if (r.open === 'none' && !busy){
+    const label = q && q.status === 'rejected' ? '重新發起交換' : '發起交換';
+    action = `<button type="button" class="btn btn-primary" data-act="initiate">${label}</button>`;
+  }
+  const empty = !blocks.length ? `<p class="pt-note">尚未與 ${esc(c.name)} 交換點數。發起後由對方在系統中同意，即可自動開通。</p>` : '';
+
+  // 按鈕一律放在卡片底部的操作列（上方有分隔線）：待我方同意 → 拒絕／同意；已開通 → 前往點數交換頁；其他 → 發起交換
+  const foot = q && q.status === 'pending' && q.by === 'them' ? `
+      <button type="button" class="btn btn-secondary" data-act="decline">拒絕</button>
+      <button type="button" class="btn btn-primary" data-act="accept">同意</button>`
+    : r.open !== 'none' ? '<button type="button" class="btn btn-secondary" data-todo="點數交換頁">前往點數交換頁</button>'
+    : action;
+  return xpanel('xp-title', `與 ${esc(c.name)} 交換點數`, `
+      ${ratioBox(c, r.open)}
+      ${empty}${blocks.join('')}`, '', foot);
+}
+
+/* 交換路線：我方點數 [圖示] 對方點數 */
+function route(c, dirs){
+  const mode = dirs === 'both' ? 'twoway' : 'oneway';
+  const label = dirs === 'both' ? `雙向：${ME.point} ⇄ ${c.point}` : `單向：${dirLabel(c, dirs)}`;
+  return `<div class="pt-route" data-mode="${mode}" data-dir="${dirs}" role="img" aria-label="${esc(label)}"><span>${esc(ME.point)}</span>${MODE_IC}<span>${esc(c.point)}</span></div>`;
+}
+
+/* 換算比例：兩個方向都列出，已開通單向時未開通的方向變淡 */
+function ratioBox(c, open = 'both'){
+  const line = (d) => {
+    const [from, to] = d === 'out' ? [ME, c] : [c, ME];
+    const off = open === 'out' && d === 'in' || open === 'in' && d === 'out';
+    return `<p class="${off ? 'off' : ''}"><small>${num(100)} ${esc(from.point)}</small><span>可換 <em>${num(convert(from, to))}</em> ${esc(to.point)}</span></p>`;
+  };
+  return `<div class="pt-ratio" aria-label="換算比例">${line('out')}${line('in')}</div>`;
+}
+
+function renderCompany(c){
+  const view = document.getElementById('view-company');
+  view.innerHTML = `
+    <section class="content-section" aria-label="企業資訊">
+      <div class="pt-co-head">
+        ${SenseUI.orgLogo(c)}
+        <div class="pt-co-title">
+          <h1>${esc(c.name)}${VERIFIED}</h1>
+          <div class="pt-co-meta"><span class="pt-tag">${esc(c.industry)}</span><span class="pt-tag">會員 ${num(c.members)} 萬人</span></div>
+        </div>
+      </div>
+      <p class="pt-co-intro">${esc(c.intro)}</p>
+    </section>
+    <div class="pt-detail">
+      <div>
+        ${panel('pi-title', '點數資訊', `
+          <div class="pt-info">
+            <div class="ro-item"><span class="ro-label">點數名稱</span><span class="ro-value">${esc(c.point)}</span></div>
+            <div class="ro-item"><span class="ro-label">兌台幣比值</span><span class="ro-value">${rateText(c)}</span></div>
+            <div class="ro-item"><span class="ro-label">會員規模</span><span class="ro-value">${num(c.members)} 萬人</span></div>
+            <div class="ro-item span-2"><span class="ro-label">點數說明</span><span class="ro-value">${esc(c.rule)}</span></div>
+          </div>`)}
+      </div>
+      <div id="xp">${exchangePanel(c)}</div>
+    </div>`;
+  playModes(view);
+}
+
+/* ═════════ 路由：#browse 主頁、#co=c1 企業內頁 ═════════ */
+const app = document.querySelector('.app');
+let current = null;
+function route_(){
+  const m = location.hash.match(/^#co=(\w+)/);
+  const c = m && COMPANIES.find(x => x.id === m[1]);
+  current = c || null;
+  document.getElementById('view-home').hidden = !!c;
+  document.getElementById('view-company').hidden = !c;
+  app.dataset.page = c ? 'company' : 'home';
+  if (c) app.dataset.crumb = c.name; else delete app.dataset.crumb;
+  SenseShell.refresh();
+  renderFab(!c);
+  if (c){ renderCompany(c); window.scrollTo(0, 0); }
+  else {
+    renderList();
+    if (location.hash === '#browse') document.getElementById('browse').scrollIntoView({ block:'start' });
+  }
+}
+function rerender(){
+  renderFab(!current);
+  if (current){ document.getElementById('xp').innerHTML = exchangePanel(current); playModes(document.getElementById('xp')); }
+  else renderList();
+}
+
+/* ═════════ 對話框 ═════════ */
+const dlg = document.getElementById('dlg'), form = document.getElementById('dlg-form');
+let onSubmit = null;
+function openDialog({ title, body, foot, wide = false, submit = null }){
+  dlg.classList.toggle('wide', wide);
+  form.innerHTML = `
+    <div class="pt-dlg-head"><h2 id="dlg-title">${title}</h2><button type="button" class="pt-dlg-x" data-close aria-label="關閉">×</button></div>
+    <div class="pt-dlg-body">${body}</div>
+    <div class="pt-dlg-foot">${foot}</div>`;
+  onSubmit = submit; form.onchange = null;
+  if (!dlg.open) dlg.showModal();
+  const first = form.querySelector('.pt-dlg-body input:not([readonly]):not([type=radio]), .pt-dlg-body input:checked, .pt-dlg-foot .btn-primary');
+  if (first) first.focus();
+}
+form.addEventListener('click', (e) => { if (e.target.closest('[data-close]')) dlg.close(); });
+dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });  // 點背景關閉
+form.addEventListener('submit', (e) => { e.preventDefault(); if (onSubmit) onSubmit(); });
+
+/* 發起交換：選單向／雙向，單向再選方向；比例依雙方兌台幣比值自動換算，不提供議價 */
+function openInitiate(c){
+  const r = rel(c.id);
+  const only = missingDir(r.open);   // 已開通單向時，只能開通另一個方向
+  const opt = (name, value, checked, head, sub) => `
+    <label class="pt-opt"><input type="radio" name="${name}" value="${value}"${checked ? ' checked' : ''}>
+      <span><b>${head}</b><small>${sub}</small></span></label>`;
+  const body = only ? `
+      <p class="pt-note">已開通 ${esc(dirLabel(c, r.open))}。開通反方向後即為雙向交換。</p>
+      <div class="field"><span class="field-label">要開通的方向</span>
+        <div class="pt-opts stack">${opt('dir', only, true, `<span data-mode="oneway" data-dir="${only}">${MODE_IC}</span>${esc(dirLabel(c, only))}`,
+          only === 'out' ? `我方會員可以把${esc(ME.point)}換成${esc(c.point)}` : `${esc(c.name)}的會員可以把${esc(c.point)}換成${esc(ME.point)}`)}</div>
+      </div>
+      <div class="field"><span class="field-label">換算比例</span><div id="ratio-slot" style="width:100%"></div></div>`
+    : `
+      <div class="field"><span class="field-label">交換方式</span>
+        <div class="pt-opts">
+          ${opt('mode', 'both', true, `<span data-mode="twoway" data-dir="both">${MODE_IC}</span>雙向`, '雙方會員都可以互換')}
+          ${opt('mode', 'oneway', false, `<span data-mode="oneway" data-dir="out">${MODE_IC}</span>單向`, '只開通一個方向')}
+        </div>
+      </div>
+      <div class="field" id="dir-field" hidden><span class="field-label">交換方向</span>
+        <div class="pt-opts stack">
+          ${opt('dir', 'out', true, esc(dirLabel(c, 'out')), `我方會員可以把${esc(ME.point)}換成${esc(c.point)}`)}
+          ${opt('dir', 'in', false, esc(dirLabel(c, 'in')), `${esc(c.name)}的會員可以把${esc(c.point)}換成${esc(ME.point)}`)}
+        </div>
+      </div>
+      <div class="field"><span class="field-label">換算比例</span><div id="ratio-slot" style="width:100%"></div></div>`;
+  const chosen = () => only || (form.elements.mode.value === 'both' ? 'both' : form.elements.dir.value);
+  openDialog({
+    title:`向 ${esc(c.name)} 發起交換`,
+    body: body + `<p class="pt-note muted">比例依雙方點數兌台幣比值自動換算，四捨五入到小數點後第一位，不提供議價。送出後由對方在系統中同意，同意後自動開通。</p>`,
+    foot:`<button type="button" class="btn btn-secondary" data-close>取消</button><button type="submit" class="btn btn-primary">送出</button>`,
+    submit(){
+      const dirs = chosen();
+      r.req = { by:'me', dirs, status:'pending', date:today() };
+      dlg.close(); rerender();
+      SenseShell.toast(`已向 ${c.name} 發起交換，待對方同意`);
+    }
+  });
+  const sync = () => {
+    if (!only) document.getElementById('dir-field').hidden = form.elements.mode.value !== 'oneway';
+    const d = chosen();
+    document.getElementById('ratio-slot').innerHTML = ratioBox(c, d === 'both' ? 'both' : d);
+  };
+  form.onchange = sync;   // 每次開對話框重新指定，不累加
+  sync();
+}
+
+/* 加入點數 SENSE：送出申請 → 平台洽談 → 串接完成。已在兌換 SENSE 串接的企業自動帶入既有資料 */
+function openJoin(){
+  const pre = EXCHANGE_PROFILE;   // 原型示意：以「已在兌換 SENSE 串接」的企業呈現自動帶入
+  const from = pre ? '<span class="pt-from">已帶入</span>' : '';
+  const val = (k) => pre ? esc(pre[k]) : '';
+  const select = (name, items, v) => `<select class="select" name="${name}" required>
+      <option value="" disabled${v ? '' : ' selected'}>請選擇</option>${items.map(i => `<option${i === v ? ' selected' : ''}>${i}</option>`).join('')}</select>`;
+  const field = (label, html, { req = false, filled = false, error = '' } = {}) => `
+    <div class="field"><label class="field-label">${label}${req ? '<span class="req">*</span>' : ''}${filled ? from : ''}</label>${html}
+      ${error ? `<span class="field-error">${error}</span>` : ''}</div>`;
+  openDialog({
+    title:'加入點數 SENSE', wide:true,
+    body:`
+      ${pre ? `<div class="pt-prefill">${INFO}<span>你已在兌換 SENSE 完成 SSO 與點數串接，以下欄位已自動帶入，可沿用同一套串接。請確認內容後送出。</span></div>`
+            : `<p class="pt-note">加入點數 SENSE 需完成 SSO 與點數串接，無法自動開通。送出後專人將與你聯繫，洽談串接細節。</p>`}
+      <div class="form-row">
+        ${field('企業名稱', `<input class="input" name="company" value="${esc(ME.name)}" readonly>`)}
+        ${field('會員規模', select('members', MEMBER_SIZES, pre && pre.members), { filled:!!pre })}
+      </div>
+      <div class="form-row">
+        ${field('聯絡人', `<input class="input" name="contact" value="${val('contact')}" placeholder="姓名" required>`, { req:true, filled:!!pre, error:'請填寫聯絡人' })}
+        ${field('聯絡電話', `<input class="input" name="phone" value="${val('phone')}" placeholder="例：02-1234-5678">`, { filled:!!pre })}
+      </div>
+      ${field('Email', `<input class="input" type="email" name="email" value="${val('email')}" placeholder="name@company.com" required>`, { req:true, filled:!!pre, error:'請填寫有效的 Email' })}
+      <div class="form-row">
+        ${field('點數名稱', `<input class="input" name="point" value="${val('point')}" placeholder="例：會員點" required>`, { req:true, filled:!!pre, error:'請填寫點數名稱' })}
+        ${field('預計上線時間', select('launch', LAUNCHES, pre && pre.launch), { filled:!!pre })}
+      </div>
+      ${field('點數制度說明', `<textarea class="textarea short" name="rule" placeholder="發點方式、點數兌台幣比值等">${val('rule')}</textarea>`, { filled:!!pre })}
+      ${field('備註', `<textarea class="textarea short" name="memo" placeholder="其他想讓我們知道的事"></textarea>`)}`,
+    foot:`<button type="button" class="btn btn-secondary" data-close>取消</button><button type="submit" class="btn btn-primary">送出申請</button>`,
+    submit(){
+      let ok = true;
+      ['contact','email','point'].forEach(n => {
+        const el = form.elements[n], bad = !el.value.trim() || (n === 'email' && !el.checkValidity());
+        el.classList.toggle('is-invalid', bad); el.closest('.field').classList.toggle('has-error', bad);
+        if (bad && ok){ el.focus(); ok = false; }
+      });
+      if (!ok) return;
+      demo.joinPending = true; rerender();
+      openDialog({
+        title:'加入點數 SENSE',
+        body:`<div class="pt-done"><span class="pt-done-ic">${CHECK}</span><h3>已收到你的加入申請</h3>
+          <p>專人將與你聯繫，洽談 SSO 與點數串接。<br>串接完成並在單位管理設定點數後，就能開始與其他企業交換。</p></div>`,
+        foot:`<button type="button" class="btn btn-primary" data-close>完成</button>`
+      });
+    }
+  });
+}
+
+function today(){
+  const d = new Date(), p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}/${p(d.getMonth() + 1)}/${p(d.getDate())}`;
+}
+
+/* ═════════ 事件 ═════════ */
+SenseShell.mount();
+
+renderDash();
+renderChips();
+document.getElementById('chips').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-chip]'); if (!b) return;
+  state.cat = b.dataset.chip; state.page = 1; renderChips(); renderList();
+});
+const actions = document.getElementById('list-actions');
+actions.innerHTML = SenseUI.listActions({ sorts:SORTS, sort:state.sort, placeholder:'搜尋企業或點數名稱' });
+SenseUI.bindListActions(actions, {
+  onQuery: (q) => { state.query = q; state.page = 1; renderList(); },
+  onSort:  (k) => { state.sort = k; state.page = 1; renderList(); }
+});
+document.getElementById('pager').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-page]'); if (!b || b.disabled) return;
+  state.page = +b.dataset.page; renderList();
+  document.getElementById('browse').scrollIntoView({ behavior:'smooth', block:'start' });
+});
+
+const grid = document.getElementById('grid');
+grid.addEventListener('click', (e) => { const c = e.target.closest('[data-card]'); if (c) location.hash = 'co=' + c.dataset.card; });
+grid.addEventListener('keydown', (e) => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-card]')){ e.preventDefault(); location.hash = 'co=' + e.target.dataset.card; }
+});
+
+document.getElementById('fab').addEventListener('click', () => {
+  if (demo.joinPending) return SenseShell.toast('加入申請處理中，專人將與你聯繫');
+  openJoin();
+});
+
+document.getElementById('view-company').addEventListener('click', (e) => {
+  const t = e.target.closest('[data-act]'); if (!t || !current) return;
+  const c = current, r = rel(c.id);
+  if (t.dataset.act === 'join') return openJoin();
+  if (t.dataset.act === 'initiate') return openInitiate(c);
+  if (t.dataset.act === 'accept'){
+    r.open = mergeDirs(r.open, r.req.dirs); r.req = null;
+    SenseShell.toast(`已同意，與 ${c.name} 的交換已開通`);
+  } else if (t.dataset.act === 'decline'){
+    r.req.status = 'rejected';
+    SenseShell.toast(`已拒絕 ${c.name} 的交換`);
+  }
+  rerender();
+});
+
+
+window.addEventListener('hashchange', route_);
+route_();
+rerender();
+</script>
+</body>
+</html>

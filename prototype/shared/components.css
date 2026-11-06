@@ -281,7 +281,7 @@ a.sb-mod-label:hover{color:var(--strong)}
 .card-grid{width:100%;display:grid;grid-template-columns:repeat(var(--cols,3),minmax(0,1fr));gap:20px}
 .r-card{position:relative;display:flex;flex-direction:column;gap:10px;padding:14px;background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r-30);
   text-align:left;letter-spacing:var(--tracking-ultra);transition:border-color .15s}
-.r-card:hover,.r-card:focus-visible{border-color:var(--hover-teal);outline:0}
+.r-card:hover,.r-card:focus-visible{border-color:var(--hover-line);outline:0}
 .r-card-media{position:relative;display:block;width:100%}
 .r-card-img{display:block;width:100%;aspect-ratio:1/1;border:1px solid var(--line-soft);border-radius:var(--r-30);background:var(--black-50);overflow:hidden}
 .r-card-img img{width:100%;height:100%;object-fit:cover}
