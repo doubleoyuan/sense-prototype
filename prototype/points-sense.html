@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="shared/tokens.css?v=20261106b">
+<link rel="stylesheet" href="shared/tokens.css?v=20261106c">
 <link rel="stylesheet" href="shared/components.css?v=20261106a">
 <link rel="stylesheet" href="shared/forms.css?v=20261028d">
 <style>
@@ -289,7 +289,7 @@
 
 <dialog class="pt-dialog" id="dlg" aria-labelledby="dlg-title"><form method="dialog" id="dlg-form" novalidate></form></dialog>
 
-<script src="shared/shell.js?v=20261106a"></script>
+<script src="shared/shell.js?v=20261106b"></script>
 <script src="shared/components.js?v=20261028d"></script>
 <script>
 /* ═════════ 示意資料（僅供原型展示） ═════════ */
@@ -396,9 +396,14 @@ function modeBadge(dirs, cls = ''){
 /* 卡片右上的交換方式頁籤：一律只顯示單向／雙向。已開通用開通的方向；待同意、已拒絕先用發起時的方向示意；
    還沒有任何交換的企業，用 CARD_MODE_DEMO 示意 */
 const CARD_MODE_DEMO = { c7:'out', c8:'both' };
+// 卡片與內頁示意用的交換方向（out／in／both）
+function shownDirs(c){
+  const r = rel(c.id);
+  return r.open !== 'none' ? r.open : r.req ? r.req.dirs : CARD_MODE_DEMO[c.id];
+}
 function statusTab(c){
   if (!joined()) return '';
-  const r = rel(c.id), dirs = r.open !== 'none' ? r.open : r.req ? r.req.dirs : CARD_MODE_DEMO[c.id];
+  const dirs = shownDirs(c);
   if (!dirs) return '';
   const mode = dirs === 'both' ? 'twoway' : 'oneway';
   const title = dirs === 'both' ? '雙向交換' : `單向交換：${dirLabel(c, dirs)}`;
@@ -632,7 +637,9 @@ function exchangePanel(c){
       pending ? '<span class="pt-tag"><span class="dot"></span>加入申請處理中</span>' : '');
   }
 
-  const r = rel(c.id), q = r.req;
+  // 現階段示意：不論實際狀態，內頁一律以「已開通」呈現，方向同卡片右上的單向／雙向
+  //（待同意、已拒絕等狀態的內容保留在下方，之後恢復時改回 rel(c.id) 即可）
+  const r = { open:shownDirs(c) || 'both', req:null }, q = r.req;
   const blocks = [];
   if (r.open !== 'none'){
     blocks.push(`
@@ -680,7 +687,7 @@ function exchangePanel(c){
   const foot = q && q.status === 'pending' && q.by === 'them' ? `
       <button type="button" class="btn btn-secondary" data-act="decline">拒絕</button>
       <button type="button" class="btn btn-primary" data-act="accept">同意</button>`
-    : r.open !== 'none' ? '<button type="button" class="btn btn-secondary" data-todo="點數交換頁">前往點數交換頁</button>'
+    : r.open !== 'none' ? '<button type="button" class="btn btn-primary" data-todo="點數交換頁">前往點數交換頁</button>'
     : action;
   return xpanel('xp-title', `與 ${esc(c.name)} 交換點數`, `
       ${ratioBox(c, r.open)}
