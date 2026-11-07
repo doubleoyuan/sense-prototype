@@ -100,8 +100,8 @@
   .pt-card-intro{display:flex;flex-direction:column;gap:4px}
   .pt-card-title{font-size:16px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-super);color:var(--black-800);
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .pt-industry{display:inline-flex;align-items:center;gap:4px;padding:4px 0;color:var(--accent);font-size:13px;line-height:20px;letter-spacing:var(--tracking-wider)}
-  .pt-industry svg{width:14px;height:14px;flex:none}
+  .pt-industry{display:inline-flex;align-items:center;gap:6px;padding:4px 0;color:var(--accent);font-size:13px;font-weight:600;line-height:20px;letter-spacing:var(--tracking-wider)}
+  .pt-industry svg{width:16px;height:16px;flex:none}
   .pt-desc{font-size:14px;line-height:22px;letter-spacing:var(--tracking-wider);color:var(--black-600);
     display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
   /* 兌台幣比值與會員規模合成一個框：同策略卡片的指標框 */
@@ -361,7 +361,8 @@ const LAUNCHES = ['2026 Q4','2027 Q1','2027 Q2','2027 Q3','2027 Q4','尚未確�
 const VERIFIED = '<svg class="pt-verified" viewBox="0 0 16 16" aria-label="已完成串接"><path fill="currentColor" d="M8 .8l1.7 1.3 2.1-.2.8 2 1.9 1-.3 2.1L15.2 8 14 9.7l.3 2.1-1.9 1-.8 2-2.1-.2L8 15.2l-1.7-1.3-2.1.2-.8-2-1.9-1 .3-2.1L.8 8 2 6.3 1.7 4.2l1.9-1 .8-2 2.1.2z"/><path d="M5.3 8.2l1.8 1.8 3.6-3.7" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 // 交換方式圖示：同策略 SENSE（上去下回的半箭頭）
 const MODE_IC = '<svg class="pt-mode-ic" viewBox="0 0 16 16" aria-hidden="true"><path class="back" d="M12 10.5H3l2.5 2.5"/><path class="fwd" d="M4 5.5h9l-2.5-2.5"/></svg>';
-const TAG = '<svg viewBox="0 0 16 16" fill="currentColor" fill-rule="evenodd" aria-hidden="true"><path d="M2 3.5A1.5 1.5 0 0 1 3.5 2h4.1a1.5 1.5 0 0 1 1.06.44l5.2 5.2a1.5 1.5 0 0 1 0 2.12l-4.1 4.1a1.5 1.5 0 0 1-2.12 0l-5.2-5.2A1.5 1.5 0 0 1 2 7.6zM5.75 4.4a1.35 1.35 0 1 0 0 2.7 1.35 1.35 0 0 0 0-2.7z"/></svg>';
+// 產業標示：大樓圖示（同兌換 SENSE）
+const IC_INDUSTRY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V6.5L12 4v16M12 9l7 2.5V20M3.5 20h17M8 9h1M8 12h1M8 15h1M15 14h1M15 17h1"/></svg>';
 const CLOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>';
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 
@@ -544,7 +545,7 @@ function companyCard(c){
       <div class="pt-card-body">
         <div class="pt-card-intro">
           <h3 class="pt-card-title" title="${esc(c.point)}">${esc(c.point)}</h3>
-          <span class="pt-industry">${TAG}${esc(c.industry)}</span>
+          <span class="pt-industry">${IC_INDUSTRY}${esc(c.industry)}</span>
           <p class="pt-desc" title="${esc(c.intro)}">${esc(c.intro)}</p>
         </div>
         <div class="r-card-metrics">
