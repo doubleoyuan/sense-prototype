@@ -1,0 +1,866 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>兌換 SENSE</title>
+<link rel="icon" type="image/svg+xml" href="shared/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="shared/tokens.css?v=20261106c">
+<link rel="stylesheet" href="shared/components.css?v=20261106a">
+<link rel="stylesheet" href="shared/forms.css?v=20261028d">
+<style>
+  /* ── 兌換 SENSE 頁內元件：UI Library 尚未收錄，需求確認後再決定是否抽到 shared/ ──
+     版型沿用點數 SENSE（數據卡、頁籤卡片、資訊卡、對話框），class 改以 ex- 開頭 */
+
+  /* 右下角固定按鈕會蓋住內容，底部多留空間 */
+  .content{padding-bottom:120px}
+
+  /* 灰底示意框：圖片、截圖尚無素材時使用 */
+  .ex-ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:12px;background:var(--black-100);color:var(--black-500);
+    font-size:13px;font-weight:500;line-height:20px;letter-spacing:var(--tracking-wider);text-align:center}
+  .ex-ph svg{width:28px;height:28px;flex:none;color:var(--black-400)}
+  .ex-ph small{font-size:12px;font-weight:400;color:var(--black-400)}
+
+  /* ── 數據盤：四張數據卡（樣式同點數 SENSE 的 .pt-stat，不放迷你圖） ── */
+  .ex-dash{width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
+  /* 高度依內容（標題＋翻牌數字），不再固定 140px */
+  .ex-stat{display:flex;flex-direction:column;justify-content:space-between;gap:20px;padding:16px 20px 20px;
+    border:1px solid var(--black-200);border-radius:var(--r-20);background:var(--white);container-type:inline-size}
+  .ex-stat-head{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+  .ex-stat-head .ic{width:18px;height:18px;flex:none;color:var(--black-400)}
+  .ex-stat b{display:flex;align-items:flex-end;gap:6px;font-size:16px;font-weight:500;line-height:22px;letter-spacing:var(--tracking-wider);color:var(--black-600);white-space:nowrap}
+
+  /* 翻牌數字（參考 React Bits 的 Split Flap Text）：每個數字一塊深藍牌，中間一道接縫；
+     進入畫面時上半片往下翻，依序翻過幾個亂數後停在實際數字，由左到右錯開。
+     字級依卡片寬度縮放（container query），最多 30px，窄卡片也不會超出 */
+  .ex-flaps{display:inline-flex;align-items:flex-end;gap:.08em;font-size:clamp(16px,15cqi,30px);font-weight:700;line-height:1;letter-spacing:0;
+    color:var(--ex-flap-fg);font-variant-numeric:tabular-nums}
+  /* 牌色試做深藍底白字（2026-11-07），確認後再決定是否加進 tokens.css。
+     試過淡藍底深藍字（底 color-mix(--mod-product 45%, 白)、上半片白 25%、白色接縫），使用者決定維持深藍 */
+  .app[data-module="exchange"]{--ex-flap-bg:#1C3461;--ex-flap-fg:var(--white);--ex-flap-hi:rgba(255,255,255,.06);--ex-flap-seam:rgba(0,0,0,.5)}
+  .ex-flap{position:relative;width:.72em;height:1.3em;flex:none;border-radius:.14em;background:var(--ex-flap-bg);perspective:4em}
+  .ex-flap .h{position:absolute;left:0;right:0;height:50%;overflow:hidden;background:var(--ex-flap-bg);backface-visibility:hidden}
+  .ex-flap .top{top:0;border-radius:.14em .14em 0 0;transform-origin:bottom}
+  .ex-flap .top::before{content:"";position:absolute;inset:0;background:var(--ex-flap-hi)}  /* 上半片稍亮，做出翻牌的層次 */
+  .ex-flap .bot{top:50%;border-radius:0 0 .14em .14em;transform-origin:top}
+  .ex-flap .h b{position:absolute;left:0;right:0;height:200%;display:flex;align-items:center;justify-content:center;font:inherit;color:inherit}
+  .ex-flap .bot b{top:-100%}
+  .ex-flap .flap{z-index:2}
+  .ex-flap::after{content:"";position:absolute;left:0;right:0;top:50%;z-index:3;height:1px;margin-top:-.5px;background:var(--ex-flap-seam)}  /* 接縫 */
+
+  /* ── CaseCard：案例卡片。沿用點數 SENSE 企業卡片的頁籤模板（只有公司頁籤） ──
+     兩種前往方式：底部兩顆按鈕並列——左「案例詳情頁」、右「前往兌換平台」（新分頁開啟）；點卡片其他位置同樣進案例詳情頁。
+     滑到按鈕上時卡片外框不變色，避免以為點的是整張卡片 */
+  .ex-card{--ex-line:var(--black-300);display:flex;flex-direction:column;cursor:pointer;filter:drop-shadow(0 4px 0 var(--black-200))}
+  .ex-card:hover:not(:has(.ex-card-actions:hover)),.ex-card:focus-visible{--ex-line:var(--hover-line);outline:0}
+  .ex-tab{position:relative;z-index:1;margin-bottom:-1px;padding:14px 20px 12px;display:flex;align-items:center;gap:10px;
+    background:var(--white);border:1px solid var(--ex-line);border-bottom:0;border-radius:var(--r-20) var(--r-20) 0 0}
+  .ex-tab .org-name{min-width:0;font-size:14px;line-height:20px;letter-spacing:var(--tracking-super);color:var(--black-700);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ex-card-body{flex:1;display:flex;flex-direction:column;gap:16px;padding:10px 20px 20px;background:var(--white);border:1px solid var(--ex-line);
+    border-radius:0 0 var(--r-30) var(--r-30)}
+  .ex-shot{aspect-ratio:16/10;border:1px solid var(--black-200);border-radius:var(--r-16);overflow:hidden}
+  /* 實際截圖：裁切填滿，保留畫面上緣（網站頁首） */
+  .ex-img{background:var(--black-100)}
+  .ex-img img{width:100%;height:100%;object-fit:cover;object-position:top}
+  .ex-card-intro{display:flex;flex-direction:column;gap:4px}
+  .ex-card-title{font-size:16px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-super);color:var(--black-800);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* 產業：圖示 16px（不超過上方標題）；文字 13px、加粗 */
+  .ex-industry{display:inline-flex;align-items:center;gap:6px;padding:4px 0;color:var(--accent);font-size:13px;font-weight:600;line-height:20px;letter-spacing:var(--tracking-wider)}
+  .ex-industry svg{width:16px;height:16px;flex:none}
+  /* 功能標籤緊接在產業／上線時間下方：抵掉卡片內 16px 間距的一部分，與上一列文字相距 10px（含文字列下方 4px 內距） */
+  .ex-feats{display:flex;flex-wrap:wrap;gap:6px;margin-top:-10px}
+  /* 產業與上線時間排成一列（圖示＋文字，樣式相同） */
+  .ex-meta{display:flex;flex-wrap:wrap;align-items:center;column-gap:20px}
+  /* 底部按鈕列：沿用表單的 .btn-secondary／.btn-primary，兩顆平分卡片寬度。
+     卡片窄（4 欄時內容約 235px）放不下 .btn 的最小寬度 120px，改為可縮、內距與字距收小 */
+  .ex-card-actions{display:flex;gap:12px;margin-top:auto}  /* 推到卡片底部，各卡片的按鈕才會對齊 */
+  .ex-card-actions .btn{flex:1;min-width:0;padding:0 12px;letter-spacing:var(--tracking-wider);white-space:nowrap}
+
+  /* 標籤：樣式同點數 SENSE 的 .pt-tag */
+  .ex-tag{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:20px;font-size:12px;font-weight:600;
+    letter-spacing:var(--tracking-wider);white-space:nowrap;background:var(--black-100);color:var(--black-600)}
+  .ex-tag.blue{background:var(--mod-product-tint);color:var(--accent-border)}
+  .ex-tag.orange{background:var(--metric-bg);color:var(--cta-orange)}
+  .ex-tag .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+
+  /* ── 票券商品卡：沿用 ResourceCard（.r-card），主圖改灰底示意框，左上角疊類型標籤 ── */
+  .ex-prod .r-card-img{position:relative}
+  .ex-prod .ex-ph{width:100%;height:100%}
+  .ex-prod-type{position:absolute;left:12px;top:12px;height:24px;padding:0 10px;display:inline-flex;align-items:center;border-radius:20px;background:var(--white);
+    border:1px solid var(--black-200);font-size:12px;font-weight:600;letter-spacing:var(--tracking-wider);color:var(--black-600)}
+
+  /* ── 案例詳情頁（版型同點數 SENSE 企業內頁） ── */
+  .ex-co-head{width:100%;display:flex;align-items:flex-start;gap:20px}
+  .ex-co-head .org-logo{width:64px;height:64px;padding:4px;border-radius:var(--r-10)}
+  .ex-co-head .org-logo .mono{width:54px;height:54px;border-radius:var(--r-8);font-size:24px}
+  .ex-co-title{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+  .ex-co-title h1{font-size:24px;font-weight:700;line-height:32px;letter-spacing:var(--tracking-ultra)}
+  .ex-co-title .sub{font-size:14px;line-height:22px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+  /* 前往兌換平台：放在畫面截圖輪播下方置中，需登入的平台在按鈕下方另起一行加註 */
+  .ex-ext-actions{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+  .ex-panel .ex-ext-actions .btn{width:auto}  /* 資訊卡內的按鈕預設滿版，這裡維持依文字寬度 */
+  .ex-co-intro{font-size:14px;line-height:24px;letter-spacing:1.6px;color:var(--black-700)}
+  /* 標題區放在左欄，右側申請卡從頁面頂端開始並固定（sticky），捲動左欄時一直看得到 */
+  .ex-detail{width:100%;display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:40px;align-items:start}
+  .ex-detail .ex-co{margin-bottom:20px}  /* 標題區與下方資訊卡相距 40px（同原本的區塊間距） */
+  .ex-detail > div{display:flex;flex-direction:column;gap:20px;min-width:0}
+  .ex-aside{position:sticky;top:calc(var(--header-h) + 20px)}
+  .ex-panel .form-group-title h2{flex:1;min-width:0}
+  .ex-panel-body{display:flex;flex-direction:column;gap:16px}
+  .ex-note{font-size:13px;line-height:22px;letter-spacing:var(--tracking-wider);color:var(--black-600)}
+  .ex-note.muted{color:var(--black-500)}
+  .ex-panel .btn{width:100%}
+  .ex-panel .btn svg{width:18px;height:18px;flex:none}
+
+  /* 畫面截圖輪播：橫向捲動（手機可直接滑），左右鈕與圓點同步 */
+  .ex-carousel{display:flex;flex-direction:column;gap:12px}
+  .ex-stage{position:relative}
+  .ex-slides{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;border:1px solid var(--black-200);border-radius:var(--r-16);
+    scrollbar-width:none}
+  .ex-slides::-webkit-scrollbar{display:none}
+  .ex-slide{flex:0 0 100%;aspect-ratio:16/9;scroll-snap-align:start}
+  .ex-nav{position:absolute;top:50%;width:40px;height:40px;margin-top:-20px;border-radius:50%;display:grid;place-items:center;
+    background:var(--white);border:1px solid var(--black-200);filter:drop-shadow(0 2px 0 var(--black-200));color:var(--black-600);transition:opacity .15s}
+  .ex-nav:hover{background:var(--black-50)}
+  .ex-nav[disabled]{opacity:0;pointer-events:none}
+  .ex-nav.prev{left:12px}
+  .ex-nav.next{right:12px}
+  .ex-nav svg{width:20px;height:20px}
+  .ex-dots{display:flex;justify-content:center;gap:8px}
+  .ex-dots button{position:relative;width:8px;height:8px;border-radius:4px;background:var(--black-300);transition:width .2s,background .2s}
+  .ex-dots button::before{content:"";position:absolute;inset:-8px}  /* 可點範圍放大到 24px */
+  .ex-dots button[aria-current="true"]{width:20px;background:var(--accent-border)}
+
+  /* 主要功能說明：每項一列，左側圓形圖示 */
+  .ex-feat-list{display:flex;flex-direction:column}
+  .ex-feat{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--black-200)}
+  .ex-feat:first-child{padding-top:0}
+  .ex-feat:last-child{padding-bottom:0;border-bottom:0}
+  .ex-feat-ic{width:36px;height:36px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--mod-product-tint);color:var(--accent-border)}
+  .ex-feat-ic svg{width:18px;height:18px}
+  .ex-feat h3{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-super)}
+  .ex-feat p{font-size:14px;line-height:24px;letter-spacing:1.6px;color:var(--black-700)}
+  .ex-types{display:flex;flex-direction:column;gap:12px}
+  .ex-types .ro-item > div{display:flex;flex-wrap:wrap;gap:6px}
+
+  /* 申請卡：淺藍標題列（同點數 SENSE 的交換點數卡） */
+  .ex-xpanel{padding:0;overflow:hidden;border-color:var(--mod-product)}
+  .ex-xp-head{display:flex;align-items:center;gap:12px;padding:14px 20px;background:var(--step-highlight);color:var(--accent-border)}
+  .ex-xp-head h2{flex:1;min-width:0;font-size:18px;font-weight:700;line-height:32px;letter-spacing:var(--tracking-ultra)}
+  .ex-xpanel > .ex-panel-body{padding:20px 20px 24px}
+
+  /* ── 對話框：沿用點數 SENSE 的 .pt-dialog ── */
+  .ex-dialog{width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 48px);padding:0;border:0;border-radius:24px;background:var(--white);color:var(--black-800);
+    box-shadow:0 20px 60px rgba(0,0,0,.18);letter-spacing:var(--tracking-ultra)}
+  .ex-dialog.wide{width:min(720px,calc(100vw - 32px))}
+  .ex-dialog::backdrop{background:rgba(0,0,0,.32)}
+  .ex-dialog form{display:flex;flex-direction:column;max-height:calc(100vh - 48px)}
+  .ex-dlg-head{display:flex;align-items:center;gap:12px;padding:18px 24px;border-bottom:1px solid var(--black-200)}
+  .ex-dlg-head h2{flex:1;font-size:17px;font-weight:700;letter-spacing:var(--tracking-super)}
+  .ex-dlg-x{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:20px;color:var(--black-500)}
+  .ex-dlg-x:hover{background:var(--black-100)}
+  .ex-dlg-body{padding:20px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:20px;font-size:14px;line-height:24px;letter-spacing:1.6px}
+  .ex-dlg-foot{display:flex;justify-content:flex-end;gap:12px;padding:16px 24px;border-top:1px solid var(--black-200);flex-wrap:wrap}
+  .ex-dlg-foot .spacer{flex:1}
+  .ex-dlg-body .field{gap:8px}
+  .ex-dlg-body .field-label{font-size:14px}
+  .ex-dlg-body .form-row{gap:16px}
+  .ex-dlg-body .input[readonly]{background:var(--black-50);color:var(--black-600)}  /* 帶入、不可修改 */
+
+  /* 申請流程：送出申請 → 專人洽談 → 開發上線 */
+  .ex-flow{display:flex;align-items:center;gap:8px;padding:12px 16px;border-radius:var(--r-10);background:var(--step-highlight);
+    font-size:13px;font-weight:600;line-height:22px;letter-spacing:var(--tracking-wider);color:var(--accent-border);flex-wrap:wrap}
+  .ex-flow i{font-style:normal;color:var(--black-400)}
+  .ex-flow + .ex-note{margin-top:-10px}
+
+  /* 選項卡：同點數 SENSE 的 .pt-opt（radio／checkbox 共用），必要項目勾選後不可取消 */
+  .ex-opts{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .ex-opts.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .ex-opt{position:relative;display:flex;align-items:flex-start;gap:10px;padding:14px 16px;border:1px solid var(--black-200);border-radius:var(--r-16);cursor:pointer;
+    transition:border-color .15s,background .15s}
+  .ex-opt:hover{border-color:var(--black-400)}
+  .ex-opt:has(input:checked){border-color:var(--accent-border);background:var(--step-highlight)}
+  .ex-opt:has(input:disabled){cursor:default}
+  .ex-opt:has(input:disabled):hover{border-color:var(--accent-border)}
+  .ex-opt:has(input:focus-visible){outline:2px solid var(--accent-border);outline-offset:2px}
+  .ex-opt input{margin:5px 0 0;accent-color:var(--accent-border)}
+  .ex-opt b{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-wider)}
+  .ex-opt small{display:block;font-size:12px;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+  .ex-opt .ex-tag{height:20px;padding:0 8px;font-size:11px}
+
+  /* 送出完成 */
+  .ex-done{display:flex;flex-direction:column;align-items:center;gap:10px;padding:24px 0 8px;text-align:center}
+  .ex-done-ic{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:var(--mod-product-tint);color:var(--accent-border)}
+  .ex-done-ic.pending{background:var(--black-100);color:var(--black-500)}
+  .ex-done-ic svg{width:28px;height:28px}
+  .ex-done h3{font-size:18px;font-weight:700;line-height:32px;letter-spacing:var(--tracking-ultra)}
+  .ex-done p{font-size:14px;line-height:24px;letter-spacing:1.6px;color:var(--black-600)}
+  /* 申請內容摘要（申請處理中） */
+  .ex-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 20px;padding:16px 20px;border-radius:var(--r-10);background:var(--black-50)}
+  .ex-summary .ro-label{font-size:12px;line-height:20px;letter-spacing:var(--tracking-wider)}
+  .ex-summary .ro-value{font-size:14px;line-height:22px;letter-spacing:var(--tracking-wider)}
+  .ex-reset{font-size:13px;font-weight:500;letter-spacing:var(--tracking-wider);color:var(--black-500);text-decoration:underline;text-underline-offset:3px}
+  .ex-reset:hover{color:var(--black-800)}
+
+  /* 申請兌換平台：右下角固定按鈕，沿用 CtaButton。申請送出後改為灰色「申請處理中」 */
+  .ex-fab{position:fixed;right:40px;bottom:32px;z-index:45}
+  /* 案例詳情頁：雙欄時右側申請卡已固定在上方，不重複顯示；單欄時申請卡排到最下面，改用浮動按鈕 */
+  @media (min-width:1280px){ .ex-fab.on-detail{display:none} }
+  .ex-fab.is-pending{background:var(--black-100);border-color:var(--black-300);color:var(--black-600)}
+  .ex-fab.is-pending .round-icon{background:linear-gradient(var(--white),var(--white)) padding-box,linear-gradient(var(--black-300),var(--black-300)) border-box}
+  .ex-fab .round-icon svg{position:absolute;left:50%;top:50%;width:24px;height:24px;transform:translate(-50%,-50%);color:var(--black-500)}
+
+  @media (max-width:1279px){
+    .ex-dash{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .ex-detail{grid-template-columns:minmax(0,1fr)}
+    .ex-aside{position:static}
+  }
+  @media (max-width:899px){ .ex-fab{right:16px;bottom:16px} }
+  @media (max-width:767px){
+    .ex-co-head .org-logo{width:48px;height:48px;padding:3px}
+    .ex-co-head .org-logo .mono{width:40px;height:40px;font-size:18px}
+    .ex-co-title h1{font-size:20px;line-height:28px}
+    .ex-nav{display:none}  /* 手機直接左右滑 */
+  }
+  @media (max-width:559px){
+    .ex-dash{gap:12px}
+    .ex-stat{gap:12px;padding:14px 16px}
+    .ex-stat b{font-size:14px;gap:4px}
+    .ex-opts,.ex-opts.three{grid-template-columns:minmax(0,1fr)}
+    .ex-dlg-body .form-row{grid-template-columns:minmax(0,1fr)}
+    .ex-summary{grid-template-columns:minmax(0,1fr)}
+    .ex-fab{padding:10px 24px 10px 60px}
+  }
+</style>
+</head>
+<body>
+<!-- 僅供內部使用，非經許可不得外流。頁面中的公司、案例、票券商品與數據皆為示意。 -->
+<div class="app" data-module="exchange" data-page="home">
+  <aside class="sidebar" id="sidebar" aria-label="主選單"></aside>
+  <div class="main">
+    <header class="header" id="header"></header>
+
+    <main class="content" id="view-home">
+      <!-- 區塊一：數據盤（數字由平台後台手動設定，此為示意） -->
+      <section class="content-section" aria-labelledby="dash-title">
+        <div class="section-title" id="dashboard">
+          <h2 id="dash-title">兌換數據盤</h2>
+        </div>
+        <div class="ex-dash" id="dash"></div>
+      </section>
+
+      <!-- 區塊二：案例 -->
+      <section class="content-section" aria-labelledby="cases-title">
+        <div class="section-title" id="cases">
+          <h2 id="cases-title">合作兌換平台</h2>
+        </div>
+        <div class="card-grid" id="case-grid"></div>
+      </section>
+
+      <!-- 區塊三：票券商品（不區分來源） -->
+      <section class="content-section" aria-labelledby="products-title">
+        <div class="section-title" id="products">
+          <h2 id="products-title">可兌換的票券商品</h2>
+        </div>
+        <div class="list-toolbar">
+          <div class="chips" id="chips" role="group" aria-label="商品分類"></div>
+          <div class="list-actions" id="list-actions"></div>
+        </div>
+        <div class="card-grid" id="grid" aria-live="polite"></div>
+        <div class="pager" id="pager"></div>
+      </section>
+    </main>
+
+    <main class="content" id="view-case" hidden></main>
+  </div>
+</div>
+
+<!-- 區塊四：申請兌換平台（主頁右下角固定按鈕） -->
+<button type="button" class="cta-btn ex-fab" id="fab" hidden></button>
+
+<dialog class="ex-dialog" id="dlg" aria-labelledby="dlg-title"><form method="dialog" id="dlg-form" novalidate></form></dialog>
+
+<script src="shared/shell.js?v=20261107a"></script>
+<script src="shared/components.js?v=20261028d"></script>
+<script>
+/* ═════════ 示意資料（僅供原型展示） ═════════ */
+// 目前登入的企業：申請表單自動帶入企業名稱
+const ME = { name:'股感媒體' };
+
+// 數據盤：初期由平台後台手動設定
+const DASH = [
+  { key:'products',  label:'可兌換票券商品', value:1286,   unit:'項' },
+  { key:'stores',    label:'票券合作店家',   value:214,    unit:'家' },
+  { key:'platforms', label:'已上線兌換平台', value:18,     unit:'個' },
+  { key:'orders',    label:'已完成兌換',     value:386520, unit:'筆' }
+];
+
+// 串接項目：SSO 與點數為必要，金流為選配
+const FEATURES = {
+  sso:    { label:'SSO 登入', short:'SSO' },
+  points: { label:'點數串接', short:'點數串接' },
+  pay:    { label:'金流',     short:'金流' }
+};
+
+/* 已上線的兌換平台案例。feats 為串接項目，notes 為各項目的做法；
+   login：平台需會員登入才能瀏覽，「前往兌換平台」改開公開首頁 */
+const CASES = [
+  { id:'x1', name:'晨曦銀行', color:'#3C7DD9', industry:'金融', platform:'晨曦點數兌換平台', launch:'2026/09', login:true,
+    intro:'信用卡與數位帳戶會員可用刷卡累積的晨曦點兌換咖啡、電影與生活票券，點數不足時可加價購。',
+    feats:['sso','points','pay'],
+    notes:{ sso:'會員用網路銀行帳號直接登入，不需另外註冊。', points:'即時查詢晨曦點餘額，兌換時直接扣點。', pay:'點數不足的差額可用該行信用卡支付。' },
+    types:['電子票券','實體商品','服務'], cats:['餐飲','休閒娛樂','購物','美容保養'],
+    shots:['首頁','票券商品列表','點數＋加價購結帳','兌換紀錄'] },
+  { id:'x2', name:'青嶼電信', color:'#1F9DB0', industry:'電信', platform:'青嶼幣兌換商城', launch:'2026/06', login:false,
+    intro:'行動與寬頻用戶可用青嶼幣兌換餐飲與交通票券，兌換後的電子票券直接存在會員 App。',
+    feats:['sso','points','pay'],
+    notes:{ sso:'沿用會員 App 的登入狀態，從 App 點進就是登入狀態。', points:'青嶼幣餘額與帳單系統同步，兌換後即時更新。', pay:'可用電信帳單代收補足差額。' },
+    types:['電子票券','服務'], cats:['餐飲','交通旅遊','生活服務'],
+    shots:['首頁','熱門票券','兌換確認','我的票券'] },
+  /* 實際案例（使用者指定並確認已授權公開，2026-11-07）：截圖存在 exchange-assets/。
+     上線時間尚未確認，先標「待確認」 */
+  { id:'x3', name:'兑兑喜', color:'#F26B21', industry:'票券', platform:'兑兑喜客券平台', launch:'待確認', login:false,
+    url:'https://www.ddgift.com.tw/SYSTEX', imgs:['exchange-assets/ddgift-home.png'],
+    intro:'票券兌換平台（SaaS 版），首頁以分類與活動輪播呈現票券商品，可作為案例詳情頁與票券商品呈現方式的參考。',
+    // 主要功能說明先沿用晨曦銀行的文字示意（使用者指定，2026-11-07），實際做法待確認
+    feats:['sso','points','pay'],
+    notes:{ sso:'會員用網路銀行帳號直接登入，不需另外註冊。', points:'即時查詢晨曦點餘額，兌換時直接扣點。', pay:'點數不足的差額可用該行信用卡支付。' },
+    types:['電子票券'], cats:['集團通用','咖啡飲品','便利生活','百貨美妝','美食餐飲','速食快餐','甜點冰品'],
+    shots:['首頁','品牌總覽','票券商品頁','兌換確認'] },
+  { id:'x4', name:'凌雲航空', color:'#5B6CD6', industry:'交通', platform:'凌雲哩程兌換', launch:'2025/12', login:true,
+    intro:'會員可用哩程兌換機場周邊與旅遊目的地的餐飲、住宿票券，讓小額哩程也有用途。',
+    feats:['sso','points'],
+    notes:{ sso:'用會員卡號登入，與官網會員中心共用帳號。', points:'哩程依固定比例換算，兌換後由會員帳戶扣除。' },
+    types:['電子票券','服務'], cats:['交通旅遊','餐飲','休閒娛樂'],
+    shots:['首頁','目的地票券','哩程兌換確認','兌換紀錄'] },
+  { id:'x5', name:'拾光百貨', color:'#C2569A', industry:'零售', platform:'拾光點數禮品站', launch:'2025/09', login:false,
+    intro:'百貨會員點數除了館內折抵，也能兌換館外合作店家的票券，延伸點數的使用範圍。',
+    feats:['sso','points','pay'],
+    notes:{ sso:'用百貨 App 會員帳號登入。', points:'點數與館內 POS 共用同一個帳戶。', pay:'差額可用信用卡或行動支付補足。' },
+    types:['電子票券','實體商品'], cats:['購物','美容保養','餐飲'],
+    shots:['首頁','品牌專區','結帳','我的票券'] },
+  { id:'x6', name:'禾豐超市', color:'#3FA66B', industry:'零售', platform:'禾豐點數兌換', launch:'2025/06', login:false,
+    intro:'超市會員可用購物累積的點數兌換生鮮箱與生活服務票券。',
+    feats:['sso','points'],
+    notes:{ sso:'用會員手機號碼與簡訊驗證登入。', points:'點數餘額與門市會員系統同步。' },
+    types:['實體商品','服務'], cats:['購物','生活服務'],
+    shots:['首頁','商品分類','兌換確認'] }
+];
+
+/* 票券商品：串接的票券來源與 SENSE 圈企業票券化的商品一起呈現，不顯示來源。order 越大越新上架 */
+const PRODUCTS = [
+  { name:'中杯拿鐵兌換券',     store:'暖橘咖啡',   color:'#E0822A', cat:'餐飲',     type:'電子票券', scope:'門市',      price:120 },
+  { name:'手作蛋糕兌換券',     store:'暖橘咖啡',   color:'#E0822A', cat:'餐飲',     type:'電子票券', scope:'門市',      price:95 },
+  { name:'2D 電影票',          store:'星野影城',   color:'#4C56C9', cat:'休閒娛樂', type:'電子票券', scope:'門市',      price:330 },
+  { name:'爆米花套餐券',       store:'星野影城',   color:'#4C56C9', cat:'休閒娛樂', type:'電子票券', scope:'門市',      price:180 },
+  { name:'購物金 500 元',      store:'禾豐超市',   color:'#3FA66B', cat:'購物',     type:'電子票券', scope:'門市＋線上', price:500 },
+  { name:'禮券 1,000 元',      store:'拾光百貨',   color:'#C2569A', cat:'購物',     type:'實體商品', scope:'門市',      price:1000 },
+  { name:'保養品折價券',       store:'沐森藥妝',   color:'#8A6BC9', cat:'美容保養', type:'電子票券', scope:'門市＋線上', price:200 },
+  { name:'60 分鐘舒壓按摩',    store:'森呼吸 SPA', color:'#2E8F8B', cat:'美容保養', type:'服務',     scope:'門市',      price:1880 },
+  { name:'衣物送洗 10 件',     store:'好日洗衣',   color:'#1F9DB0', cat:'生活服務', type:'服務',     scope:'門市',      price:450 },
+  { name:'30 日騎乘方案',      store:'城市單車',   color:'#E0702A', cat:'交通旅遊', type:'服務',     scope:'線上',      price:299 },
+  { name:'雙人湯屋 90 分鐘',   store:'山嵐溫泉',   color:'#7A5C3E', cat:'休閒娛樂', type:'服務',     scope:'門市',      price:1600 },
+  { name:'大杯鮮果茶兌換券',   store:'青果手搖',   color:'#5FA83A', cat:'餐飲',     type:'電子票券', scope:'門市',      price:75 },
+  { name:'經典便當兌換券',     store:'拾味便當',   color:'#B8860B', cat:'餐飲',     type:'電子票券', scope:'門市',      price:110 },
+  { name:'國內訂房折價券',     store:'行旅旅行社', color:'#2E8F8B', cat:'交通旅遊', type:'電子票券', scope:'線上',      price:1000 },
+  { name:'運動毛巾組',         store:'晨跑運動',   color:'#3C7DD9', cat:'購物',     type:'實體商品', scope:'線上',      price:680 },
+  { name:'生鮮蔬果箱',         store:'禾豐超市',   color:'#3FA66B', cat:'購物',     type:'實體商品', scope:'線上',      price:799 },
+  { name:'棉被清洗 1 件',      store:'好日洗衣',   color:'#1F9DB0', cat:'生活服務', type:'服務',     scope:'門市',      price:380 },
+  { name:'IMAX 電影票',        store:'星野影城',   color:'#4C56C9', cat:'休閒娛樂', type:'電子票券', scope:'門市',      price:450 },
+  { name:'濾掛咖啡禮盒',       store:'暖橘咖啡',   color:'#E0822A', cat:'餐飲',     type:'實體商品', scope:'線上',      price:520 },
+  { name:'保健食品禮盒',       store:'沐森藥妝',   color:'#8A6BC9', cat:'美容保養', type:'實體商品', scope:'門市＋線上', price:1280 }
+].map((p, i) => ({ ...p, id:'p' + (i + 1), order:i }));
+
+const PRODUCT_CATS = ['餐飲','購物','休閒娛樂','美容保養','生活服務','交通旅遊'];
+const CATEGORIES = [ { key:'all', label:'ALL' }, ...PRODUCT_CATS.map(c => ({ key:c, label:c })) ];
+const SORTS = [
+  { key:'newest', label:'最新上架' },
+  { key:'low',    label:'面額：低到高' },
+  { key:'high',   label:'面額：高到低' }
+];
+const PER_PAGE = 12;
+const MEMBER_SIZES = ['10 萬人以下','10–50 萬人','50–100 萬人','100 萬人以上'];
+const LAUNCHES = ['2027 Q1','2027 Q2','2027 Q3','2027 Q4','尚未確定'];
+
+// 產業標示：大樓圖示（同點數 SENSE 數據盤「已串接企業」）
+const IC_INDUSTRY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V6.5L12 4v16M12 9l7 2.5V20M3.5 20h17M8 9h1M8 12h1M8 15h1M15 14h1M15 17h1"/></svg>';
+// 上線時間：日曆圖示
+const IC_DATE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/></svg>';
+const IC_EXT = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4h5v5M16 4l-7 7M14 12v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h3"/></svg>';
+const IC_IMG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M20.5 16l-5-5-8.5 8.5"/></svg>';
+const IC_CLOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>';
+const IC_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+const IC_CHEV = { prev:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.5 4.5 7 10l5.5 5.5"/></svg>',
+                  next:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 4.5 13 10l-5.5 5.5"/></svg>' };
+// 數據卡與功能說明的圖示（24×24 線條）
+const IC = {
+  products:'<path d="M4 8.5V6a1.5 1.5 0 0 1 1.5-1.5h13A1.5 1.5 0 0 1 20 6v2.5a2 2 0 0 0 0 4V15a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 15v-2.5a2 2 0 0 0 0-4zM14 4.5v12" transform="translate(0 1.5)"/>',
+  stores:'<path d="M4 9.5V19h16V9.5M3 9.5l1.5-5h15l1.5 5zM3 9.5a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0M9.5 19v-5h5v5"/>',
+  platforms:'<rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="M3 9h18M6.5 6.75h.01M9 6.75h.01"/>',
+  orders:'<path d="M6 3.5h12v17l-3-2-3 2-3-2-3 2zM9 8.5h6M9 12h6M9 15.5h3"/>',
+  sso:'<rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5M12 14.5v2"/>',
+  points:'<circle cx="12" cy="12" r="8"/><path d="M14.5 9.2c-.5-.8-1.4-1.2-2.5-1.2-1.4 0-2.5.8-2.5 1.9 0 2.6 5 1.4 5 4.2 0 1.1-1.1 1.9-2.5 1.9-1.1 0-2.1-.5-2.6-1.3M12 6.5V8M12 16v1.5"/>',
+  pay:'<rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3 9.5h18M7 15h4"/>'
+};
+const svgIc = (k, cls = '') => `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[k]}</svg>`;
+
+/* ═════════ 狀態 ═════════
+   申請內容存在瀏覽器（localStorage），重新整理或下次開啟仍顯示「申請處理中」；申請處理中的對話框可重設示範狀態 */
+const STORE_KEY = 'sense.exchangeApplication';
+function loadApplication(){ try { return JSON.parse(localStorage.getItem(STORE_KEY)); } catch(e){ return null; } }
+function saveApplication(v){ try { v ? localStorage.setItem(STORE_KEY, JSON.stringify(v)) : localStorage.removeItem(STORE_KEY); } catch(e){} }
+let application = loadApplication();
+
+const state = { cat:'all', query:'', sort:'newest', page:1 };
+const { esc } = SenseUI;
+const num = (n) => n.toLocaleString('en-US');
+const featTags = (c) => c.feats.map(f => `<span class="ex-tag">${FEATURES[f].short}</span>`).join('');
+const placeholder = (label, sub = '') => `${IC_IMG}<span>${esc(label)}</span>${sub ? `<small>${esc(sub)}</small>` : ''}`;
+
+/* ═════════ 主頁：數據盤 ═════════ */
+function renderDash(){
+  document.getElementById('dash').innerHTML = DASH.map(d => `
+    <div class="ex-stat">
+      <div class="ex-stat-head">${svgIc(d.key, 'ic')}<span>${d.label}</span></div>
+      <b>${flapNumber(d.value)}${d.unit}</b>
+    </div>`).join('');
+  playFlaps(document.getElementById('dash'));
+}
+
+/* 翻牌數字：每個數字一塊牌（上下兩半），不加千分位逗號。
+   會播動畫時先放空白牌，捲進畫面再翻到實際數字；不播時直接顯示數字 */
+const FLAP = { flips:6, dur:118, stagger:30 };   // 每位數翻 6 次（含最後一次）、每次 0.118 秒、相鄰數字錯開 0.03 秒；6 位數整段約 0.8 秒（使用者指定，2026-11-07）
+const flapMotion = 'IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+const halves = (ch) => `<span class="h top"><b>${ch}</b></span><span class="h bot"><b>${ch}</b></span>`;
+function flapNumber(value){
+  const s = String(value);   // 不加千分位逗號（使用者指定，2026-11-07）
+  return `<span class="ex-flaps" role="img" aria-label="${s}">${[...s].map(ch =>
+    `<span class="ex-flap" data-to="${ch}" aria-hidden="true">${halves(flapMotion ? '' : ch)}</span>`).join('')}</span>`;
+}
+
+/* 翻一次：靜態上半片先換成下一個字，舊字的上半片往下翻到 90°，接著新字的下半片從 90° 翻下來蓋住舊的下半片 */
+function flipOnce(tile, to){
+  return new Promise(resolve => {
+    const top = tile.querySelector('.top b'), bot = tile.querySelector('.bot b');
+    const make = (cls, ch, deg) => {
+      const el = document.createElement('span');
+      el.className = `h ${cls} flap`; el.innerHTML = `<b>${ch}</b>`; el.style.transform = `rotateX(${deg}deg)`;
+      tile.appendChild(el); return el;
+    };
+    const from = top.textContent;
+    const fallTop = make('top', from, 0), fallBot = make('bot', to, 90);
+    top.textContent = to;
+    const half = FLAP.dur / 2;
+    fallTop.animate([{ transform:'rotateX(0deg)' }, { transform:'rotateX(-90deg)' }], { duration:half, easing:'ease-in', fill:'forwards' }).onfinish = () => {
+      fallTop.remove();
+      fallBot.animate([{ transform:'rotateX(90deg)' }, { transform:'rotateX(0deg)' }], { duration:half, easing:'ease-out', fill:'forwards' }).onfinish = () => {
+        bot.textContent = to; fallBot.remove(); resolve();
+      };
+    };
+  });
+}
+/* 每次翻牌依固定時間點開始（不等上一次結束），每格之間的換幀延遲不會累積，整段長度才穩定 */
+function flipTile(tile, delay){
+  const seq = [];
+  let prev = '';
+  for (let i = 1; i < FLAP.flips; i++){
+    let d; do { d = String(Math.floor(Math.random() * 10)); } while (d === prev);
+    seq.push(prev = d);
+  }
+  seq.push(tile.dataset.to);
+  seq.forEach((d, i) => setTimeout(() => flipOnce(tile, d), delay + i * FLAP.dur));
+}
+/* 捲進畫面時播一次；每張數據卡各自從第一位數開始錯開 */
+const flapIO = flapMotion ? new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    flapIO.unobserve(e.target);
+    e.target.querySelectorAll('.ex-flap').forEach((t, i) => flipTile(t, i * FLAP.stagger));
+  });
+}, { threshold:.6 }) : null;
+function playFlaps(root){ if (flapIO) root.querySelectorAll('.ex-flaps').forEach(el => flapIO.observe(el)); }
+
+/* ═════════ 主頁：案例卡片 ═════════ */
+// 產業＋上線時間（圖示＋文字），案例卡片與詳情頁標題共用
+const metaRow = (c) => `<span class="ex-industry" title="產業">${IC_INDUSTRY}${esc(c.industry)}</span>
+  <span class="ex-industry" title="上線時間" aria-label="上線時間 ${c.launch}">${IC_DATE}${c.launch}</span>`;
+function caseCard(c){
+  return `
+    <article class="ex-card" data-case="${c.id}" tabindex="0" aria-label="${esc(c.name)}，${esc(c.platform)}，查看案例">
+      <div class="ex-tab" title="${esc(c.name)}">${SenseUI.orgLogo(c)}<span class="org-name">${esc(c.name)}</span></div>
+      <div class="ex-card-body">
+        ${shot(c, 0, 'ex-shot', placeholder('兌換平台畫面截圖', '示意'))}
+        <div class="ex-card-intro">
+          <h3 class="ex-card-title" title="${esc(c.platform)}">${esc(c.platform)}</h3>
+          <div class="ex-meta">
+            ${metaRow(c)}
+          </div>
+        </div>
+        <div class="ex-feats" aria-label="主要功能">${featTags(c)}</div>
+        <div class="ex-card-actions">
+          <a class="btn btn-secondary" href="#case=${c.id}">案例詳情頁</a>
+          <a class="btn btn-primary" href="#" data-ext="${c.id}" target="_blank" rel="noopener">前往兌換平台</a>
+        </div>
+      </div>
+    </article>`;
+}
+function renderCases(){
+  document.getElementById('case-grid').innerHTML = [...CASES].sort((a, b) => b.launch.localeCompare(a.launch)).map(caseCard).join('');
+}
+
+/* 截圖：有實際圖片（c.imgs[i]）時顯示圖片，否則顯示灰底示意框 */
+function shot(c, i, cls, fallback, attrs = ''){
+  const src = c.imgs && c.imgs[i];
+  return src ? `<div class="${cls} ex-img" ${attrs}><img src="${src}" alt="${esc(c.platform)}畫面截圖" loading="lazy"></div>`
+             : `<div class="${cls} ex-ph" ${attrs}>${fallback}</div>`;
+}
+
+/* 前往兌換平台：有實際網址的案例直接開新分頁；其他示意案例用提示說明正式版的行為 */
+function openPlatform(c){
+  if (c.url) return window.open(c.url, '_blank', 'noopener');
+  SenseShell.toast(c.login
+    ? `正式版會以新分頁開啟「${c.platform}」的公開首頁（平台需會員登入）`
+    : `正式版會以新分頁開啟「${c.platform}」`);
+}
+
+/* ═════════ 主頁：票券商品 ═════════ */
+function productCard(p){
+  const label = p.type === '實體商品' ? '價格' : '面額';
+  return `
+    <button class="r-card ex-prod" data-todo="票券商品詳情" aria-label="${esc(p.name)}，${esc(p.store)}，${label} ${num(p.price)} 元">
+      <span class="r-card-media">
+        <span class="r-card-img"><span class="ex-ph">${placeholder('商品圖片')}</span><span class="ex-prod-type">${p.type}</span></span>
+      </span>
+      <span class="r-card-title" title="${esc(p.name)}">${esc(p.name)}</span>
+      <span class="r-card-org">${SenseUI.orgLogo({ name:p.store, color:p.color })}<span class="org-name">${esc(p.store)}</span></span>
+      <span class="r-card-metrics">
+        <span class="metric"><small>${label}</small><b>NT$ ${num(p.price)}</b></span><span class="divider"></span>
+        <span class="metric"><small>適用範圍</small><b>${p.scope}</b></span>
+      </span>
+    </button>`;
+}
+
+function filtered(){
+  const q = state.query.toLowerCase();
+  const list = PRODUCTS.filter(p => (state.cat === 'all' || p.cat === state.cat)
+    && (!q || [p.name, p.store, p.type, p.cat].some(t => t.toLowerCase().includes(q))));
+  const by = { newest:(a, b) => b.order - a.order, low:(a, b) => a.price - b.price, high:(a, b) => b.price - a.price }[state.sort];
+  return list.sort(by);
+}
+
+function renderList(){
+  const list = filtered();
+  const pages = Math.max(1, Math.ceil(list.length / PER_PAGE));
+  state.page = Math.min(state.page, pages);
+  const slice = list.slice((state.page - 1) * PER_PAGE, state.page * PER_PAGE);
+  document.getElementById('grid').innerHTML = slice.length
+    ? slice.map(productCard).join('')
+    : `<p class="empty" style="grid-column:1/-1">找不到符合「${esc(state.query || state.cat)}」的票券商品<br>換個關鍵字或分類試試看</p>`;
+  document.getElementById('pager').innerHTML = SenseUI.pagination(state.page, pages);
+}
+
+function renderChips(){ document.getElementById('chips').innerHTML = SenseUI.chips(CATEGORIES, state.cat); }
+
+/* 右下角「申請兌換平台」：主頁一律顯示，案例詳情頁只在單欄時顯示；送出後改為「申請處理中」 */
+function renderFab(onHome){
+  const fab = document.getElementById('fab');
+  fab.hidden = false;
+  fab.classList.toggle('on-detail', !onHome);   // 詳情頁：只在單欄（窄於 1280px）時顯示，見 CSS
+  fab.classList.toggle('is-pending', !!application);
+  fab.innerHTML = application
+    ? `<span class="round-icon">${IC_CLOCK}</span><span class="cta-label">申請處理中</span>`
+    : `<span class="round-icon"><img src="shared/assets/ic-plus.svg" alt=""></span><span class="cta-label">申請兌換平台</span>`;
+}
+
+/* ═════════ 案例詳情頁 ═════════ */
+// 資訊卡：沿用新增商品表單的分組卡片（.form-card＋.form-group-title）
+function panel(id, title, body){
+  return `
+    <section class="form-card form-group ex-panel" aria-labelledby="${id}">
+      <div class="form-group-title"><h2 id="${id}">${title}</h2></div>
+      <div class="ex-panel-body">${body}</div>
+    </section>`;
+}
+
+function carousel(c){
+  const n = c.shots.length;
+  return `
+    <div class="ex-carousel" id="carousel">
+      <div class="ex-stage">
+        <div class="ex-slides" tabindex="0" aria-label="畫面截圖，共 ${n} 張，可左右滑動">
+          ${c.shots.map((s, i) => shot(c, i, 'ex-slide', placeholder(`畫面截圖 ${i + 1}／${n}：${s}`, '示意'), `role="group" aria-label="第 ${i + 1} 張，${esc(s)}"`)).join('')}
+        </div>
+        <button type="button" class="ex-nav prev" data-slide="-1" aria-label="上一張">${IC_CHEV.prev}</button>
+        <button type="button" class="ex-nav next" data-slide="1" aria-label="下一張">${IC_CHEV.next}</button>
+      </div>
+      <div class="ex-dots">${c.shots.map((s, i) => `<button type="button" data-dot="${i}" aria-label="第 ${i + 1} 張：${esc(s)}"></button>`).join('')}</div>
+    </div>`;
+}
+
+// 申請卡：未申請 → 申請按鈕；申請處理中 → 狀態標籤＋查看申請內容
+function applyPanel(){
+  const head = application ? '<span class="ex-tag"><span class="dot"></span>申請處理中</span>' : '';
+  const body = application
+    ? `<p class="ex-note">已於 ${application.date} 送出申請，專人將與您聯繫，洽談串接與上線時程。</p>
+       <button type="button" class="btn btn-secondary" data-act="status">查看申請內容</button>`
+    : `<p class="ex-note">想為會員打造一樣的兌換平台？兌換平台需完成 SSO 與點數串接，送出申請後由專人與您聯繫。</p>
+       <button type="button" class="btn btn-primary" data-act="apply">申請兌換平台</button>`;
+  return `
+    <section class="form-card ex-panel ex-xpanel" aria-labelledby="xp-title">
+      <div class="ex-xp-head"><h2 id="xp-title">打造你的兌換平台</h2>${head}</div>
+      <div class="ex-panel-body">${body}</div>
+    </section>`;
+}
+
+function renderCase(c){
+  const view = document.getElementById('view-case');
+  view.innerHTML = `
+    <div class="ex-detail">
+      <div>
+        <section class="content-section ex-co" aria-label="案例資訊">
+          <div class="ex-co-head">
+            ${SenseUI.orgLogo(c)}
+            <div class="ex-co-title">
+              <h1>${esc(c.platform)}</h1>
+              <span class="sub">${esc(c.name)}</span>
+              <div class="ex-meta">${metaRow(c)}</div>
+            </div>
+          </div>
+          <p class="ex-co-intro">${esc(c.intro)}</p>
+        </section>
+        ${panel('shot-title', '畫面截圖', carousel(c) + `
+          <div class="ex-ext-actions">
+            <button type="button" class="btn btn-secondary" data-ext="${c.id}">前往兌換平台${IC_EXT}</button>
+            ${c.login ? '<p class="ex-note muted">此平台需會員登入才能瀏覽，將開啟平台的公開首頁。</p>' : ''}
+          </div>`)}
+        ${panel('feat-title', '主要功能說明', `
+          <div class="ex-feat-list">${c.feats.map(f => `
+            <div class="ex-feat">
+              <span class="ex-feat-ic">${svgIc(f)}</span>
+              <div><h3>${FEATURES[f].label}${f === 'pay' ? '<span class="ex-tag">選配</span>' : ''}</h3><p>${esc(c.notes[f])}</p></div>
+            </div>`).join('')}
+          </div>`)}
+        ${panel('type-title', '提供的票券商品', `
+          <div class="ex-types">
+            <div class="ro-item"><span class="ro-label">商品類型</span><div>${c.types.map(t => `<span class="ex-tag">${t}</span>`).join('')}</div></div>
+            <div class="ro-item"><span class="ro-label">商品分類</span><div>${c.cats.map(t => `<span class="ex-tag">${t}</span>`).join('')}</div></div>
+          </div>`)}
+      </div>
+      <div class="ex-aside">
+        <div id="xp">${applyPanel()}</div>
+      </div>
+    </div>`;
+  bindCarousel(document.getElementById('carousel'));
+}
+
+/* 輪播：左右鈕捲動一張，圓點跟著捲動位置更新 */
+function bindCarousel(root){
+  const track = root.querySelector('.ex-slides'), dots = [...root.querySelectorAll('[data-dot]')];
+  const prev = root.querySelector('.prev'), next = root.querySelector('.next');
+  const go = (i) => track.scrollTo({ left:i * track.clientWidth });
+  const sync = () => {
+    const i = Math.round(track.scrollLeft / track.clientWidth);
+    dots.forEach((d, k) => d.setAttribute('aria-current', k === i));
+    prev.disabled = i === 0; next.disabled = i === dots.length - 1;
+    return i;
+  };
+  root.addEventListener('click', (e) => {
+    const s = e.target.closest('[data-slide]'), d = e.target.closest('[data-dot]');
+    if (s) go(sync() + +s.dataset.slide);
+    if (d) go(+d.dataset.dot);
+  });
+  track.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight'){ e.preventDefault(); go(sync() + 1); }
+    if (e.key === 'ArrowLeft'){ e.preventDefault(); go(sync() - 1); }
+  });
+  track.addEventListener('scroll', sync, { passive:true });
+  sync();
+}
+
+/* ═════════ 路由：主頁（#cases、#products 捲到區塊）、#case=x1 案例詳情 ═════════ */
+const app = document.querySelector('.app');
+let current = null;
+function route(){
+  const m = location.hash.match(/^#case=(\w+)/);
+  const c = m && CASES.find(x => x.id === m[1]);
+  current = c || null;
+  document.getElementById('view-home').hidden = !!c;
+  document.getElementById('view-case').hidden = !c;
+  app.dataset.page = c ? 'case' : 'home';
+  if (c) app.dataset.crumb = c.platform; else delete app.dataset.crumb;
+  SenseShell.refresh();
+  renderFab(!c);
+  if (c){ renderCase(c); window.scrollTo(0, 0); }
+  else {
+    const id = location.hash.slice(1);
+    if (['dashboard','cases','products'].includes(id)) document.getElementById(id).scrollIntoView({ block:'start' });
+  }
+}
+// 申請狀態改變後重畫按鈕與申請卡
+function rerender(){
+  renderFab(!current);
+  if (current) document.getElementById('xp').innerHTML = applyPanel();
+}
+
+/* ═════════ 對話框 ═════════ */
+const dlg = document.getElementById('dlg'), form = document.getElementById('dlg-form');
+let onSubmit = null;
+function openDialog({ title, body, foot, wide = false, submit = null }){
+  dlg.classList.toggle('wide', wide);
+  form.innerHTML = `
+    <div class="ex-dlg-head"><h2 id="dlg-title">${title}</h2><button type="button" class="ex-dlg-x" data-close aria-label="關閉">×</button></div>
+    <div class="ex-dlg-body">${body}</div>
+    <div class="ex-dlg-foot">${foot}</div>`;
+  onSubmit = submit;
+  if (!dlg.open) dlg.showModal();
+  const first = form.querySelector('.ex-dlg-body input:not([readonly]):not([type=radio]):not([type=checkbox]), .ex-dlg-foot .btn-primary');
+  if (first) first.focus();
+}
+form.addEventListener('click', (e) => { if (e.target.closest('[data-close]')) dlg.close(); });
+dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });  // 點背景關閉
+form.addEventListener('submit', (e) => { e.preventDefault(); if (onSubmit) onSubmit(); });
+
+/* 申請兌換平台：申請 → 平台洽談 → 開發上線，無法自動產生 */
+function openApply(){
+  const select = (name, items) => `<select class="select" name="${name}" required>
+      <option value="" disabled selected>請選擇</option>${items.map(i => `<option>${i}</option>`).join('')}</select>`;
+  const field = (label, html, { req = false, error = '' } = {}) => `
+    <div class="field"><label class="field-label">${label}${req ? '<span class="req">*</span>' : ''}</label>${html}
+      ${error ? `<span class="field-error">${error}</span>` : ''}</div>`;
+  const opt = (type, name, value, head, sub, { checked = false, locked = false } = {}) => `
+    <label class="ex-opt"><input type="${type}" name="${name}" value="${value}"${checked ? ' checked' : ''}${locked ? ' disabled' : ''}>
+      <span><b>${head}</b><small>${sub}</small></span></label>`;
+  openDialog({
+    title:'申請兌換平台', wide:true,
+    body:`
+      <div class="ex-flow" aria-label="申請流程"><span>送出申請</span><i>→</i><span>專人洽談</span><i>→</i><span>開發上線</span></div>
+      <p class="ex-note">兌換平台需完成 SSO 與點數串接，無法自動開通。送出後專人將與您聯繫，洽談串接細節與上線時程。</p>
+      <div class="form-row">
+        ${field('企業名稱', `<input class="input" name="company" value="${esc(ME.name)}" readonly>`)}
+        ${field('會員規模', select('members', MEMBER_SIZES), { req:true, error:'請選擇會員規模' })}
+      </div>
+      <div class="form-row">
+        ${field('聯絡人', '<input class="input" name="contact" placeholder="姓名" required>', { req:true, error:'請填寫聯絡人' })}
+        ${field('聯絡電話', '<input class="input" type="tel" name="phone" placeholder="例：02-1234-5678" required>', { req:true, error:'請填寫聯絡電話' })}
+      </div>
+      ${field('Email', '<input class="input" type="email" name="email" placeholder="name@company.com" required>', { req:true, error:'請填寫有效的 Email' })}
+      <div class="field"><span class="field-label">是否已有點數制度</span>
+        <div class="ex-opts">
+          ${opt('radio', 'hasPoints', 'yes', '已有點數制度', '會員已能累積與使用點數', { checked:true })}
+          ${opt('radio', 'hasPoints', 'no', '尚未建立', '可與專人討論點數規劃')}
+        </div>
+      </div>
+      <div class="field"><span class="field-label">需要的串接</span>
+        <div class="ex-opts three">
+          ${opt('checkbox', 'sso', 'sso', `${FEATURES.sso.label}<span class="ex-tag blue">必要</span>`, '會員用原帳號登入', { checked:true, locked:true })}
+          ${opt('checkbox', 'points', 'points', `${FEATURES.points.label}<span class="ex-tag blue">必要</span>`, '查詢與扣抵會員點數', { checked:true, locked:true })}
+          ${opt('checkbox', 'pay', 'pay', `${FEATURES.pay.label}<span class="ex-tag">選配</span>`, '點數不足時補差額')}
+        </div>
+      </div>
+      ${field('預計上線時間', select('launch', LAUNCHES))}
+      ${field('備註', '<textarea class="textarea short" name="memo" placeholder="其他想讓我們知道的事"></textarea>')}`,
+    foot:`<button type="button" class="btn btn-secondary" data-close>取消</button><button type="submit" class="btn btn-primary">送出申請</button>`,
+    submit(){
+      let ok = true;
+      ['members','contact','phone','email'].forEach(n => {
+        const el = form.elements[n], bad = !el.value.trim() || (n === 'email' && !el.checkValidity());
+        el.classList.toggle('is-invalid', bad); el.closest('.field').classList.toggle('has-error', bad);
+        if (bad && ok){ el.focus(); ok = false; }
+      });
+      if (!ok) return;
+      const f = form.elements;
+      application = { date:today(), contact:f.contact.value.trim(), phone:f.phone.value.trim(), email:f.email.value.trim(), members:f.members.value,
+        hasPoints:f.hasPoints.value === 'yes', feats:['sso','points', ...(f.pay.checked ? ['pay'] : [])], launch:f.launch.value || '尚未確定' };
+      saveApplication(application); rerender();
+      openDialog({
+        title:'申請兌換平台',
+        body:`<div class="ex-done"><span class="ex-done-ic">${IC_CHECK}</span><h3>已收到您的申請</h3>
+          <p>專人將與您聯繫，洽談 SSO 與點數串接細節。<br>處理期間可隨時在本頁查看申請內容。</p></div>`,
+        foot:`<button type="button" class="btn btn-primary" data-close>完成</button>`
+      });
+    }
+  });
+}
+
+/* 申請處理中：顯示送出的內容；左下角可重設示範狀態（原型用） */
+function openStatus(){
+  const a = application;
+  const item = (label, value) => `<div class="ro-item"><span class="ro-label">${label}</span><span class="ro-value">${esc(value)}</span></div>`;
+  openDialog({
+    title:'申請處理中',
+    body:`
+      <div class="ex-done"><span class="ex-done-ic pending">${IC_CLOCK}</span><h3>專人將與您聯繫</h3>
+        <p>已於 ${a.date} 送出申請，我們正在安排專人洽談。</p></div>
+      <div class="ex-summary">
+        ${item('聯絡人', a.contact)}${item('聯絡電話', a.phone || '—')}${item('Email', a.email)}
+        ${item('會員規模', a.members)}${item('點數制度', a.hasPoints ? '已有點數制度' : '尚未建立')}
+        ${item('需要的串接', a.feats.map(f => FEATURES[f].short).join('、'))}${item('預計上線時間', a.launch)}
+      </div>`,
+    foot:`<button type="button" class="ex-reset" data-reset>重設示範狀態</button><span class="spacer"></span>
+      <button type="button" class="btn btn-primary" data-close>關閉</button>`
+  });
+}
+form.addEventListener('click', (e) => {
+  if (!e.target.closest('[data-reset]')) return;
+  application = null; saveApplication(null); rerender(); dlg.close();
+  SenseShell.toast('已重設為尚未申請');
+});
+
+function today(){
+  const d = new Date(), p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}/${p(d.getMonth() + 1)}/${p(d.getDate())}`;
+}
+
+/* ═════════ 事件 ═════════ */
+SenseShell.mount();
+
+renderDash();
+renderCases();
+renderChips();
+renderList();
+document.getElementById('chips').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-chip]'); if (!b) return;
+  state.cat = b.dataset.chip; state.page = 1; renderChips(); renderList();
+});
+const actions = document.getElementById('list-actions');
+actions.innerHTML = SenseUI.listActions({ sorts:SORTS, sort:state.sort, placeholder:'搜尋商品或店家名稱' });
+SenseUI.bindListActions(actions, {
+  onQuery: (q) => { state.query = q; state.page = 1; renderList(); },
+  onSort:  (k) => { state.sort = k; state.page = 1; renderList(); }
+});
+document.getElementById('pager').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-page]'); if (!b || b.disabled) return;
+  state.page = +b.dataset.page; renderList();
+  document.getElementById('products').scrollIntoView({ behavior:'smooth', block:'start' });
+});
+
+// 案例卡片：底部連結開兌換平台，其他位置進案例詳情
+const caseGrid = document.getElementById('case-grid');
+caseGrid.addEventListener('click', (e) => {
+  const ext = e.target.closest('[data-ext]');
+  if (ext){ e.preventDefault(); return openPlatform(CASES.find(c => c.id === ext.dataset.ext)); }
+  const c = e.target.closest('[data-case]'); if (c) location.hash = 'case=' + c.dataset.case;
+});
+caseGrid.addEventListener('keydown', (e) => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-case]')){ e.preventDefault(); location.hash = 'case=' + e.target.dataset.case; }
+});
+
+document.getElementById('fab').addEventListener('click', () => application ? openStatus() : openApply());
+
+document.getElementById('view-case').addEventListener('click', (e) => {
+  const t = e.target.closest('[data-act],[data-ext]'); if (!t || !current) return;
+  if (t.dataset.ext) return openPlatform(current);
+  if (t.dataset.act === 'apply') openApply();
+  if (t.dataset.act === 'status') openStatus();
+});
+
+window.addEventListener('hashchange', route);
+route();
+</script>
+</body>
+</html>

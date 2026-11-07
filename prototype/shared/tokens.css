@@ -32,6 +32,8 @@
   --mod-finance:#FFDD80;   --mod-finance-strong:#B8860B;
   /* 點數 SENSE 模組色暫用灰階（2026-11-06），正式色待定 */
   --mod-points:var(--black-400); --mod-points-strong:var(--black-700);
+  /* 兌換 SENSE 模組色同點數暫用灰階（2026-11-06），正式色待定 */
+  --mod-exchange:var(--black-400); --mod-exchange-strong:var(--black-700);
 
   /* 目前模組的強調色（各頁在 .app[data-module] 覆寫） */
   --accent:#4D9DF8; --accent-border:#1A81F6;
