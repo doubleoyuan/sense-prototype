@@ -54,6 +54,11 @@
   /* ── CaseCard：案例卡片。沿用點數 SENSE 企業卡片的頁籤模板（只有公司頁籤） ──
      兩種前往方式：底部兩顆按鈕並列——左「案例詳情頁」、右「前往兌換平台」（新分頁開啟）；點卡片其他位置同樣進案例詳情頁。
      滑到按鈕上時卡片外框不變色，避免以為點的是整張卡片 */
+  /* 合作兌換平台共 8 張：4／2／1 欄都能排滿；排 3 欄時只顯示前 6 張（依上線時間新到舊，藏最舊的 2 張），避免最後一排空一格。
+     斷點對應 components.css 的 .card-grid：900–1023px、1280–1559px 為 3 欄 */
+  @media (min-width:900px) and (max-width:1023px), (min-width:1280px) and (max-width:1559px){
+    .ex-case-grid > :nth-child(n+7){display:none}
+  }
   .ex-card{--ex-line:var(--black-300);display:flex;flex-direction:column;cursor:pointer;filter:drop-shadow(0 4px 0 var(--black-200))}
   .ex-card:hover:not(:has(.ex-card-actions:hover)),.ex-card:focus-visible{--ex-line:var(--hover-line);outline:0}
   .ex-tab{position:relative;z-index:1;margin-bottom:-1px;padding:14px 20px 12px;display:flex;align-items:center;gap:10px;
@@ -80,6 +85,11 @@
      卡片窄（4 欄時內容約 235px）放不下 .btn 的最小寬度 120px，改為可縮、內距與字距收小 */
   .ex-card-actions{display:flex;gap:12px;margin-top:auto}  /* 推到卡片底部，各卡片的按鈕才會對齊 */
   .ex-card-actions .btn{flex:1;min-width:0;padding:0 12px;letter-spacing:var(--tracking-wider);white-space:nowrap}
+
+  /* 載入更多（手機版）：合作兌換平台與票券商品先顯示 4 張，按一次多顯示 4 張；沿用 .btn-secondary */
+  .ex-more{width:100%;display:flex;justify-content:center}
+  .ex-more:empty{display:none}
+  .ex-more .btn{min-width:200px}
 
   /* 標籤：共用的 StatusTag（.status-tag）；橘色同點數 SENSE（CTA 橘），先留在頁內 */
   .status-tag.orange{background:var(--metric-bg);color:var(--cta-orange)}
@@ -245,7 +255,8 @@
         <div class="section-title" id="cases">
           <h2 id="cases-title">合作兌換平台</h2>
         </div>
-        <div class="card-grid" id="case-grid"></div>
+        <div class="card-grid ex-case-grid" id="case-grid"></div>
+        <div class="ex-more" id="case-more"></div>
       </section>
 
       <!-- 區塊三：票券商品（不區分來源） -->
@@ -259,6 +270,7 @@
         </div>
         <div class="card-grid" id="grid" aria-live="polite"></div>
         <div class="pager" id="pager"></div>
+        <div class="ex-more" id="product-more"></div>
       </section>
     </main>
 
@@ -381,7 +393,9 @@ const SORTS = [
   { key:'low',    label:'面額：低到高' },
   { key:'high',   label:'面額：高到低' }
 ];
-const PER_PAGE = 12;
+// 每頁數量同合作兌換平台：8 項（4／2 欄剛好整排）；排 3 欄時 6 項（斷點同 .ex-case-grid 的 CSS）
+const threeColMQ = matchMedia('(min-width:900px) and (max-width:1023px), (min-width:1280px) and (max-width:1559px)');
+const perPage = () => threeColMQ.matches ? 6 : 8;
 const MEMBER_SIZES = ['10 萬人以下','10–50 萬人','50–100 萬人','100 萬人以上'];
 const LAUNCHES = ['2027 Q1','2027 Q2','2027 Q3','2027 Q4','尚未確定'];
 
@@ -416,7 +430,12 @@ function loadApplication(){ try { return JSON.parse(localStorage.getItem(STORE_K
 function saveApplication(v){ try { v ? localStorage.setItem(STORE_KEY, JSON.stringify(v)) : localStorage.removeItem(STORE_KEY); } catch(e){} }
 let application = loadApplication();
 
-const state = { cat:'all', query:'', sort:'newest', page:1 };
+const state = { cat:'all', query:'', sort:'newest', page:1, shown:4 };
+// 手機版（單欄）改用「載入更多」：合作兌換平台與票券商品先顯示 4 張，每按一次多 4 張
+const mobileMQ = matchMedia('(max-width:559px)');
+const MORE_STEP = 4;
+let caseShown = MORE_STEP;
+const moreBtn = () => '<button type="button" class="btn btn-secondary" data-more>載入更多</button>';
 const { esc } = SenseUI;
 const num = (n) => n.toLocaleString('en-US');
 const featTags = (c) => c.feats.map(f => `<span class="status-tag">${FEATURES[f].short}</span>`).join('');
@@ -510,7 +529,10 @@ function caseCard(c){
     </article>`;
 }
 function renderCases(){
-  document.getElementById('case-grid').innerHTML = [...CASES].sort((a, b) => b.launch.localeCompare(a.launch)).map(caseCard).join('');
+  const list = [...CASES].sort((a, b) => b.launch.localeCompare(a.launch));
+  const shown = mobileMQ.matches ? list.slice(0, caseShown) : list;
+  document.getElementById('case-grid').innerHTML = shown.map(caseCard).join('');
+  document.getElementById('case-more').innerHTML = shown.length < list.length ? moreBtn() : '';
 }
 
 /* 截圖：有實際圖片（c.imgs[i]）時顯示圖片，否則顯示灰底示意框 */
@@ -555,13 +577,17 @@ function filtered(){
 
 function renderList(){
   const list = filtered();
-  const pages = Math.max(1, Math.ceil(list.length / PER_PAGE));
+  const mobile = mobileMQ.matches;
+  const per = perPage();
+  const pages = Math.max(1, Math.ceil(list.length / per));
   state.page = Math.min(state.page, pages);
-  const slice = list.slice((state.page - 1) * PER_PAGE, state.page * PER_PAGE);
+  // 手機版不分頁，改為從頭顯示到 state.shown 張
+  const slice = mobile ? list.slice(0, state.shown) : list.slice((state.page - 1) * per, state.page * per);
+  document.getElementById('product-more').innerHTML = mobile && slice.length < list.length ? moreBtn() : '';
   document.getElementById('grid').innerHTML = slice.length
     ? slice.map(productCard).join('')
     : `<p class="empty" style="grid-column:1/-1">找不到符合「${esc(state.query || state.cat)}」的票券商品<br>換個關鍵字或分類試試看</p>`;
-  document.getElementById('pager').innerHTML = SenseUI.pagination(state.page, pages);
+  document.getElementById('pager').innerHTML = mobile ? '' : SenseUI.pagination(state.page, pages);
 }
 
 function renderChips(){ document.getElementById('chips').innerHTML = SenseUI.chips(CATEGORIES, state.cat); }
@@ -825,13 +851,13 @@ renderChips();
 renderList();
 document.getElementById('chips').addEventListener('click', (e) => {
   const b = e.target.closest('[data-chip]'); if (!b) return;
-  state.cat = b.dataset.chip; state.page = 1; renderChips(); renderList();
+  state.cat = b.dataset.chip; state.page = 1; state.shown = MORE_STEP; renderChips(); renderList();
 });
 const actions = document.getElementById('list-actions');
 actions.innerHTML = SenseUI.listActions({ sorts:SORTS, sort:state.sort, placeholder:'搜尋商品或店家名稱' });
 SenseUI.bindListActions(actions, {
-  onQuery: (q) => { state.query = q; state.page = 1; renderList(); },
-  onSort:  (k) => { state.sort = k; state.page = 1; renderList(); }
+  onQuery: (q) => { state.query = q; state.page = 1; state.shown = MORE_STEP; renderList(); },
+  onSort:  (k) => { state.sort = k; state.page = 1; state.shown = MORE_STEP; renderList(); }
 });
 document.getElementById('pager').addEventListener('click', (e) => {
   const b = e.target.closest('[data-page]'); if (!b || b.disabled) return;
@@ -858,6 +884,16 @@ document.getElementById('view-case').addEventListener('click', (e) => {
   if (t.dataset.act === 'apply') openApply();
   if (t.dataset.act === 'status') openStatus();
 });
+
+// 載入更多：每按一次多顯示 4 張；手機與桌機寬度互換時重畫（桌機回到全部顯示／分頁）
+document.getElementById('case-more').addEventListener('click', (e) => {
+  if (e.target.closest('[data-more]')){ caseShown += MORE_STEP; renderCases(); }
+});
+document.getElementById('product-more').addEventListener('click', (e) => {
+  if (e.target.closest('[data-more]')){ state.shown += MORE_STEP; renderList(); }
+});
+mobileMQ.addEventListener('change', () => { renderCases(); renderList(); });
+threeColMQ.addEventListener('change', renderList);   // 3 欄與其他欄數互換時，每頁數量跟著變
 
 window.addEventListener('hashchange', route);
 route();
