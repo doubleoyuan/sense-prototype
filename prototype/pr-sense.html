@@ -9,16 +9,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="shared/tokens.css?v=20261106c">
-<link rel="stylesheet" href="shared/components.css?v=20261106a">
-<link rel="stylesheet" href="shared/forms.css?v=20261028d">
+<link rel="stylesheet" href="shared/components.css?v=20261107a">
+<link rel="stylesheet" href="shared/forms.css?v=20261107a">
 <style>
   /* ── 本頁新增的元件（推導）：UI Library 尚未收錄，確認後再移到 shared/ ── */
   /* 狀態標籤：已報名／開放報名／即將開放、消息／優惠 */
-  .status{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:var(--tracking-wider);white-space:nowrap}
-  .status.open{background:var(--mod-product-tint);color:var(--accent-border)}
-  .status.soon{background:var(--black-100);color:var(--black-500)}
-  .status.deal{background:var(--metric-bg);color:#C25E1F}
-  .status.news{background:var(--mod-product-tint);color:var(--accent-border)}
+  /* 共用的 StatusTag（.status-tag）：開放報名、消息用 .blue；即將開放的灰字、優惠的橘色先留在頁內 */
+  .status-tag.soon{color:var(--black-500)}
+  .status-tag.orange{background:var(--metric-bg);color:#C25E1F}
   .meta-line{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;font-size:14px;line-height:24px;letter-spacing:1.6px;color:var(--black-600)}
   /* 公司方塊 */
   .co-grid{width:100%;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
@@ -72,9 +70,6 @@
   .ev-deadline svg{width:14px;height:14px;flex:none}
   .ev-actions{margin-top:auto;padding-top:8px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
   .ev-actions .btn{min-width:0;width:100%;padding:0 12px;white-space:nowrap}
-  /* 藍色外框按鈕：外觀沿用財務 SENSE 的 fs-btn-outline（模組專屬元件各自留在頁內，定案後再抽成共用） */
-  .pr-btn-outline{background:var(--white);border:1px solid #CFE3FD;color:var(--accent-border);filter:drop-shadow(0 4px 0 #E3EEFD)}
-  .pr-btn-outline:hover{background:#F5F9FF}
   .ev-actions .ev-joined{justify-content:center;height:44px;font-size:14px}
   .ev-actions .ev-joined svg{width:20px;height:20px}
   @media (max-width:767px){ .ev-cards{grid-template-columns:minmax(0,1fr)} }
@@ -313,7 +308,7 @@ const EVENTS = [
   { d:'2027-01-12', slot:'night', type:'insight', series:'SENSE INSIGHT 學院 EP07', title:'AI 與數據｜資料沉睡，AI 也救不了', host:'國際管理顧問公司 數據策略合夥人', cap:40, status:'open', dl:'2027-01-08 23:59', left:25 },
   { d:'2027-02-09', slot:'noon',  type:'insight', series:'SENSE INSIGHT 學院 EP08', title:'經營領導｜接班不是交棒，是重新創業', host:'傳產二代企業家 總經理', cap:40, status:'soon', dl:'2027-02-05 23:59', left:40 }
 ];
-const EV_STATUS = { open:['open', '開放報名'], soon:['soon', '即將開放'] };
+const EV_STATUS = { open:['blue', '開放報名'], soon:['soon', '即將開放'] };
 const RECAPS = [
   { d:'2026-09-08', type:'insight', title:'數位轉型｜導入新系統前，先問對三個問題', host:'上市科技公司 資訊長', photos:16, video:true, g:'linear-gradient(135deg,#99C7FB,#B6BDFF)' },
   { d:'2026-08-11', type:'insight', title:'品牌經營｜小品牌如何在社群時代被記住', host:'設計顧問公司 創意總監', photos:18, video:true, g:'linear-gradient(135deg,#B6E6E4,#99C7FB)' },
@@ -336,7 +331,7 @@ const CLUB_FEED = [
 
 const fmt = (s) => { const d = new Date(s + 'T00:00:00+08:00'); return { y:d.getFullYear(), m:d.getMonth() + 1, d:d.getDate(), w:WEEK[d.getDay()] }; };
 const VERIFIED = '<svg class="verified" viewBox="0 0 24 24" role="img" aria-label="已認證商家"><circle cx="12" cy="12" r="12" fill="#4DB8EE"/><path d="M6.8 12.4l3.4 3.4 7-7.2" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="square"/></svg>';
-const status = (k) => `<span class="status ${EV_STATUS[k][0]}">${EV_STATUS[k][1]}</span>`;
+const status = (k) => `<span class="status-tag ${EV_STATUS[k][0]}">${EV_STATUS[k][1]}</span>`;
 const item = (label, html, wide) => `<div class="ro-item${wide ? ' span-2' : ''}"><span class="ro-label">${label}</span>${html}</div>`;
 
 
@@ -471,7 +466,7 @@ const drawCards = () => {
         <p class="ev-host">${e.type === 'day' ? '合作夥伴' : '講者'}｜${esc(e.host)}</p>
         <div class="ev-seats"><span>共 ${e.cap} 名</span>${e.left / e.cap <= 0.2 ? '<span class="ev-full">即將額滿</span>' : ''}</div>
         <p class="ev-deadline">${META_ICON.clock}報名截止 ${dl.m}/${dl.d}（${dl.w}）${e.dl.slice(11)}</p>
-        <div class="ev-actions">${e.status === 'joined' ? `<span class="ev-joined">${CHECK}已報名</span>` : `<button type="button" class="btn pr-btn-outline" data-reg="${e.d}">立即報名</button>`}<button type="button" class="btn btn-secondary" data-toast="活動詳情頁尚未製作">活動詳情</button></div>
+        <div class="ev-actions">${e.status === 'joined' ? `<span class="ev-joined">${CHECK}已報名</span>` : `<button type="button" class="btn btn-outline-blue" data-reg="${e.d}">立即報名</button>`}<button type="button" class="btn btn-secondary" data-toast="活動詳情頁尚未製作">活動詳情</button></div>
       </div>
     </article>`; }).join('')}</div>`;
 };
@@ -544,10 +539,10 @@ document.getElementById('club-grid').innerHTML = mine.map(c => `
   <section class="form-card form-group" aria-label="${esc(c.name)}">
     <div class="club-head"><span class="club-icon" aria-hidden="true">${c.icon}</span><div style="flex:1;min-width:0"><div class="club-name">${esc(c.name)}</div><span class="field-help">${c.members} 家成員・發起：${esc(coById(c.founder).name)}</span></div></div>
     <div class="ro-chips"><span>${c.type}</span></div>
-    <div class="meta-line"><span class="status news">新消息 ${c.news}</span><span class="status deal">新優惠 ${c.deals}</span></div>
+    <div class="meta-line"><span class="status-tag blue">新消息 ${c.news}</span><span class="status-tag orange">新優惠 ${c.deals}</span></div>
   </section>`).join('');
 document.getElementById('club-feed').innerHTML = CLUB_FEED.map(f => { const c = coById(f.co), cl = CLUBS.find(x => x.id === f.club);
-  return `<div class="feed-item"><span class="status ${f.kind}">${f.kind === 'deal' ? '優惠' : '消息'}</span><div><p><b>${esc(c.name)}</b>　${esc(f.text)}</p><small>${esc(cl.name)}・${f.at}</small></div></div>`; }).join('');
+  return `<div class="feed-item"><span class="status-tag ${f.kind === 'deal' ? 'orange' : 'blue'}">${f.kind === 'deal' ? '優惠' : '消息'}</span><div><p><b>${esc(c.name)}</b>　${esc(f.text)}</p><small>${esc(cl.name)}・${f.at}</small></div></div>`; }).join('');
 const moreClubs = document.getElementById('more-clubs');
 moreClubs.textContent = `還有 ${others.length} 個俱樂部可以加入`;
 moreClubs.dataset.toast = '俱樂部列表頁尚未製作';

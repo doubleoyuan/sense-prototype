@@ -311,6 +311,66 @@ a.sb-mod-label:hover{color:var(--strong)}
 .r-card-metrics .metric small{font-size:12px;font-weight:600;line-height:24px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
 .r-card-metrics .metric b{font-size:14px;font-weight:500;line-height:24px;letter-spacing:var(--tracking-super);color:var(--black-700);overflow:hidden;text-overflow:ellipsis}
 .r-card-metrics .divider{width:1px;height:20px;background:var(--black-300);flex:none}
+/* 精簡指標框（頁籤式卡片用）：圓角調小為 10，每項標籤靠左、數值靠右排成一行，數字放大、單位維持原字級 */
+.r-card-metrics.compact{border-radius:var(--r-10)}
+.r-card-metrics.compact .metric{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+.r-card-metrics.compact .metric em{font-size:18px;font-style:normal}
+/* 多項時改為上下排列 */
+.r-card-metrics.compact.stacked{flex-direction:column;align-items:stretch;gap:0}
+.r-card-metrics.compact.stacked .metric{flex:none}
+
+/* TabCard：頁籤式卡片（行銷受眾包、策略、點數企業卡）。上方頁籤列（左：公司頁籤；右：各模組自訂的小頁籤），下方卡片本體 */
+.tab-card{--tab-line:var(--black-300);display:flex;flex-direction:column;cursor:pointer;filter:drop-shadow(0 4px 0 var(--black-200))}
+/* hover 換框線色不做轉場：凹圓角是漸層，無法跟框線一起漸變 */
+.tab-card:hover,.tab-card:focus-visible{--tab-line:var(--hover-line);outline:0}
+/* 頁籤列：公司頁籤撐滿，小頁籤靠最右側；整列往下壓住卡片上緣 1px 的框線 */
+.tab-card-tabs{position:relative;z-index:1;display:flex;align-items:flex-end;margin-bottom:-1px}
+/* 公司頁籤：蓋住底下的卡片框線，與卡片之間不留分隔線；名稱放不下以「…」截斷 */
+.tab-card-org{position:relative;z-index:1;flex:1;min-width:0;padding:14px 20px 12px;display:flex;align-items:center;gap:10px;
+  background:var(--white);border:1px solid var(--tab-line);border-bottom:0;border-radius:var(--r-20) var(--r-20) 0 0}
+.tab-card-org .org-name{min-width:0;font-size:14px;line-height:20px;letter-spacing:var(--tracking-super);color:var(--black-700);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 公司頁籤右下的內凹圓角：從頁籤右框（left:100% 即框線位置）往右 21px，最底下 1px 與卡片上緣框線重疊。
+   以圓心在右上角的放射漸層畫：圓內透明、圓周為框線、圓外為白底（蓋掉頁籤右框的直線與底下的卡片框線）；沒有小頁籤時不畫 */
+.tab-card-org::after{content:"";position:absolute;left:100%;bottom:0;width:21px;height:21px;
+  background:radial-gradient(circle at 100% 0,transparent 19.6px,var(--tab-line) 20px,var(--tab-line) 20.6px,var(--white) 21px)}
+.tab-card-org:last-child::after{display:none}
+/* 小頁籤：左側接公司頁籤右框、右框接卡片右框，底部停在卡片框線上方（框線照常顯示）。
+   左右內距同為凹圓角寬（21px），內容水平置中且不壓到左下的弧線 */
+.tab-card-side{flex:none;height:40px;margin-bottom:1px;padding:0 21px;display:flex;align-items:center;justify-content:center;gap:4px;
+  background:var(--black-50);border:1px solid var(--tab-line);border-left:0;border-bottom:0;border-radius:0 var(--r-10) 0 0;
+  font-size:14px;font-weight:500;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--black-600);white-space:nowrap}
+/* 卡片本體：上方兩角被頁籤接住，不做圓角；上內距縮為 10（頁籤底部已有 12 的內距） */
+.tab-card-body{flex:1;display:flex;flex-direction:column;gap:20px;padding:10px 20px 20px;background:var(--white);border:1px solid var(--tab-line);
+  border-radius:0 0 var(--r-30) var(--r-30)}
+/* 標題只顯示一行，超出以「…」截斷（完整標題放在 title） */
+.tab-card-title{font-size:16px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-super);color:var(--black-800);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 標題＋標籤＋說明：說明至多兩行，超出以「…」截斷 */
+.tab-card-intro{display:flex;flex-direction:column;gap:4px}
+.tab-card-desc{font-size:14px;line-height:22px;letter-spacing:var(--tracking-wider);color:var(--black-600);
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
+
+/* StatusTag：狀態標籤（膠囊，可在文字前加圓點 .dot）。預設灰色；橘、綠等其他顏色各模組仍不一致，先留在頁內 */
+.status-tag{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:20px;font-size:12px;font-weight:600;
+  letter-spacing:var(--tracking-wider);white-space:nowrap;background:var(--black-100);color:var(--black-600)}
+.status-tag.blue{background:var(--mod-product-tint);color:var(--accent-border)}
+.status-tag.red{background:var(--danger-bg);color:var(--danger)}
+.status-tag .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+
+/* Dialog：對話框（原生 <dialog>）。標題列＋可捲動內容＋頁尾按鈕列；.wide 為寬版 */
+.dialog{width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 48px);padding:0;border:0;border-radius:24px;background:var(--white);color:var(--black-800);
+  box-shadow:0 20px 60px rgba(0,0,0,.18);letter-spacing:var(--tracking-ultra)}
+.dialog.wide{width:min(720px,calc(100vw - 32px))}
+.dialog::backdrop{background:rgba(0,0,0,.32)}
+.dialog form{display:flex;flex-direction:column;max-height:calc(100vh - 48px)}
+.dialog-head{display:flex;align-items:center;gap:12px;padding:18px 24px;border-bottom:1px solid var(--black-200)}
+.dialog-head h2{flex:1;font-size:17px;font-weight:700;letter-spacing:var(--tracking-super)}
+.dialog-x{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:20px;color:var(--black-500)}
+.dialog-x:hover{background:var(--black-100)}
+.dialog-body{padding:20px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:20px;font-size:14px;line-height:24px;letter-spacing:1.6px}
+.dialog-body .form-row{gap:16px}
+.dialog-foot{display:flex;justify-content:flex-end;gap:12px;padding:16px 24px;border-top:1px solid var(--black-200);flex-wrap:wrap}
 
 /* Pagination */
 .pager{width:100%;display:flex;justify-content:center}

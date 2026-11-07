@@ -9,42 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="shared/tokens.css?v=20261106c">
-<link rel="stylesheet" href="shared/components.css?v=20261106a">
+<link rel="stylesheet" href="shared/components.css?v=20261107a">
 <style>
   /* ── 行銷 SENSE 頁內元件：UI Library 尚未收錄，需求確認後再決定是否抽到 shared/ ── */
 
-  /* AudienceCard：受眾包卡片。上方頁籤列（公司 logo＋名稱、瀏覽數），下方卡片本體；AI 受眾標籤先隱藏 */
-  .ms-card{--ms-line:var(--black-300);display:flex;flex-direction:column;cursor:pointer;filter:drop-shadow(0 4px 0 var(--black-200))}
-  /* hover 換框線色不做轉場：凹圓角是漸層，無法跟框線一起漸變 */
-  .ms-card:hover,.ms-card:focus-visible{--ms-line:var(--hover-line);outline:0}
-  /* 頁籤列：公司頁籤撐滿，瀏覽數頁籤靠最右側；整列往下壓住卡片上緣 1px 的框線 */
-  .ms-tabs{position:relative;z-index:1;display:flex;align-items:flex-end;margin-bottom:-1px}
-  /* 公司頁籤：蓋住底下的卡片框線，與卡片之間不留分隔線；名稱放不下以「…」截斷 */
-  .ms-tab{position:relative;z-index:1;flex:1;min-width:0;padding:14px 20px 12px;display:flex;align-items:center;gap:10px;
-    background:var(--white);border:1px solid var(--ms-line);border-bottom:0;border-radius:var(--r-20) var(--r-20) 0 0}
-  .ms-tab .org-name{min-width:0;font-size:14px;line-height:20px;letter-spacing:var(--tracking-super);color:var(--black-700);
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  /* 公司頁籤右下的內凹圓角：從頁籤右框（left:100% 即框線位置）往右 21px，最底下 1px 與卡片上緣框線重疊。
-     以圓心在右上角的放射漸層畫：圓內透明、圓周為框線、圓外為白底（蓋掉頁籤右框的直線與底下的卡片框線） */
-  .ms-tab::after{content:"";position:absolute;left:100%;bottom:0;width:21px;height:21px;
-    background:radial-gradient(circle at 100% 0,transparent 19.6px,var(--ms-line) 20px,var(--ms-line) 20.6px,var(--white) 21px)}
-  /* 瀏覽數頁籤：左側接公司頁籤右框、右框接卡片右框，底部停在卡片框線上方（框線照常顯示）。
-     左右內距同為凹圓角寬（21px），內容水平置中且不壓到左下的弧線 */
-  .ms-tab-views{flex:none;height:40px;margin-bottom:1px;padding:0 21px;display:flex;align-items:center;justify-content:center;gap:4px;
-    background:var(--black-50);border:1px solid var(--ms-line);border-left:0;border-bottom:0;border-radius:0 var(--r-10) 0 0;
-    font-size:14px;font-weight:600;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--black-600)}
+  /* AudienceCard：受眾包卡片。外框用共用的 TabCard（.tab-card），右上小頁籤顯示瀏覽數；受眾規模用 .r-card-metrics.compact */
+  .ms-tab-views{font-weight:600}  /* 瀏覽數字重比 TabCard 小頁籤預設的 500 粗一階 */
   .ms-tab-views img{width:16px;height:16px;opacity:.6}
-  /* 卡片本體：上方兩角被頁籤接住，不做圓角 */
-  /* 上內距縮為 10：頁籤底部已有 12 的內距，標題不必再離 logo 太遠 */
-  .ms-card-body{flex:1;display:flex;flex-direction:column;gap:20px;padding:10px 20px 20px;background:var(--white);border:1px solid var(--ms-line);
-    border-radius:0 0 var(--r-30) var(--r-30)}
-  /* 標題只顯示一行，超出以「…」截斷（完整標題放在 title） */
-  .ms-card-title{font-size:16px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-super);color:var(--black-800);
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  /* 受眾規模：沿用 ResourceCard 的指標區，標籤與數值排成一行（標籤靠左、數值靠右），數字放大、「人」維持原字級 */
-  .ms-card .r-card-metrics{border-radius:var(--r-10)}  /* 共用元件為 20，這裡只有一行、高度較矮，圓角調小 */
-  .ms-card .r-card-metrics .metric{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
-  .ms-card .r-card-metrics .metric em{font-size:18px;font-style:normal}
 
   /* 通路表 */
   .ms-channels{width:100%;border-collapse:collapse;font-size:12px;line-height:16px;letter-spacing:var(--tracking-wider);white-space:nowrap}
@@ -158,14 +129,14 @@ function channelRow(c, d){
 function audienceCard(a){
   const org = ORGS[a.org];
   return `
-    <article class="ms-card" data-card="${a.id}" tabindex="0" aria-label="${esc(a.title)}，${esc(org.name)}">
-      <div class="ms-tabs">
-        <div class="ms-tab" title="${esc(org.name)}">${SenseUI.orgLogo(org)}<span class="org-name">${esc(org.name)}</span></div>
-        <div class="ms-tab-views" aria-label="瀏覽數 ${a.views}"><img src="${SenseShell.asset('ic-eye.svg')}" alt="">${SenseUI.compact(a.views)}</div>
+    <article class="tab-card ms-card" data-card="${a.id}" tabindex="0" aria-label="${esc(a.title)}，${esc(org.name)}">
+      <div class="tab-card-tabs">
+        <div class="tab-card-org" title="${esc(org.name)}">${SenseUI.orgLogo(org)}<span class="org-name">${esc(org.name)}</span></div>
+        <div class="tab-card-side ms-tab-views" aria-label="瀏覽數 ${a.views}"><img src="${SenseShell.asset('ic-eye.svg')}" alt="">${SenseUI.compact(a.views)}</div>
       </div>
-      <div class="ms-card-body">
-        <h3 class="ms-card-title" title="${esc(a.title)}">${esc(a.title)}</h3>
-        <span class="r-card-metrics"><span class="metric"><small>受眾規模</small><b><em>${num(a.size)}</em> 人</b></span></span>
+      <div class="tab-card-body">
+        <h3 class="tab-card-title" title="${esc(a.title)}">${esc(a.title)}</h3>
+        <span class="r-card-metrics compact"><span class="metric"><small>受眾規模</small><b><em>${num(a.size)}</em> 人</b></span></span>
         <table class="ms-channels">
           <thead><tr><th scope="col">通路</th><th scope="col">可觸及</th><th scope="col">每千次</th></tr></thead>
           <tbody>${CHANNELS.map(c => channelRow(c, a.channels[c.key])).join('')}</tbody>

@@ -9,8 +9,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="shared/tokens.css?v=20261106c">
-<link rel="stylesheet" href="shared/components.css?v=20261106a">
-<link rel="stylesheet" href="shared/forms.css?v=20261028d">
+<link rel="stylesheet" href="shared/components.css?v=20261107a">
+<link rel="stylesheet" href="shared/forms.css?v=20261107a">
 <style>
   /* ── 財務 SENSE 頁內元件（推導）：UI Library 尚未收錄，需求確認後再決定是否抽到 shared/ ── */
   .fs-view{width:100%;display:flex;flex-direction:column;gap:40px}
@@ -28,14 +28,10 @@
   .fs-spacer{flex:1}
 
   /* 狀態標籤 */
-  .fs-tag{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:20px;font-size:12px;font-weight:600;
-    letter-spacing:var(--tracking-wider);white-space:nowrap;background:var(--black-100);color:var(--black-600)}
-  .fs-tag.blue{background:var(--mod-product-tint);color:var(--accent-border)}
-  .fs-tag.green{background:#E7F6EE;color:#1F8A57}
-  .fs-tag.orange{background:var(--metric-bg);color:#C25E1F}
-  .fs-tag.gold{background:#FFF6DB;color:var(--mod-finance-strong)}
-  .fs-tag.dark{background:var(--black-800);color:var(--white)}
-  .fs-tag .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+  .status-tag.green{background:#E7F6EE;color:#1F8A57}
+  .status-tag.orange{background:var(--metric-bg);color:#C25E1F}
+  .status-tag.gold{background:#FFF6DB;color:var(--mod-finance-strong)}
+  .status-tag.dark{background:var(--black-800);color:var(--white)}
 
   /* 卡片：沿用 form-card 外框 */
   .fs-card{width:100%;padding:20px;border:1px solid var(--black-300);border-radius:var(--r-16);background:var(--white);box-shadow:0 4px 0 0 var(--black-200)}
@@ -69,10 +65,8 @@
   .fs-profilecard .btn{align-self:flex-start}
   .fs-todo-more{display:block;width:100%;padding-top:12px;border-top:1px solid var(--black-100);text-align:center;font-size:13px;font-weight:600;letter-spacing:var(--tracking-wider);color:var(--black-600)}
   .fs-todo-more:hover{color:var(--hover-teal)}
-  /* 首頁按鈕：藍框藍字白底，避免實心藍太多（2026-10-27 使用者確認，先只用在首頁；尺寸與陰影同 btn-primary） */
-  .fs-btn-outline{background:var(--white);border:1px solid #CFE3FD;color:var(--accent-border);filter:drop-shadow(0 4px 0 #E3EEFD)}
-  .btn.fs-btn-outline.btn-sm{filter:drop-shadow(0 2px 0 #E3EEFD)}  /* 小尺寸的陰影位移是 2px（.btn.btn-sm），這裡只換顏色 */
-  .fs-btn-outline:hover{background:#F5F9FF}
+  /* 首頁按鈕：共用的藍色外框按鈕 .btn-outline-blue（2026-10-27 使用者確認，避免實心藍太多） */
+  .btn.btn-outline-blue.btn-sm{filter:drop-shadow(0 2px 0 #E3EEFD)}  /* 小尺寸的陰影位移是 2px（.btn.btn-sm），這裡只換顏色 */
   /* 首頁：募資／融資／併購三條路徑卡（外框沿用 ResourceCard） */
   .fs-paths{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
   .fs-path-card{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:20px;border:1px solid var(--line-soft);border-radius:var(--r-30);background:var(--white);transition:border-color .15s}
@@ -282,18 +276,8 @@
   .fs-asidedata span{color:var(--black-500)}
 
   /* 對話框（推導）：外框沿用表單卡片，頁尾按鈕沿用 .btn */
-  .fs-dialog{width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 48px);padding:0;border:0;border-radius:24px;background:var(--white);color:var(--black-800);
-    box-shadow:0 20px 60px rgba(0,0,0,.18);letter-spacing:var(--tracking-ultra)}
-  .fs-dialog.wide{width:min(760px,calc(100vw - 32px))}
-  .fs-dialog::backdrop{background:rgba(0,0,0,.32)}
-  .fs-dialog form{display:flex;flex-direction:column;max-height:calc(100vh - 48px)}
-  .fs-dlg-head{display:flex;align-items:center;gap:12px;padding:18px 24px;border-bottom:1px solid var(--black-200)}
-  .fs-dlg-head h2{flex:1;font-size:17px;font-weight:700;letter-spacing:var(--tracking-super)}
-  .fs-dlg-x{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:20px;color:var(--black-500)}
-  .fs-dlg-x:hover{background:var(--black-100)}
-  .fs-dlg-body{padding:20px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;font-size:14px;line-height:24px;letter-spacing:1.6px}
-  .fs-dlg-foot{display:flex;justify-content:flex-end;gap:12px;padding:16px 24px;border-top:1px solid var(--black-200);flex-wrap:wrap}
-  .fs-dlg-body .form-row{gap:16px}
+  .dialog.wide{width:min(760px,calc(100vw - 32px))}  /* 共用 Dialog 寬版為 720，財務頁維持 760 */
+  .dialog-body{gap:16px}  /* 共用 Dialog 內容間距為 20，財務頁維持 16 */
   .fs-doc{padding:24px;border:1px solid var(--black-200);border-radius:var(--r-16);background:var(--black-50)}
   .fs-doc h3{font-size:16px;font-weight:700;margin-bottom:6px}
   .fs-docline{height:8px;margin:10px 0;border-radius:6px;background:var(--black-200)}
@@ -359,7 +343,7 @@
   <button type="button" data-demo-role="both">兩者</button>
 </div>
 
-<dialog class="fs-dialog" id="dlg" aria-labelledby="dlg-title"><form method="dialog" id="dlg-form"></form></dialog>
+<dialog class="dialog" id="dlg" aria-labelledby="dlg-title"><form method="dialog" id="dlg-form"></form></dialog>
 
 <script src="shared/shell.js?v=20261107a"></script>
 <script src="shared/components.js?v=20261028d"></script>
@@ -485,7 +469,7 @@ const unlockedName = (c) => c.id === 1 ? '翰森科技' : c.id === 2 ? '康曜�
 const AV = ['#5AB0D6','#7A9E7E','#E89A5B','#8DC26F','#6F7FD8','#4FB7A8','#C98BB9','#D4A017'];
 function hashStr(s){ let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; }
 const avatar = (name, cls = '') => `<span class="fs-avatar ${cls}" style="--av:${AV[hashStr(name) % AV.length]}" aria-hidden="true">${esc(name[0])}</span>`;
-const tag = (color, text, dot) => `<span class="fs-tag ${color}">${dot ? '<i class="dot"></i>' : ''}${text}</span>`;
+const tag = (color, text, dot) => `<span class="status-tag ${color}">${dot ? '<i class="dot"></i>' : ''}${text}</span>`;
 const badge = (v) => v ? tag('dark', '✓ 已查核 · 2026.08') : tag('', '未經查核');
 function status(s){
   const m = { pending:['orange','待回覆'], L1:['green','已連結 · L1'], L2:['blue','已連結 · L2'], nda:['orange','NDA 待對方簽署'], declined:['','已婉拒'], expired:['','逾期關閉'], following:['green','追蹤中'], hello:['orange','打招呼'] };
@@ -520,7 +504,7 @@ function profileCard(){
     <div class="fs-id">${avatar('翰森科技', 'lg')}<div><h3>翰森科技 ${badge(true)}</h3><span class="fs-note">企業軟體 · A+ 輪 · 檔案公開中</span></div></div>
     <div><div class="fs-progress-meta"><b>檔案完成度 ${state.profileCompletion}%</b><span class="fs-muted">本週被瀏覽 12 次</span></div>
       <div class="fs-progress"><i style="width:${state.profileCompletion}%"></i></div><span class="fs-note">下一步：${next}</span></div>
-    <a class="btn fs-btn-outline btn-sm" href="${state.techFilled ? '#settings' : '#set-tech'}">完善檔案</a></div>`;
+    <a class="btn btn-outline-blue btn-sm" href="${state.techFilled ? '#settings' : '#set-tech'}">完善檔案</a></div>`;
 }
 
 /* ── 首頁：我的檔案＋待處理事項（同一列）→ 募資／融資／併購入口 → 最近動態 → 專屬顧問（2026-10-27 使用者確認移除票券） ── */
@@ -529,11 +513,11 @@ const trackCount = (t) => companies.filter(c => c.track === t).length;
 function pathCards(){
   const cards = [
     { title:'募資', desc:'找到投資偏好相符的投資人，或瀏覽正在募資的企業。', count:`${trackCount('equity')} 家企業募資中`,
-      main:`<button type="button" class="btn fs-btn-outline btn-sm" data-act="browse-track" data-id="equity">瀏覽募資企業</button>`, sub:`<a class="btn btn-secondary btn-sm" href="#investors">找投資人</a>` },
+      main:`<button type="button" class="btn btn-outline-blue btn-sm" data-act="browse-track" data-id="equity">瀏覽募資企業</button>`, sub:`<a class="btn btn-secondary btn-sm" href="#investors">找投資人</a>` },
     { title:'融資', desc:'先用 5 題診斷釐清方向，再看融資方案或由專人規劃。', count:`${financing.length} 個融資方案`,
-      main:`<a class="btn fs-btn-outline btn-sm" href="#financing">開始 5 題診斷</a>`, sub:`<button type="button" class="btn btn-secondary btn-sm" data-act="fin-plans">看融資方案</button>` },
+      main:`<a class="btn btn-outline-blue btn-sm" href="#financing">開始 5 題診斷</a>`, sub:`<button type="button" class="btn btn-secondary btn-sm" data-act="fin-plans">看融資方案</button>` },
     { title:'併購', desc:'出售、收購或引進策略股東，先與顧問一對一討論。', count:`${trackCount('ma')} 家企業評估中`,
-      main:`<button type="button" class="btn fs-btn-outline btn-sm" data-act="ma-consult">預約併購顧問</button>`, sub:`<button type="button" class="btn btn-secondary btn-sm" data-act="browse-track" data-id="ma">瀏覽併購審視</button>` }];
+      main:`<button type="button" class="btn btn-outline-blue btn-sm" data-act="ma-consult">預約併購顧問</button>`, sub:`<button type="button" class="btn btn-secondary btn-sm" data-act="browse-track" data-id="ma">瀏覽併購審視</button>` }];
   return `<div class="fs-paths">${cards.map(c => `<div class="fs-path-card">
       <h3><span class="fs-marker">${c.title}</span></h3><p>${c.desc}</p><span class="count">${c.count}</span>
       <div class="btn-row">${c.main}${c.sub}</div></div>`).join('')}</div>`;
@@ -543,15 +527,15 @@ function todoItems(){
   const list = [];
   if (has('company')){
     requests.filter(r => r.state === 'pending').forEach(r => { const i = investors.find(x => x.id === r.investor);
-      list.push({ ic:'連', title:`${i.org} · ${i.name} 送來連結請求`, sub:`想了解：${r.topics} · 剩 ${r.days} 天回應`, btn:`<a class="btn fs-btn-outline btn-sm" href="#requests">處理</a>` }); });
+      list.push({ ic:'連', title:`${i.org} · ${i.name} 送來連結請求`, sub:`想了解：${r.topics} · 剩 ${r.days} 天回應`, btn:`<a class="btn btn-outline-blue btn-sm" href="#requests">處理</a>` }); });
     ndaRequests.filter(r => r.state === 'pending').forEach(r =>
-      list.push({ ic:'簽', title:`${r.org} 已簽署${r.doc}，等你完成雙方簽署`, sub:`${r.contact} · ${r.date}`, btn:`<button type="button" class="btn fs-btn-outline btn-sm" data-act="view-nda" data-id="${r.id}">檢視並簽署</button>` }));
+      list.push({ ic:'簽', title:`${r.org} 已簽署${r.doc}，等你完成雙方簽署`, sub:`${r.contact} · ${r.date}`, btn:`<button type="button" class="btn btn-outline-blue btn-sm" data-act="view-nda" data-id="${r.id}">檢視並簽署</button>` }));
     requests.filter(r => r.state === 'L1').forEach(r => { const i = investors.find(x => x.id === r.investor);
       if (!perms[i.org] || perms[i.org].every(v => !v)) list.push({ ic:'權', title:`${i.org} 已連結（L1），資料室尚未開放任何檔案`, sub:'完成 NDA 後可依角色套用預設權限', btn:`<a class="btn btn-secondary btn-sm" href="#roomadmin">設定權限</a>` }); });
   }
   if (has('investor')){
     links.filter(l => l.state === 'L1').forEach(l => { const c = companies.find(x => x.id === l.company);
-      list.push({ ic:'簽', title:`${unlockedName(c)} 已開放 L1 具名資訊`, sub:'可申請線上簽署 NDA，進一步查看資料室', btn:`<a class="btn fs-btn-outline btn-sm" href="#company-${c.id}">查看</a>` }); });
+      list.push({ ic:'簽', title:`${unlockedName(c)} 已開放 L1 具名資訊`, sub:'可申請線上簽署 NDA，進一步查看資料室', btn:`<a class="btn btn-outline-blue btn-sm" href="#company-${c.id}">查看</a>` }); });
     const waiting = links.filter(l => l.state === 'pending');
     if (waiting.length) list.push({ ic:'等', title:`${waiting.length} 筆連結請求等待企業回覆`, sub:`最短剩 ${Math.min(...waiting.map(l => l.days))} 天`, btn:`<a class="btn btn-secondary btn-sm" href="#links">查看</a>` });
   }
@@ -845,7 +829,7 @@ function requestCard(r){
     : r.state === 'L1' ? `<a class="btn btn-secondary btn-sm" href="#roomadmin">管理下一層權限</a>` : '';
   return `<article class="fs-card fs-request">
     <div class="fs-request-head">${avatar(i.org)}<div><b>${i.org} · ${i.name} 投資經理</b><span>${i.level}級 · ${ROLE_GROUPS[i.group]} · 過往投資 ${i.deals} 件 · ${i.focus}</span></div>${status(r.state)}</div>
-    <div class="fs-path">${i.path}　<span class="fs-tag">概念展示</span></div>
+    <div class="fs-path">${i.path}　<span class="status-tag">概念展示</span></div>
     <div class="fs-reqmeta"><span>想了解<b>${r.topics}</b></span><span>投資規模<b>${r.scale}</b></span><span>參與程度<b>${r.role}</b></span></div>
     <blockquote class="fs-quote">「${r.text}」</blockquote>
     <div class="fs-request-foot"><time>${r.date} 送出${r.state === 'pending' ? ' · 剩餘 ' + r.days + ' 天回應' : ''}</time><div class="btn-row">${acts}</div></div>
@@ -1056,8 +1040,8 @@ function maPage(){
 const dlg = document.getElementById('dlg'), dlgForm = document.getElementById('dlg-form');
 function modal(title, body, foot = '', wide = false){
   dlg.classList.toggle('wide', !!wide);
-  dlgForm.innerHTML = `<div class="fs-dlg-head"><h2 id="dlg-title">${title}</h2><button type="button" class="fs-dlg-x" data-close aria-label="關閉">×</button></div>
-    <div class="fs-dlg-body">${body}</div>${foot ? `<div class="fs-dlg-foot">${foot}</div>` : ''}`;
+  dlgForm.innerHTML = `<div class="dialog-head"><h2 id="dlg-title">${title}</h2><button type="button" class="dialog-x" data-close aria-label="關閉">×</button></div>
+    <div class="dialog-body">${body}</div>${foot ? `<div class="dialog-foot">${foot}</div>` : ''}`;
   if (!dlg.open) dlg.showModal();
 }
 const closeModal = () => { if (dlg.open) dlg.close(); };

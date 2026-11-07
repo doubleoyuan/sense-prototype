@@ -169,6 +169,9 @@ button.step:hover{color:var(--black-600)}
 .btn-primary:hover{filter:drop-shadow(0 4px 0 var(--black-200)) brightness(1.06)}
 .btn-secondary{background:var(--white);border:1px solid var(--black-200);color:var(--black-700);filter:drop-shadow(0 4px 0 var(--black-200))}
 .btn-secondary:hover{background:var(--black-50)}
+/* 藍色外框按鈕：白底、淡藍框線與陰影、藍字。用在不想再多一顆實心藍的次要操作（與上方表單用的方角 .btn-outline 不同） */
+.btn-outline-blue{background:var(--white);border:1px solid #CFE3FD;color:var(--accent-border);filter:drop-shadow(0 4px 0 #E3EEFD)}
+.btn-outline-blue:hover{background:#F5F9FF}
 
 /* ═════════ 第 3 步：唯讀確認＋商品頁示意（推導） ═════════ */
 .review-layout{width:100%;display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:40px;align-items:start}

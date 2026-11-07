@@ -9,8 +9,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="shared/tokens.css?v=20261106c">
-<link rel="stylesheet" href="shared/components.css?v=20261106a">
-<link rel="stylesheet" href="shared/forms.css?v=20261028d">
+<link rel="stylesheet" href="shared/components.css?v=20261107a">
+<link rel="stylesheet" href="shared/forms.css?v=20261107a">
 <style>
   /* ── 點數 SENSE 頁內元件：UI Library 尚未收錄，需求確認後再決定是否抽到 shared/ ── */
 
@@ -63,23 +63,8 @@
   @media (prefers-reduced-motion:reduce){ .pt-waffle i.on{animation:none} }
 
 
-  /* PointsCard：企業卡片。沿用策略 SENSE 策略卡片的頁籤模板，右上頁籤改顯示「與我方的交換狀態」 */
-  .pt-card{--pt-line:var(--black-300);display:flex;flex-direction:column;cursor:pointer;filter:drop-shadow(0 4px 0 var(--black-200))}
-  .pt-card:hover,.pt-card:focus-visible{--pt-line:var(--hover-line);outline:0}
-  .pt-tabs{position:relative;z-index:1;display:flex;align-items:flex-end;margin-bottom:-1px}
-  .pt-tab{position:relative;z-index:1;flex:1;min-width:0;padding:14px 20px 12px;display:flex;align-items:center;gap:10px;
-    background:var(--white);border:1px solid var(--pt-line);border-bottom:0;border-radius:var(--r-20) var(--r-20) 0 0}
-  .pt-tab .org-name{min-width:0;font-size:14px;line-height:20px;letter-spacing:var(--tracking-super);color:var(--black-700);
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* PointsCard：企業卡片。外框用共用的 TabCard（.tab-card），右上小頁籤（.tab-card-side）顯示單向／雙向 */
   .pt-verified{width:16px;height:16px;flex:none;margin-left:-6px;color:var(--badge-blue)}
-  /* 公司頁籤右下的內凹圓角；沒有狀態頁籤時不畫 */
-  .pt-tab::after{content:"";position:absolute;left:100%;bottom:0;width:21px;height:21px;
-    background:radial-gradient(circle at 100% 0,transparent 19.6px,var(--pt-line) 20px,var(--pt-line) 20.6px,var(--white) 21px)}
-  .pt-tab:last-child::after{display:none}
-  /* 交換方式頁籤：顯示單向／雙向圖示 */
-  .pt-tab-mode{flex:none;height:40px;margin-bottom:1px;padding:0 21px;display:flex;align-items:center;justify-content:center;gap:4px;
-    background:var(--black-50);border:1px solid var(--pt-line);border-left:0;border-bottom:0;border-radius:0 var(--r-10) 0 0;
-    font-size:14px;font-weight:500;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--black-600);white-space:nowrap}
 
   /* 交換方式圖示（同策略 SENSE）：上方箭頭往右（去）、下方箭頭往左（回）。單向時「回」為淡灰，雙向時兩支同色。
      單向且方向為「對方 → 我方」時左右翻轉，亮的箭頭改指向我方 */
@@ -95,28 +80,14 @@
   @keyframes pt-arrow-l{from{opacity:0;transform:translateX(6px)}to{opacity:1;transform:none}}
   @media (prefers-reduced-motion:reduce){ .pt-mode-ic path{animation:none !important} }
 
-  .pt-card-body{flex:1;display:flex;flex-direction:column;gap:20px;padding:10px 20px 20px;background:var(--white);border:1px solid var(--pt-line);
-    border-radius:0 0 var(--r-30) var(--r-30)}
-  .pt-card-intro{display:flex;flex-direction:column;gap:4px}
-  .pt-card-title{font-size:16px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-super);color:var(--black-800);
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .pt-industry{display:inline-flex;align-items:center;gap:6px;padding:4px 0;color:var(--accent);font-size:13px;font-weight:600;line-height:20px;letter-spacing:var(--tracking-wider)}
   .pt-industry svg{width:16px;height:16px;flex:none}
-  .pt-desc{font-size:14px;line-height:22px;letter-spacing:var(--tracking-wider);color:var(--black-600);
-    display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
-  /* 兌台幣比值與會員規模合成一個框：同策略卡片的指標框 */
-  .pt-card .r-card-metrics{flex-direction:column;align-items:stretch;gap:10px;margin-top:auto;border-radius:var(--r-10)}
-  .pt-card .r-card-metrics .metric{flex:none;flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
-  .pt-card .r-card-metrics .metric em{font-size:18px;font-style:normal}
+  /* 兌台幣比值與會員規模合成一個框（.r-card-metrics.compact.stacked），貼齊卡片底部，兩項之間加分隔線 */
+  .pt-card .r-card-metrics.stacked{gap:10px;margin-top:auto}
   .pt-card .r-card-metrics .metric + .metric{padding-top:10px;border-top:1px solid var(--black-300)}
 
-  /* 狀態標籤：樣式同財務 SENSE 的 .fs-tag */
-  .pt-tag{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:20px;font-size:12px;font-weight:600;
-    letter-spacing:var(--tracking-wider);white-space:nowrap;background:var(--black-100);color:var(--black-600)}
-  .pt-tag.blue{background:var(--mod-product-tint);color:var(--accent-border)}
-  .pt-tag.orange{background:var(--metric-bg);color:var(--cta-orange)}
-  .pt-tag.red{background:var(--danger-bg);color:var(--danger)}
-  .pt-tag .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+  /* 狀態標籤：共用的 StatusTag（.status-tag）；橘色在點數／兌換用 CTA 橘，與財務／公關的橘不同，先留在頁內 */
+  .status-tag.orange{background:var(--metric-bg);color:var(--cta-orange)}
 
   /* ── 企業內頁 ── */
   .pt-co-head{width:100%;display:flex;align-items:flex-start;gap:20px}
@@ -175,22 +146,10 @@
   .pt-ratio p.off{color:var(--black-400)}
   .pt-ratio em{font-size:18px;font-style:normal}
 
-  /* ── 對話框：沿用財務 SENSE 的 .fs-dialog ── */
-  .pt-dialog{width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 48px);padding:0;border:0;border-radius:24px;background:var(--white);color:var(--black-800);
-    box-shadow:0 20px 60px rgba(0,0,0,.18);letter-spacing:var(--tracking-ultra)}
-  .pt-dialog.wide{width:min(720px,calc(100vw - 32px))}
-  .pt-dialog::backdrop{background:rgba(0,0,0,.32)}
-  .pt-dialog form{display:flex;flex-direction:column;max-height:calc(100vh - 48px)}
-  .pt-dlg-head{display:flex;align-items:center;gap:12px;padding:18px 24px;border-bottom:1px solid var(--black-200)}
-  .pt-dlg-head h2{flex:1;font-size:17px;font-weight:700;letter-spacing:var(--tracking-super)}
-  .pt-dlg-x{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:20px;color:var(--black-500)}
-  .pt-dlg-x:hover{background:var(--black-100)}
-  .pt-dlg-body{padding:20px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:20px;font-size:14px;line-height:24px;letter-spacing:1.6px}
-  .pt-dlg-foot{display:flex;justify-content:flex-end;gap:12px;padding:16px 24px;border-top:1px solid var(--black-200);flex-wrap:wrap}
-  .pt-dlg-body .field{gap:8px}
-  .pt-dlg-body .field-label{font-size:14px}
-  .pt-dlg-body .form-row{gap:16px}
-  .pt-dlg-body .input[readonly]{background:var(--black-50);color:var(--black-600)}  /* 帶入、不可修改 */
+  /* ── 對話框：共用的 Dialog（.dialog）；以下為表單欄位在對話框內的調整（同兌換 SENSE） ── */
+  .dialog-body .field{gap:8px}
+  .dialog-body .field-label{font-size:14px}
+  .dialog-body .input[readonly]{background:var(--black-50);color:var(--black-600)}  /* 帶入、不可修改 */
 
   /* 選項卡：單向／雙向、方向 */
   .pt-opts{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
@@ -239,7 +198,7 @@
   }
   @media (max-width:559px){
     .pt-opts{grid-template-columns:minmax(0,1fr)}
-    .pt-dlg-body .form-row{grid-template-columns:minmax(0,1fr)}
+    .dialog-body .form-row{grid-template-columns:minmax(0,1fr)}
     .pt-route{gap:8px;padding:12px}
     .pt-fab{padding:10px 24px 10px 60px}
   }
@@ -286,7 +245,7 @@
 <!-- 加入點數 SENSE：主頁右下角固定按鈕 -->
 <button type="button" class="cta-btn pt-fab" id="fab" hidden></button>
 
-<dialog class="pt-dialog" id="dlg" aria-labelledby="dlg-title"><form method="dialog" id="dlg-form" novalidate></form></dialog>
+<dialog class="dialog" id="dlg" aria-labelledby="dlg-title"><form method="dialog" id="dlg-form" novalidate></form></dialog>
 
 <script src="shared/shell.js?v=20261107a"></script>
 <script src="shared/components.js?v=20261028d"></script>
@@ -406,7 +365,7 @@ function statusTab(c){
   if (!dirs) return '';
   const mode = dirs === 'both' ? 'twoway' : 'oneway';
   const title = dirs === 'both' ? '雙向交換' : `單向交換：${dirLabel(c, dirs)}`;
-  return `<div class="pt-tab-mode" data-mode="${mode}" data-dir="${dirs}" title="${esc(title)}" aria-label="${esc(title)}">${MODE_IC}${MODE_TEXT[dirs]}</div>`;
+  return `<div class="tab-card-side pt-tab-mode" data-mode="${mode}" data-dir="${dirs}" title="${esc(title)}" aria-label="${esc(title)}">${MODE_IC}${MODE_TEXT[dirs]}</div>`;
 }
 
 /* ═════════ 主頁：數據盤 ═════════ */
@@ -538,18 +497,18 @@ function fillDash(totalId, statsId){
 /* ═════════ 主頁：企業卡片 ═════════ */
 function companyCard(c){
   return `
-    <article class="pt-card" data-card="${c.id}" tabindex="0" aria-label="${esc(c.name)}，${esc(c.point)}">
-      <div class="pt-tabs">
-        <div class="pt-tab" title="${esc(c.name)}">${SenseUI.orgLogo(c)}<span class="org-name">${esc(c.name)}</span>${VERIFIED}</div>
+    <article class="tab-card pt-card" data-card="${c.id}" tabindex="0" aria-label="${esc(c.name)}，${esc(c.point)}">
+      <div class="tab-card-tabs">
+        <div class="tab-card-org" title="${esc(c.name)}">${SenseUI.orgLogo(c)}<span class="org-name">${esc(c.name)}</span>${VERIFIED}</div>
         ${statusTab(c)}
       </div>
-      <div class="pt-card-body">
-        <div class="pt-card-intro">
-          <h3 class="pt-card-title" title="${esc(c.point)}">${esc(c.point)}</h3>
+      <div class="tab-card-body">
+        <div class="tab-card-intro">
+          <h3 class="tab-card-title" title="${esc(c.point)}">${esc(c.point)}</h3>
           <span class="pt-industry">${IC_INDUSTRY}${esc(c.industry)}</span>
-          <p class="pt-desc" title="${esc(c.intro)}">${esc(c.intro)}</p>
+          <p class="tab-card-desc" title="${esc(c.intro)}">${esc(c.intro)}</p>
         </div>
-        <div class="r-card-metrics">
+        <div class="r-card-metrics compact stacked">
           <span class="metric"><small>點數兌台幣</small><b><em>${num(c.pts)}</em> 點 = <em>${num(c.ntd)}</em> 元</b></span>
           <span class="metric"><small>會員規模</small><b><em>${num(c.members)}</em> 萬人</b></span>
         </div>
@@ -635,7 +594,7 @@ function exchangePanel(c){
         ${pending
           ? '<button type="button" class="btn btn-secondary" disabled>加入申請處理中</button>'
           : '<button type="button" class="btn btn-primary" data-act="join">加入點數 SENSE</button>'}`,
-      pending ? '<span class="pt-tag"><span class="dot"></span>加入申請處理中</span>' : '');
+      pending ? '<span class="status-tag"><span class="dot"></span>加入申請處理中</span>' : '');
   }
 
   // 現階段示意：不論實際狀態，內頁一律以「已開通」呈現，方向同卡片右上的單向／雙向
@@ -645,7 +604,7 @@ function exchangePanel(c){
   if (r.open !== 'none'){
     blocks.push(`
       <div class="pt-block">
-        <div class="pt-block-head"><h3>已開通</h3><span class="pt-tag blue">${MODE_TEXT[r.open]}交換</span></div>
+        <div class="pt-block-head"><h3>已開通</h3><span class="status-tag blue">${MODE_TEXT[r.open]}交換</span></div>
         ${route(c, r.open)}
         <p class="pt-note">${r.open === 'both'
           ? `雙方會員都可以把自己的點數換成對方的點數。`
@@ -655,21 +614,21 @@ function exchangePanel(c){
   if (q && q.status === 'pending' && q.by === 'them'){
     blocks.push(`
       <div class="pt-block">
-        <div class="pt-block-head"><h3>${esc(c.name)} 向我方發起</h3><span class="pt-tag orange"><span class="dot"></span>待我方同意</span></div>
+        <div class="pt-block-head"><h3>${esc(c.name)} 向我方發起</h3><span class="status-tag orange"><span class="dot"></span>待我方同意</span></div>
         ${route(c, q.dirs)}
         <p class="pt-note muted">${q.date} 發起。同意後會自動產生交換頁，雙方會員即可開始交換。</p>
       </div>`);
   } else if (q && q.status === 'pending'){
     blocks.push(`
       <div class="pt-block">
-        <div class="pt-block-head"><h3>我方發起的交換</h3><span class="pt-tag"><span class="dot"></span>待對方同意</span></div>
+        <div class="pt-block-head"><h3>我方發起的交換</h3><span class="status-tag"><span class="dot"></span>待對方同意</span></div>
         ${route(c, q.dirs)}
         <p class="pt-note muted">${q.date} 發起，等待 ${esc(c.name)} 同意。對方同意後會自動開通。</p>
       </div>`);
   } else if (q && q.status === 'rejected'){
     blocks.push(`
       <div class="pt-block">
-        <div class="pt-block-head"><h3>${q.by === 'me' ? '我方發起的交換' : `${esc(c.name)} 發起的交換`}</h3><span class="pt-tag red">已拒絕</span></div>
+        <div class="pt-block-head"><h3>${q.by === 'me' ? '我方發起的交換' : `${esc(c.name)} 發起的交換`}</h3><span class="status-tag red">已拒絕</span></div>
         ${route(c, q.dirs)}
         <p class="pt-note muted">${q.date} 發起，${q.by === 'me' ? `${esc(c.name)} 已拒絕` : '我方已拒絕'}。可以重新發起。</p>
       </div>`);
@@ -720,7 +679,7 @@ function renderCompany(c){
         ${SenseUI.orgLogo(c)}
         <div class="pt-co-title">
           <h1>${esc(c.name)}${VERIFIED}</h1>
-          <div class="pt-co-meta"><span class="pt-tag">${esc(c.industry)}</span><span class="pt-tag">會員 ${num(c.members)} 萬人</span></div>
+          <div class="pt-co-meta"><span class="status-tag">${esc(c.industry)}</span><span class="status-tag">會員 ${num(c.members)} 萬人</span></div>
         </div>
       </div>
       <p class="pt-co-intro">${esc(c.intro)}</p>
@@ -771,12 +730,12 @@ let onSubmit = null;
 function openDialog({ title, body, foot, wide = false, submit = null }){
   dlg.classList.toggle('wide', wide);
   form.innerHTML = `
-    <div class="pt-dlg-head"><h2 id="dlg-title">${title}</h2><button type="button" class="pt-dlg-x" data-close aria-label="關閉">×</button></div>
-    <div class="pt-dlg-body">${body}</div>
-    <div class="pt-dlg-foot">${foot}</div>`;
+    <div class="dialog-head"><h2 id="dlg-title">${title}</h2><button type="button" class="dialog-x" data-close aria-label="關閉">×</button></div>
+    <div class="dialog-body">${body}</div>
+    <div class="dialog-foot">${foot}</div>`;
   onSubmit = submit; form.onchange = null;
   if (!dlg.open) dlg.showModal();
-  const first = form.querySelector('.pt-dlg-body input:not([readonly]):not([type=radio]), .pt-dlg-body input:checked, .pt-dlg-foot .btn-primary');
+  const first = form.querySelector('.dialog-body input:not([readonly]):not([type=radio]), .dialog-body input:checked, .dialog-foot .btn-primary');
   if (first) first.focus();
 }
 form.addEventListener('click', (e) => { if (e.target.closest('[data-close]')) dlg.close(); });

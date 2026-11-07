@@ -9,30 +9,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="shared/tokens.css?v=20261106c">
-<link rel="stylesheet" href="shared/components.css?v=20261106a">
-<link rel="stylesheet" href="shared/forms.css?v=20261028d">
+<link rel="stylesheet" href="shared/components.css?v=20261107a">
+<link rel="stylesheet" href="shared/forms.css?v=20261107a">
 <style>
   /* ── 策略 SENSE 頁內元件：UI Library 尚未收錄，需求確認後再決定是否抽到 shared/ ── */
 
-  /* StrategyCard：策略卡片。套行銷 SENSE 受眾包卡片的頁籤模板，右上頁籤改顯示交換方式 */
-  .ss-card{--ss-line:var(--black-300);display:flex;flex-direction:column;cursor:pointer;filter:drop-shadow(0 4px 0 var(--black-200))}
-  /* hover 換框線色不做轉場：凹圓角是漸層，無法跟框線一起漸變 */
-  .ss-card:hover,.ss-card:focus-visible{--ss-line:var(--hover-line);outline:0}
-  .ss-tabs{position:relative;z-index:1;display:flex;align-items:flex-end;margin-bottom:-1px}
+  /* StrategyCard：策略卡片。外框用共用的 TabCard（.tab-card），右上小頁籤顯示交換方式 */
   /* 公司頁籤：logo＋名稱＋版本＋認證標章。只有名稱會以「…」截斷，版本與認證標章固定顯示在最後 */
-  .ss-tab{position:relative;z-index:1;flex:1;min-width:0;padding:14px 20px 12px;display:flex;align-items:center;gap:10px;
-    background:var(--white);border:1px solid var(--ss-line);border-bottom:0;border-radius:var(--r-20) var(--r-20) 0 0}
-  .ss-tab .org-name{min-width:0;font-size:14px;line-height:20px;letter-spacing:var(--tracking-super);color:var(--black-700);
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .ss-tab .ver{flex:none;margin-left:-6px;font-size:12px;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--black-500);white-space:nowrap}
   .ss-verified{width:16px;height:16px;flex:none;margin-left:-6px;color:var(--badge-blue)}
-  /* 公司頁籤右下的內凹圓角，畫法同行銷 SENSE 受眾包卡片 */
-  .ss-tab::after{content:"";position:absolute;left:100%;bottom:0;width:21px;height:21px;
-    background:radial-gradient(circle at 100% 0,transparent 19.6px,var(--ss-line) 20px,var(--ss-line) 20.6px,var(--white) 21px)}
-  /* 交換方式頁籤：取代受眾包卡片的瀏覽數頁籤，圖示＋「單向／雙向」 */
-  .ss-tab-mode{flex:none;height:40px;margin-bottom:1px;padding:0 21px;display:flex;align-items:center;justify-content:center;gap:4px;
-    background:var(--black-50);border:1px solid var(--ss-line);border-left:0;border-bottom:0;border-radius:0 var(--r-10) 0 0;
-    font-size:14px;font-weight:500;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--black-600);white-space:nowrap}
+  /* 交換方式頁籤（.tab-card-side）：圖示＋「單向／雙向」 */
   /* 交換方式圖示：上方箭頭往右（去）、下方箭頭往左（回）。單向時「回」為淡灰，雙向時兩支同色 */
   .ss-mode-ic{width:16px;height:16px;flex:none;overflow:visible}
   .ss-mode-ic path{fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
@@ -45,20 +31,7 @@
   @keyframes ss-arrow-r{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
   @keyframes ss-arrow-l{from{opacity:0;transform:translateX(6px)}to{opacity:1;transform:none}}
   @media (prefers-reduced-motion:reduce){ .ss-mode-ic path{animation:none !important} }
-  /* 卡片本體：上方兩角被頁籤接住，不做圓角 */
-  .ss-card-body{flex:1;display:flex;flex-direction:column;gap:20px;padding:10px 20px 20px;background:var(--white);border:1px solid var(--ss-line);
-    border-radius:0 0 var(--r-30) var(--r-30)}
-  /* 標題只顯示一行，超出以「…」截斷（完整標題放在 title） */
-  .ss-card-title{font-size:16px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-super);color:var(--black-800);
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  /* 標題＋條件標籤＋說明：說明至多兩行，超出以「…」截斷 */
-  .ss-card-intro{display:flex;flex-direction:column;gap:4px}
-  .ss-desc{font-size:14px;line-height:22px;letter-spacing:var(--tracking-wider);color:var(--black-600);
-    display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
-  /* 人數與價格合成一個框：沿用受眾包卡片受眾規模列的淡橘底（ResourceCard 指標區），上方人數、下方價格 */
-  .ss-card .r-card-metrics{flex-direction:column;align-items:stretch;gap:0;border-radius:var(--r-10)}
-  .ss-card .r-card-metrics .metric{flex:none;flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
-  .ss-card .r-card-metrics .metric em{font-size:18px;font-style:normal}
+  /* 人數與價格合成一個框（.r-card-metrics.compact.stacked）：上方人數、下方價格 */
   .ss-prices{width:100%;margin-top:10px;border-collapse:collapse;border-top:1px solid var(--black-300);font-size:12px;line-height:16px;letter-spacing:var(--tracking-wider);white-space:nowrap}
   .ss-prices th{padding:10px 0 0;font-weight:600;color:var(--black-500);text-align:left}
   /* 價格數值同上方人數的樣式：數字放大、單位（NT$）維持原字級並放在數字後 */
@@ -77,10 +50,8 @@
   .ss-tags li{flex:none;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;padding:4px 0;
     color:var(--accent);font-size:13px;line-height:20px;letter-spacing:var(--tracking-wider)}
   .ss-tags li svg{width:14px;height:14px;flex:none}
-  /* 發起媒合預估：outline 按鈕，樣式照財務 SENSE 的 .fs-btn-outline（該元件在財務頁內，尚未抽到 shared/），撐滿卡片寬度、貼齊卡片底部 */
-  .ss-btn-outline{background:var(--white);border:1px solid #CFE3FD;color:var(--accent-border);filter:drop-shadow(0 4px 0 #E3EEFD)}
-  .ss-btn-outline:hover{background:#F5F9FF}
-  .ss-card-body .ss-btn-outline{width:100%;margin-top:auto}
+  /* 發起媒合預估：共用的藍色外框按鈕（.btn-outline-blue），撐滿卡片寬度、貼齊卡片底部 */
+  .tab-card-body .btn-outline-blue{width:100%;margin-top:auto}
 </style>
 </head>
 <body>
@@ -157,18 +128,18 @@ const num = (n) => n.toLocaleString('en-US');
 function strategyCard(s){
   const org = ORGS[s.org], mode = MODES[s.mode];
   return `
-    <article class="ss-card" data-card="${s.id}" tabindex="0" aria-label="${esc(s.title)}，${esc(org.name)}">
-      <div class="ss-tabs">
-        <div class="ss-tab" title="${esc(org.name)}（${esc(s.ver)}）">${SenseUI.orgLogo(org)}<span class="org-name">${esc(org.name)}</span><span class="ver">(${esc(s.ver)})</span>${VERIFIED}</div>
-        <div class="ss-tab-mode" data-mode="${s.mode}" aria-label="${mode.full}">${MODE_IC}${mode.label}</div>
+    <article class="tab-card ss-card" data-card="${s.id}" tabindex="0" aria-label="${esc(s.title)}，${esc(org.name)}">
+      <div class="tab-card-tabs">
+        <div class="tab-card-org ss-tab" title="${esc(org.name)}（${esc(s.ver)}）">${SenseUI.orgLogo(org)}<span class="org-name">${esc(org.name)}</span><span class="ver">(${esc(s.ver)})</span>${VERIFIED}</div>
+        <div class="tab-card-side ss-tab-mode" data-mode="${s.mode}" aria-label="${mode.full}">${MODE_IC}${mode.label}</div>
       </div>
-      <div class="ss-card-body">
-        <div class="ss-card-intro">
-          <h3 class="ss-card-title" title="${esc(s.title)}">${esc(s.title)}</h3>
+      <div class="tab-card-body">
+        <div class="tab-card-intro">
+          <h3 class="tab-card-title" title="${esc(s.title)}">${esc(s.title)}</h3>
           <ul class="ss-tags" tabindex="0" aria-label="同時具備以下全部條件">${s.tags.map(t => `<li>${TAG}${esc(t)}</li>`).join('')}</ul>
-          <p class="ss-desc" title="${esc(s.desc)}">${esc(s.desc)}</p>
+          <p class="tab-card-desc" title="${esc(s.desc)}">${esc(s.desc)}</p>
         </div>
-        <div class="r-card-metrics">
+        <div class="r-card-metrics compact stacked">
           <span class="metric"><small>符合人數</small><b><em>${num(s.size)}</em> 人</b></span>
           <table class="ss-prices">
             <tbody>
@@ -176,7 +147,7 @@ function strategyCard(s){
             </tbody>
           </table>
         </div>
-        <button class="btn ss-btn-outline" data-estimate="${s.id}">發起媒合預估</button>
+        <button class="btn btn-outline-blue" data-estimate="${s.id}">發起媒合預估</button>
       </div>
     </article>`;
 }

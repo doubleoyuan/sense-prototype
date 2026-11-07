@@ -9,8 +9,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="shared/tokens.css?v=20261106c">
-<link rel="stylesheet" href="shared/components.css?v=20261106a">
-<link rel="stylesheet" href="shared/forms.css?v=20261028d">
+<link rel="stylesheet" href="shared/components.css?v=20261107a">
+<link rel="stylesheet" href="shared/forms.css?v=20261107a">
 <style>
   /* ── 兌換 SENSE 頁內元件：UI Library 尚未收錄，需求確認後再決定是否抽到 shared/ ──
      版型沿用點數 SENSE（數據卡、頁籤卡片、資訊卡、對話框），class 改以 ex- 開頭 */
@@ -81,12 +81,8 @@
   .ex-card-actions{display:flex;gap:12px;margin-top:auto}  /* 推到卡片底部，各卡片的按鈕才會對齊 */
   .ex-card-actions .btn{flex:1;min-width:0;padding:0 12px;letter-spacing:var(--tracking-wider);white-space:nowrap}
 
-  /* 標籤：樣式同點數 SENSE 的 .pt-tag */
-  .ex-tag{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:20px;font-size:12px;font-weight:600;
-    letter-spacing:var(--tracking-wider);white-space:nowrap;background:var(--black-100);color:var(--black-600)}
-  .ex-tag.blue{background:var(--mod-product-tint);color:var(--accent-border)}
-  .ex-tag.orange{background:var(--metric-bg);color:var(--cta-orange)}
-  .ex-tag .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+  /* 標籤：共用的 StatusTag（.status-tag）；橘色同點數 SENSE（CTA 橘），先留在頁內 */
+  .status-tag.orange{background:var(--metric-bg);color:var(--cta-orange)}
 
   /* ── 票券商品卡：沿用 ResourceCard（.r-card），主圖改灰底示意框，左上角疊類型標籤 ── */
   .ex-prod .r-card-img{position:relative}
@@ -156,23 +152,11 @@
   .ex-xp-head h2{flex:1;min-width:0;font-size:18px;font-weight:700;line-height:32px;letter-spacing:var(--tracking-ultra)}
   .ex-xpanel > .ex-panel-body{padding:20px 20px 24px}
 
-  /* ── 對話框：沿用點數 SENSE 的 .pt-dialog ── */
-  .ex-dialog{width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 48px);padding:0;border:0;border-radius:24px;background:var(--white);color:var(--black-800);
-    box-shadow:0 20px 60px rgba(0,0,0,.18);letter-spacing:var(--tracking-ultra)}
-  .ex-dialog.wide{width:min(720px,calc(100vw - 32px))}
-  .ex-dialog::backdrop{background:rgba(0,0,0,.32)}
-  .ex-dialog form{display:flex;flex-direction:column;max-height:calc(100vh - 48px)}
-  .ex-dlg-head{display:flex;align-items:center;gap:12px;padding:18px 24px;border-bottom:1px solid var(--black-200)}
-  .ex-dlg-head h2{flex:1;font-size:17px;font-weight:700;letter-spacing:var(--tracking-super)}
-  .ex-dlg-x{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:20px;color:var(--black-500)}
-  .ex-dlg-x:hover{background:var(--black-100)}
-  .ex-dlg-body{padding:20px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:20px;font-size:14px;line-height:24px;letter-spacing:1.6px}
-  .ex-dlg-foot{display:flex;justify-content:flex-end;gap:12px;padding:16px 24px;border-top:1px solid var(--black-200);flex-wrap:wrap}
-  .ex-dlg-foot .spacer{flex:1}
-  .ex-dlg-body .field{gap:8px}
-  .ex-dlg-body .field-label{font-size:14px}
-  .ex-dlg-body .form-row{gap:16px}
-  .ex-dlg-body .input[readonly]{background:var(--black-50);color:var(--black-600)}  /* 帶入、不可修改 */
+  /* ── 對話框：共用的 Dialog（.dialog）；以下為表單欄位在對話框內的調整（同點數 SENSE） ── */
+  .dialog-foot .spacer{flex:1}
+  .dialog-body .field{gap:8px}
+  .dialog-body .field-label{font-size:14px}
+  .dialog-body .input[readonly]{background:var(--black-50);color:var(--black-600)}  /* 帶入、不可修改 */
 
   /* 申請流程：送出申請 → 專人洽談 → 開發上線 */
   .ex-flow{display:flex;align-items:center;gap:8px;padding:12px 16px;border-radius:var(--r-10);background:var(--step-highlight);
@@ -193,7 +177,7 @@
   .ex-opt input{margin:5px 0 0;accent-color:var(--accent-border)}
   .ex-opt b{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-wider)}
   .ex-opt small{display:block;font-size:12px;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
-  .ex-opt .ex-tag{height:20px;padding:0 8px;font-size:11px}
+  .ex-opt .status-tag{height:20px;padding:0 8px;font-size:11px}
 
   /* 送出完成 */
   .ex-done{display:flex;flex-direction:column;align-items:center;gap:10px;padding:24px 0 8px;text-align:center}
@@ -234,7 +218,7 @@
     .ex-stat{gap:12px;padding:14px 16px}
     .ex-stat b{font-size:14px;gap:4px}
     .ex-opts,.ex-opts.three{grid-template-columns:minmax(0,1fr)}
-    .ex-dlg-body .form-row{grid-template-columns:minmax(0,1fr)}
+    .dialog-body .form-row{grid-template-columns:minmax(0,1fr)}
     .ex-summary{grid-template-columns:minmax(0,1fr)}
     .ex-fab{padding:10px 24px 10px 60px}
   }
@@ -285,7 +269,7 @@
 <!-- 區塊四：申請兌換平台（主頁右下角固定按鈕） -->
 <button type="button" class="cta-btn ex-fab" id="fab" hidden></button>
 
-<dialog class="ex-dialog" id="dlg" aria-labelledby="dlg-title"><form method="dialog" id="dlg-form" novalidate></form></dialog>
+<dialog class="dialog" id="dlg" aria-labelledby="dlg-title"><form method="dialog" id="dlg-form" novalidate></form></dialog>
 
 <script src="shared/shell.js?v=20261107a"></script>
 <script src="shared/components.js?v=20261028d"></script>
@@ -435,7 +419,7 @@ let application = loadApplication();
 const state = { cat:'all', query:'', sort:'newest', page:1 };
 const { esc } = SenseUI;
 const num = (n) => n.toLocaleString('en-US');
-const featTags = (c) => c.feats.map(f => `<span class="ex-tag">${FEATURES[f].short}</span>`).join('');
+const featTags = (c) => c.feats.map(f => `<span class="status-tag">${FEATURES[f].short}</span>`).join('');
 const placeholder = (label, sub = '') => `${IC_IMG}<span>${esc(label)}</span>${sub ? `<small>${esc(sub)}</small>` : ''}`;
 
 /* ═════════ 主頁：數據盤 ═════════ */
@@ -620,7 +604,7 @@ function carousel(c){
 
 // 申請卡：未申請 → 申請按鈕；申請處理中 → 狀態標籤＋查看申請內容
 function applyPanel(){
-  const head = application ? '<span class="ex-tag"><span class="dot"></span>申請處理中</span>' : '';
+  const head = application ? '<span class="status-tag"><span class="dot"></span>申請處理中</span>' : '';
   const body = application
     ? `<p class="ex-note">已於 ${application.date} 送出申請，專人將與您聯繫，洽談串接與上線時程。</p>
        <button type="button" class="btn btn-secondary" data-act="status">查看申請內容</button>`
@@ -658,13 +642,13 @@ function renderCase(c){
           <div class="ex-feat-list">${c.feats.map(f => `
             <div class="ex-feat">
               <span class="ex-feat-ic">${svgIc(f)}</span>
-              <div><h3>${FEATURES[f].label}${f === 'pay' ? '<span class="ex-tag">選配</span>' : ''}</h3><p>${esc(c.notes[f])}</p></div>
+              <div><h3>${FEATURES[f].label}${f === 'pay' ? '<span class="status-tag">選配</span>' : ''}</h3><p>${esc(c.notes[f])}</p></div>
             </div>`).join('')}
           </div>`)}
         ${panel('type-title', '提供的票券商品', `
           <div class="ex-types">
-            <div class="ro-item"><span class="ro-label">商品類型</span><div>${c.types.map(t => `<span class="ex-tag">${t}</span>`).join('')}</div></div>
-            <div class="ro-item"><span class="ro-label">商品分類</span><div>${c.cats.map(t => `<span class="ex-tag">${t}</span>`).join('')}</div></div>
+            <div class="ro-item"><span class="ro-label">商品類型</span><div>${c.types.map(t => `<span class="status-tag">${t}</span>`).join('')}</div></div>
+            <div class="ro-item"><span class="ro-label">商品分類</span><div>${c.cats.map(t => `<span class="status-tag">${t}</span>`).join('')}</div></div>
           </div>`)}
       </div>
       <div class="ex-aside">
@@ -729,12 +713,12 @@ let onSubmit = null;
 function openDialog({ title, body, foot, wide = false, submit = null }){
   dlg.classList.toggle('wide', wide);
   form.innerHTML = `
-    <div class="ex-dlg-head"><h2 id="dlg-title">${title}</h2><button type="button" class="ex-dlg-x" data-close aria-label="關閉">×</button></div>
-    <div class="ex-dlg-body">${body}</div>
-    <div class="ex-dlg-foot">${foot}</div>`;
+    <div class="dialog-head"><h2 id="dlg-title">${title}</h2><button type="button" class="dialog-x" data-close aria-label="關閉">×</button></div>
+    <div class="dialog-body">${body}</div>
+    <div class="dialog-foot">${foot}</div>`;
   onSubmit = submit;
   if (!dlg.open) dlg.showModal();
-  const first = form.querySelector('.ex-dlg-body input:not([readonly]):not([type=radio]):not([type=checkbox]), .ex-dlg-foot .btn-primary');
+  const first = form.querySelector('.dialog-body input:not([readonly]):not([type=radio]):not([type=checkbox]), .dialog-foot .btn-primary');
   if (first) first.focus();
 }
 form.addEventListener('click', (e) => { if (e.target.closest('[data-close]')) dlg.close(); });
@@ -773,9 +757,9 @@ function openApply(){
       </div>
       <div class="field"><span class="field-label">需要的串接</span>
         <div class="ex-opts three">
-          ${opt('checkbox', 'sso', 'sso', `${FEATURES.sso.label}<span class="ex-tag blue">必要</span>`, '會員用原帳號登入', { checked:true, locked:true })}
-          ${opt('checkbox', 'points', 'points', `${FEATURES.points.label}<span class="ex-tag blue">必要</span>`, '查詢與扣抵會員點數', { checked:true, locked:true })}
-          ${opt('checkbox', 'pay', 'pay', `${FEATURES.pay.label}<span class="ex-tag">選配</span>`, '點數不足時補差額')}
+          ${opt('checkbox', 'sso', 'sso', `${FEATURES.sso.label}<span class="status-tag blue">必要</span>`, '會員用原帳號登入', { checked:true, locked:true })}
+          ${opt('checkbox', 'points', 'points', `${FEATURES.points.label}<span class="status-tag blue">必要</span>`, '查詢與扣抵會員點數', { checked:true, locked:true })}
+          ${opt('checkbox', 'pay', 'pay', `${FEATURES.pay.label}<span class="status-tag">選配</span>`, '點數不足時補差額')}
         </div>
       </div>
       ${field('預計上線時間', select('launch', LAUNCHES))}
