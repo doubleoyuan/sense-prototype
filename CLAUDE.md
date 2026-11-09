@@ -21,6 +21,12 @@ SENSE 平台各模組的可互動原型（純 HTML／CSS／JS，無建置流程�
 - `prototype/ui-library.html`：給人看的 UI Library 說明頁，不上傳。
 - `scripts/build_share*.py`：把原型打包成單一 HTML 到 `dist/`，方便直接傳送。
 - `doc/`：需求文件，內含機密，絕不上傳。
+  - `deck/`：各模組的規劃簡報與技術說明。
+  - `meeting minutes/`：週會記錄。
+  - `prototype from PO/`：PO 提供的參考原型。
+  - `design resource/`：Logo 等設計原始檔。
+  - 其他未分類的資料直接放在 `doc/` 底下。
+  - 讀取前先跟使用者確認哪些內容仍然有效，簡報裡可能夾著隱藏的舊版頁面。
 
 ## AppShell
 - 頁面結構為 `<div class="app" data-module="…" data-page="…">`，再呼叫 `SenseShell.mount()`。

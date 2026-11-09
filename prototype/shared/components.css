@@ -271,11 +271,13 @@ a.sb-mod-label:hover{color:var(--strong)}
 
 /* FilterChips */
 .chips{width:100%;min-height:36px;display:flex;flex-wrap:wrap;align-items:center;gap:10px}  /* 與 36px 的搜尋／排序按鈕垂直置中 */
-/* 依 Figma 4025:310：高 32、內距 8／16、行高 16，未選取為淡灰字 */
+/* 依 Figma 4025:310：高 32、內距 8／16、行高 16。
+   顏色依 Figma 4275:354 改為藍色系（2026-11-09，使用者設計）：選取中為淺藍底、白字；hover 為實心藍、白字；
+   選取中的標籤滑過時維持選取樣式；鍵盤聚焦沿用全站外框。色值先對應到最接近的 token，待取得 Figma 數值再校正 */
 .chip{height:32px;padding:8px 16px;display:inline-flex;align-items:center;border:1px solid var(--black-200);border-radius:var(--r-16);background:var(--white);
-  font-size:12px;font-weight:600;line-height:16px;letter-spacing:var(--tracking-wider);color:var(--black-400);transition:background .15s,color .15s}
-.chip:hover{background:var(--black-50);color:var(--black-600)}
-.chip[aria-pressed="true"]{background:var(--black-500);color:var(--white)}
+  font-size:12px;font-weight:600;line-height:16px;letter-spacing:var(--tracking-wider);color:var(--black-400);transition:background .15s,color .15s,border-color .15s}
+.chip:hover{background:var(--accent);border-color:var(--accent);color:var(--white)}  /* 外框與底色同色 */
+.chip[aria-pressed="true"]{background:var(--mod-product);border-color:var(--mod-product);color:var(--white)}  /* 外框與底色同色（看起來無框線，2026-11-09） */
 
 /* ResourceCard */
 .card-grid{width:100%;display:grid;grid-template-columns:repeat(var(--cols,3),minmax(0,1fr));gap:20px}
@@ -351,10 +353,11 @@ a.sb-mod-label:hover{color:var(--strong)}
 .tab-card-desc{font-size:14px;line-height:22px;letter-spacing:var(--tracking-wider);color:var(--black-600);
   display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
 
-/* StatusTag：狀態標籤（膠囊，可在文字前加圓點 .dot）。預設灰色；橘、綠等其他顏色各模組仍不一致，先留在頁內 */
+/* StatusTag：狀態標籤（膠囊，可在文字前加圓點 .dot）。預設灰色；綠、金、黑目前只有財務在用，先留在頁內 */
 .status-tag{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:20px;font-size:12px;font-weight:600;
   letter-spacing:var(--tracking-wider);white-space:nowrap;background:var(--black-100);color:var(--black-600)}
 .status-tag.blue{background:var(--mod-product-tint);color:var(--accent-border)}
+.status-tag.orange{background:var(--metric-bg);color:var(--warn-text)}  /* 待處理、提醒（2026-11-09 統一為深橘字） */
 .status-tag.red{background:var(--danger-bg);color:var(--danger)}
 .status-tag .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
 

@@ -8,9 +8,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="shared/tokens.css?v=20261106c">
-<link rel="stylesheet" href="shared/components.css?v=20261107a">
-<link rel="stylesheet" href="shared/forms.css?v=20261107a">
+<link rel="stylesheet" href="shared/tokens.css?v=20261109a">
+<link rel="stylesheet" href="shared/components.css?v=20261109e">
+<link rel="stylesheet" href="shared/forms.css?v=20261109a">
 <style>
   /* ── 財務 SENSE 頁內元件（推導）：UI Library 尚未收錄，需求確認後再決定是否抽到 shared/ ── */
   .fs-view{width:100%;display:flex;flex-direction:column;gap:40px}
@@ -19,7 +19,6 @@
   .fs-muted{color:var(--black-500)}
   .section-title .fs-aside{flex:none;display:flex;align-items:center;gap:8px}
   .btn-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-  .btn.btn-sm{min-width:0;height:32px;padding:0 16px;font-size:12px;letter-spacing:var(--tracking-wider);filter:drop-shadow(0 2px 0 var(--black-200))}
   .btn.danger{color:var(--danger)}
   .btn[disabled]{opacity:.45;cursor:not-allowed;filter:none}
   .btn.block{width:100%}
@@ -29,7 +28,6 @@
 
   /* 狀態標籤 */
   .status-tag.green{background:#E7F6EE;color:#1F8A57}
-  .status-tag.orange{background:var(--metric-bg);color:#C25E1F}
   .status-tag.gold{background:#FFF6DB;color:var(--mod-finance-strong)}
   .status-tag.dark{background:var(--black-800);color:var(--white)}
 
@@ -66,7 +64,6 @@
   .fs-todo-more{display:block;width:100%;padding-top:12px;border-top:1px solid var(--black-100);text-align:center;font-size:13px;font-weight:600;letter-spacing:var(--tracking-wider);color:var(--black-600)}
   .fs-todo-more:hover{color:var(--hover-teal)}
   /* 首頁按鈕：共用的藍色外框按鈕 .btn-outline-blue（2026-10-27 使用者確認，避免實心藍太多） */
-  .btn.btn-outline-blue.btn-sm{filter:drop-shadow(0 2px 0 #E3EEFD)}  /* 小尺寸的陰影位移是 2px（.btn.btn-sm），這裡只換顏色 */
   /* 首頁：募資／融資／併購三條路徑卡（外框沿用 ResourceCard） */
   .fs-paths{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
   .fs-path-card{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:20px;border:1px solid var(--line-soft);border-radius:var(--r-30);background:var(--white);transition:border-color .15s}
@@ -196,7 +193,7 @@
   .fs-audit{display:grid;grid-template-columns:150px 140px 90px minmax(0,1fr);gap:12px;padding:8px 0;border-bottom:1px solid var(--black-100);font-size:13px;letter-spacing:var(--tracking-wider)}
   .fs-banner{width:100%;display:flex;flex-direction:column;gap:2px;padding:14px 18px;border-radius:var(--r-16);background:#E7F6EE;color:#1F8A57;font-size:13px;line-height:22px;letter-spacing:var(--tracking-wider)}
   .fs-banner b{font-size:14px}
-  .fs-banner.warn{background:var(--metric-bg);color:#C25E1F}
+  .fs-banner.warn{background:var(--metric-bg);color:var(--warn-text)}
 
   /* 訊息 */
   .fs-msg{display:grid;grid-template-columns:300px minmax(0,1fr);min-height:520px;padding:0;overflow:hidden}
@@ -258,7 +255,7 @@
   .fs-section{display:flex;flex-direction:column;gap:12px;padding:18px 0;border-top:1px solid var(--black-200)}
   .fs-section:first-child{border-top:0;padding-top:0}
   .fs-section:last-child{padding-bottom:0}
-  .fs-section h3{font-size:15px;font-weight:700;letter-spacing:var(--tracking-super)}
+  .fs-section h3{font-size:14px;font-weight:700;letter-spacing:var(--tracking-super)}  /* 內頁小標統一 14px（2026-11-09） */
   .fs-datagrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
   .fs-datum{padding:12px 14px;border-radius:var(--r-16);background:var(--black-50)}
   .fs-datum span{display:block;font-size:12px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
@@ -281,7 +278,7 @@
   .fs-doc{padding:24px;border:1px solid var(--black-200);border-radius:var(--r-16);background:var(--black-50)}
   .fs-doc h3{font-size:16px;font-weight:700;margin-bottom:6px}
   .fs-docline{height:8px;margin:10px 0;border-radius:6px;background:var(--black-200)}
-  .fs-watermark{padding:6px 12px;border-radius:10px;background:var(--metric-bg);font-size:12px;color:#C25E1F;text-align:center}
+  .fs-watermark{padding:6px 12px;border-radius:10px;background:var(--metric-bg);font-size:12px;color:var(--warn-text);text-align:center}
   .fs-sig{height:48px;max-width:170px;object-fit:contain;padding:4px;border:1px solid var(--black-200);border-radius:8px;background:var(--white)}
   .fs-count-hint{align-self:flex-end;font-size:12px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
   .fs-count-hint.ok{color:#1F8A57}

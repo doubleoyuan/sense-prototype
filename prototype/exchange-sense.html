@@ -8,9 +8,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="shared/tokens.css?v=20261106c">
-<link rel="stylesheet" href="shared/components.css?v=20261107a">
-<link rel="stylesheet" href="shared/forms.css?v=20261107a">
+<link rel="stylesheet" href="shared/tokens.css?v=20261109a">
+<link rel="stylesheet" href="shared/components.css?v=20261109e">
+<link rel="stylesheet" href="shared/forms.css?v=20261109a">
 <style>
   /* ── 兌換 SENSE 頁內元件：UI Library 尚未收錄，需求確認後再決定是否抽到 shared/ ──
      版型沿用點數 SENSE（數據卡、頁籤卡片、資訊卡、對話框），class 改以 ex- 開頭 */
@@ -59,21 +59,14 @@
   @media (min-width:900px) and (max-width:1023px), (min-width:1280px) and (max-width:1559px){
     .ex-case-grid > :nth-child(n+7){display:none}
   }
-  .ex-card{--ex-line:var(--black-300);display:flex;flex-direction:column;cursor:pointer;filter:drop-shadow(0 4px 0 var(--black-200))}
-  .ex-card:hover:not(:has(.ex-card-actions:hover)),.ex-card:focus-visible{--ex-line:var(--hover-line);outline:0}
-  .ex-tab{position:relative;z-index:1;margin-bottom:-1px;padding:14px 20px 12px;display:flex;align-items:center;gap:10px;
-    background:var(--white);border:1px solid var(--ex-line);border-bottom:0;border-radius:var(--r-20) var(--r-20) 0 0}
-  .ex-tab .org-name{min-width:0;font-size:14px;line-height:20px;letter-spacing:var(--tracking-super);color:var(--black-700);
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .ex-card-body{flex:1;display:flex;flex-direction:column;gap:16px;padding:10px 20px 20px;background:var(--white);border:1px solid var(--ex-line);
-    border-radius:0 0 var(--r-30) var(--r-30)}
+  /* 案例卡：外框用共用的 TabCard（.tab-card），只有公司頁籤、沒有右側小頁籤；卡片內間距 16（共用為 20） */
+  .ex-card .tab-card-body{gap:16px}
+  /* 滑到底部按鈕上時，卡片框線不轉色（按鈕各自有 hover） */
+  .ex-card:hover:has(.ex-card-actions:hover):not(:focus-visible){--tab-line:var(--black-300)}
   .ex-shot{aspect-ratio:16/10;border:1px solid var(--black-200);border-radius:var(--r-16);overflow:hidden}
   /* 實際截圖：裁切填滿，保留畫面上緣（網站頁首） */
   .ex-img{background:var(--black-100)}
   .ex-img img{width:100%;height:100%;object-fit:cover;object-position:top}
-  .ex-card-intro{display:flex;flex-direction:column;gap:4px}
-  .ex-card-title{font-size:16px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-super);color:var(--black-800);
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   /* 產業：圖示 16px（不超過上方標題）；文字 13px、加粗 */
   .ex-industry{display:inline-flex;align-items:center;gap:6px;padding:4px 0;color:var(--accent);font-size:13px;font-weight:600;line-height:20px;letter-spacing:var(--tracking-wider)}
   .ex-industry svg{width:16px;height:16px;flex:none}
@@ -91,8 +84,7 @@
   .ex-more:empty{display:none}
   .ex-more .btn{min-width:200px}
 
-  /* 標籤：共用的 StatusTag（.status-tag）；橘色同點數 SENSE（CTA 橘），先留在頁內 */
-  .status-tag.orange{background:var(--metric-bg);color:var(--cta-orange)}
+  /* 標籤：共用的 StatusTag（.status-tag） */
 
   /* ── 票券商品卡：沿用 ResourceCard（.r-card），主圖改灰底示意框，左上角疊類型標籤 ── */
   .ex-prod .r-card-img{position:relative}
@@ -509,12 +501,12 @@ const metaRow = (c) => `<span class="ex-industry" title="產業">${IC_INDUSTRY}$
   <span class="ex-industry" title="上線時間" aria-label="上線時間 ${c.launch}">${IC_DATE}${c.launch}</span>`;
 function caseCard(c){
   return `
-    <article class="ex-card" data-case="${c.id}" tabindex="0" aria-label="${esc(c.name)}，${esc(c.platform)}，查看案例">
-      <div class="ex-tab" title="${esc(c.name)}">${SenseUI.orgLogo(c)}<span class="org-name">${esc(c.name)}</span></div>
-      <div class="ex-card-body">
+    <article class="tab-card ex-card" data-case="${c.id}" tabindex="0" aria-label="${esc(c.name)}，${esc(c.platform)}，查看案例">
+      <div class="tab-card-tabs"><div class="tab-card-org" title="${esc(c.name)}">${SenseUI.orgLogo(c)}<span class="org-name">${esc(c.name)}</span></div></div>
+      <div class="tab-card-body">
         ${shot(c, 0, 'ex-shot', placeholder('兌換平台畫面截圖', '示意'))}
-        <div class="ex-card-intro">
-          <h3 class="ex-card-title" title="${esc(c.platform)}">${esc(c.platform)}</h3>
+        <div class="tab-card-intro">
+          <h3 class="tab-card-title" title="${esc(c.platform)}">${esc(c.platform)}</h3>
           <div class="ex-meta">
             ${metaRow(c)}
           </div>
