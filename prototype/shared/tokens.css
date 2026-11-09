@@ -24,6 +24,7 @@
   --ticket:#F3EBE4;              /* 入口頁票券 */
   --metric-bg:#FFF7F2;           /* 卡片指標區 */
   --warn-text:#C25E1F;           /* 淡橘底上的深橘字（狀態標籤、提醒列；2026-11-09 統一） */
+  --toast-line:#FFBB00;          /* Toast 黃框（Figma 4288:883，先泛用） */
 
   /* 模組識別色：--mod-* 為側欄色條，--mod-*-strong 為文字／選取色 */
   --mod-product:#99C7FB;   --mod-product-strong:#1A81F6; --mod-product-tint:#E6F1FE;

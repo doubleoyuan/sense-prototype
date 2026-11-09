@@ -85,13 +85,29 @@
     return `<svg class="sb-collapse-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="${SB_CHEVRON[dir]}"/></svg>`;
   }
 
-  /* ── Toast ── */
+  /* ── Toast：右上角提示（Figma 4288:883）。關閉鈕外圈 5 秒倒數（滑鼠移入時暫停），倒數完 ✕ 變 ✓ 再關閉 ── */
+  const TOAST_IC = `<svg class="toast-ic" viewBox="0 0 24 28" aria-hidden="true"><ellipse cx="11.5" cy="23" rx="11.5" ry="5" fill="#EEEEEE"/>`
+    + `<path d="M12 3C6.49 3 2 6.59 2 11C2 13.91 3.9 16.51 7 17.93V21C7 21.38 7.21 21.73 7.55 21.89C7.69 21.96 7.84 22 8 22C8.21 22 8.42 21.93 8.6 21.8L12.34 19C17.7 18.86 22 15.32 22 11C22 6.68 17.51 3 12 3ZM12 17C11.78 17 11.57 17.07 11.4 17.2L9 19V17.27C9 16.86 8.75 16.49 8.36 16.34C5.67 15.3 4 13.26 4 11C4 7.69 7.59 5 12 5C16.41 5 20 7.69 20 11C20 14.31 16.41 17 12 17Z" fill="#BDBDBD"/>`
+    + `<circle class="dot" cx="8" cy="11" r="1" fill="#66ABF9"/><circle class="dot" cx="12" cy="11" r="1" fill="#FFD666"/><circle class="dot" cx="16" cy="11" r="1" fill="#FF904D"/></svg>`;
+  const TOAST_CLOSE = `<button type="button" class="toast-close" aria-label="關閉提示"><svg viewBox="0 0 24 24" aria-hidden="true">`
+    + `<circle class="track" cx="12" cy="12" r="11"/><circle class="ring" cx="12" cy="12" r="11" pathLength="100"/>`
+    + `<path class="x" d="M8.5 8.5l7 7M15.5 8.5l-7 7"/><path class="ok" d="M7.5 12.3l3.1 3.1 5.9-6.3" pathLength="100"/></svg></button>`;
   let toastTimer;
+  function hideToast(el){ clearTimeout(toastTimer); el.classList.remove('show', 'is-done'); }
   function toast(msg){
     let el = document.getElementById('toast');
-    if (!el){ el = document.createElement('div'); el.id = 'toast'; el.className = 'toast'; el.setAttribute('role','status'); document.body.appendChild(el); }
-    el.textContent = msg; el.classList.add('show');
-    clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+    if (!el){
+      el = document.createElement('div'); el.id = 'toast'; el.className = 'toast'; el.setAttribute('role', 'status');
+      el.innerHTML = TOAST_IC + '<p class="toast-msg"></p>' + TOAST_CLOSE;
+      el.querySelector('.toast-close').addEventListener('click', () => hideToast(el));
+      // 倒數動畫跑完（含暫停的時間）才換成 ✓，再稍等一下關閉
+      el.querySelector('.ring').addEventListener('animationend', () => { el.classList.add('is-done'); toastTimer = setTimeout(() => hideToast(el), 500); });
+    }
+    // 對話框開著時放進對話框裡，才不會被擋在後面
+    (document.querySelector('dialog[open]') || document.body).appendChild(el);
+    el.querySelector('.toast-msg').textContent = msg;
+    hideToast(el); void el.offsetWidth;   // 連續觸發時重新開始倒數與跳動
+    el.classList.add('show');
   }
   const notYet = (what) => toast(`「${what}」尚未製作，之後補上`);
 

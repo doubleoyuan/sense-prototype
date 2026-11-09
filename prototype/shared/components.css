@@ -391,11 +391,38 @@ a.sb-mod-label:hover{color:var(--strong)}
 .empty{width:100%;padding:60px 20px;border:1px dashed var(--black-300);border-radius:var(--r-30);text-align:center;color:var(--black-500);
   font-size:14px;letter-spacing:var(--tracking-wider);line-height:1.8}
 
-/* Toast */
-.toast{position:fixed;left:50%;bottom:32px;z-index:60;transform:translateX(-50%) translateY(12px);opacity:0;pointer-events:none;
-  background:var(--black-800);color:var(--white);padding:10px 18px;border-radius:12px;font-size:13px;letter-spacing:var(--tracking-wider);
-  transition:opacity .2s,transform .2s;max-width:calc(100vw - 32px)}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* Toast：右上角提示（Figma 4288:883）。白底黃框，左側對話泡泡（出現時三顆點依序跳，共三輪），文字超過 320px 自然換行 */
+.toast{position:fixed;top:calc(var(--header-h) + 20px);right:20px;z-index:60;width:max-content;max-width:min(394px,calc(100vw - 32px));
+  display:flex;align-items:flex-start;gap:10px;padding:20px;background:var(--white);border:2px solid var(--toast-line);border-radius:var(--r-10);
+  box-shadow:0 4px 0 var(--black-200);opacity:0;transform:translateX(24px) scale(.96);transform-origin:top right;pointer-events:none;
+  transition:opacity .2s ease-in,transform .2s ease-in}  /* 退場：0.2 秒、加速離開 */
+/* 進場：0.32 秒，從右側 24px 滑入並由 96% 放大到 100%，快速出現、慢慢停下 */
+.toast.show{opacity:1;transform:none;pointer-events:auto;transition:opacity .32s cubic-bezier(.22,.61,.36,1),transform .32s cubic-bezier(.22,.61,.36,1)}
+.toast-ic{width:24px;height:28px;flex:none;margin-bottom:-4px;overflow:visible}  /* 底部陰影超出 24px 方框，不佔版面高度 */
+.toast-ic .dot{transform-box:fill-box;transform-origin:center}
+.toast.show .toast-ic .dot{animation:toast-dot 1.6s ease-out .62s 3 both}  /* 進場 0.32 秒後再隔 0.3 秒開始；三輪平均分散在 5 秒倒數內：每輪 1.6 秒，開頭 0.36 秒跳起落下、其餘停住，三顆錯開 0.12 秒 */
+.toast.show:hover .toast-ic .dot{animation-play-state:paused}  /* 與倒數一起暫停，保持同步 */
+.toast.show .toast-ic .dot:nth-of-type(2){animation-delay:.74s}
+.toast.show .toast-ic .dot:nth-of-type(3){animation-delay:.86s}
+@keyframes toast-dot{0%,22.5%,100%{transform:none}10%{transform:translateY(-3px)}}
+/* 行高 20、上下各 2px：單行時與 24px 圖示置中對齊，多行時從圖示頂端開始 */
+.toast-msg{min-width:0;margin:2px 0;font-size:12px;font-weight:600;line-height:20px;letter-spacing:var(--tracking-wider);color:var(--black-800);overflow-wrap:anywhere}
+/* 關閉鈕：跨在右上角（無陰影）。外圈 5 秒倒數，由淺灰轉藍；倒數完 ✕ 換成藍色 ✓ */
+.toast-close{position:absolute;top:-13px;right:-2px;width:24px;height:24px;padding:0;border:0;border-radius:50%;background:var(--white);cursor:pointer}
+.toast-close svg{display:block;width:24px;height:24px;overflow:visible}
+.toast-close .track,.toast-close .ring{fill:none;stroke:var(--black-300);stroke-width:2}
+.toast-close .ring{stroke-dasharray:100;stroke-dashoffset:100;transform-box:fill-box;transform-origin:center;transform:rotate(-90deg)}
+.toast.show .toast-close .ring{animation:toast-count 5s linear forwards}
+.toast.show:hover .toast-close .ring{animation-play-state:paused}
+@keyframes toast-count{from{stroke-dashoffset:100;stroke:var(--black-300)}to{stroke-dashoffset:0;stroke:var(--accent-border)}}
+.toast-close .x,.toast-close .ok{fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.toast-close .x{stroke:var(--black-400);transition:opacity .15s,stroke .15s}
+.toast-close:hover .x{stroke:var(--black-700)}
+.toast-close .ok{stroke:var(--accent-border);stroke-dasharray:100;stroke-dashoffset:100;opacity:0}
+.toast.is-done .toast-close .x{opacity:0}
+.toast.is-done .toast-close .ok{opacity:1;animation:toast-ok .3s ease-out forwards}
+@keyframes toast-ok{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){ .toast,.toast.show{transform:none;transition:opacity .2s} .toast.show .toast-ic .dot{animation:none} }
 
 .backdrop{display:none}
 
@@ -432,6 +459,7 @@ a.sb-mod-label:hover{color:var(--strong)}
   .ticket-stats{width:100%}
 }
 @media (max-width:559px){
+  .toast{top:calc(var(--header-h) + 12px);left:16px;right:16px;width:auto;max-width:none}  /* 手機：頂部左右各留 16px */
   .title-btn{padding:6px;gap:0}
   .title-btn span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 
