@@ -1,0 +1,824 @@
+<!doctype html>
+<html lang="zh-Hant-TW" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENSE 首頁</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="shared/tokens.css">
+<style>
+/* 首頁（2026-11-09 起，2026-11-10 取代線稿成為入口頁的 Landing Page Prototype）：網點質感的首屏版面。
+   有深色（深藍）與淺色（白底、天藍網點、深靛藍字）兩種配色，右下角可切換比較。
+   --alt-* 為本頁暫用色，待確認後再決定是否收進 tokens。 */
+:root, [data-theme="dark"] {
+  --alt-page: #0A1530;
+  --alt-bg: radial-gradient(ellipse 70% 60% at 40% 38%, #1E3A6E 0, #142B57 45%, #0A1530 100%);
+  --alt-grain: rgba(255,255,255,.07);      /* 整面細網點 */
+  --alt-ink: var(--white);                 /* 主要文字 */
+  --alt-ink-soft: var(--white);           /* 次要文字：深色模式改為白色（2026-11-10） */
+  --alt-line: rgba(255,255,255,.18);
+  --alt-ghost: rgba(255,255,255,.28);      /* 外框按鈕的框線 */
+  --alt-ghost-hover: rgba(255,255,255,.08);
+  --alt-head-bg: rgba(10,21,48,.72);
+  --alt-logo-ink: var(--white);
+  --alt-card: #14264F;
+  --alt-card-img: rgba(255,255,255,.06);
+  --alt-card-text: rgba(255,255,255,.75);
+}
+[data-theme="light"] {
+  --alt-page: var(--white);
+  --alt-bg: radial-gradient(ellipse 45% 50% at 30% 40%, rgba(124,196,238,.16) 0, rgba(124,196,238,0) 100%), var(--white);
+  --alt-grain: rgba(0,0,0,.055);           /* 中性淡灰 */
+  --alt-ink: #1F2A6B;                      /* 深靛藍 */
+  --alt-ink-soft: #5E7396;                 /* 次要文字：中藍灰 */
+  --alt-line: rgba(31,42,107,.15);
+  --alt-ghost: rgba(31,42,107,.35);
+  --alt-ghost-hover: rgba(31,42,107,.05);
+  --alt-grad-in: #0090E2;                  /* 主標漸層：中心亮藍 */
+  --alt-grad-out: #0A0A4C;                 /* 主標漸層：外圍深靛 */
+  --alt-head-bg: rgba(255,255,255,.72);
+  --alt-logo-ink: #3F3F3F;                 /* logo 字母原色 */
+  --alt-card: var(--white);
+  --alt-card-img: #F5F5F5;                 /* 卡片內預留的灰色區塊 */
+  --alt-card-text: #333333;
+  --alt-card-line: #EBEBEB;                /* 卡片外框（非常淺的灰） */
+}
+* { box-sizing: border-box; }
+html { background: var(--alt-page); }
+body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* 首屏：深藍漸層＋整面細網點 */
+.alt-screen {
+  position: relative; height: 100vh; min-height: 640px; overflow: clip;
+  display: grid; grid-template-rows: auto 1fr auto auto;
+  background: var(--alt-bg);
+}
+.alt-screen::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(circle, var(--alt-grain) .7px, transparent 1px) 0 0 / 4px 4px;
+}
+.alt-dots { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+.alt-screen > :not(.alt-dots) { position: relative; z-index: 1; }
+.alt-screen { padding-top: 88px; grid-template-rows: 1fr auto auto; }
+
+/* Header：固定在頂端。首屏時兩顆按鈕收成圓形圖示（.is-compact），離開首屏後展開成文字按鈕並加半透明模糊底 */
+.alt-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 40; display: flex; align-items: center; justify-content: space-between;
+  padding: 24px max(40px, (100% - var(--content-max)) / 2);  /* 左右對齊內容區（最寬 1280px），底色仍滿版 */
+  transition: background .3s, padding .3s, box-shadow .3s;
+}
+.alt-header:not(.is-compact) {
+  padding-top: 14px; padding-bottom: 14px; background: var(--alt-head-bg); box-shadow: 0 1px 0 var(--alt-line);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+}
+.alt-brand { --logo-h: 40px; display: flex; align-items: center; color: var(--alt-logo-ink); text-decoration: none; }
+.alt-logo { display: block; width: auto; height: var(--logo-h); }
+/* logo 的 SENSE 字母：比例依標準字（字高為圖形的 77.5/185，間距 59.8/185） */
+.alt-brand-word { display: block; overflow: hidden; max-width: calc(var(--logo-h) * 2.4); margin-left: calc(var(--logo-h) * .323);
+  transition: max-width .3s, opacity .2s, margin .3s; }
+.alt-brand-word svg { display: block; height: calc(var(--logo-h) * .419); width: auto; fill: currentColor; }
+.alt-header.is-compact .alt-brand-word { max-width: 0; margin-left: 0; opacity: 0; }
+.alt-actions { display: flex; gap: 10px; }
+.alt-hbtn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 12px; height: 40px; padding: 0 20px; border-radius: var(--r-30);
+  font-size: 14px; font-weight: 700; letter-spacing: var(--tracking-wider); color: var(--alt-ink); text-decoration: none; white-space: nowrap;
+  transition: background .2s, filter .2s, padding .3s, gap .3s;
+}
+.alt-hbtn.ghost { border: 1px solid var(--alt-ghost); }
+.alt-hbtn.ghost:hover { background: var(--alt-ghost-hover); }
+.alt-hbtn.book { padding: 0 20px 0 14px; background: var(--cta-orange); color: var(--white); }
+.alt-hbtn.book:hover { filter: brightness(1.06); }
+.alt-hbtn .ico { width: 18px; height: 18px; flex: none; }
+.alt-hbtn .divider { width: 1px; height: 20px; background: rgba(255,255,255,.45); flex: none; }
+.alt-hbtn .label, .alt-hbtn .divider, .alt-header .ghost .ico {
+  display: inline-block; max-width: 8em; overflow: hidden; transition: max-width .3s, opacity .2s, margin .3s;
+}
+/* 展開時：登入維持原本的純文字（不顯示會員圖示） */
+.alt-header .ghost .ico { max-width: 0; opacity: 0; margin-right: -12px; }
+/* 首屏：只留圓形圖示（40×40），文字與分隔線收起 */
+.alt-header.is-compact .alt-hbtn { padding: 0 10px; gap: 0; }
+.alt-header.is-compact .label, .alt-header.is-compact .divider { max-width: 0; opacity: 0; }
+.alt-header.is-compact .ghost .ico { max-width: 18px; opacity: 1; margin-right: 0; }
+.alt-header .alt-hbtn { min-width: 40px; }
+/* 首屏的大按鈕 */
+/* 主標下方的預約按鈕（加大） */
+.alt-hbtn.lg { height: 60px; gap: 14px; padding: 0 34px 0 24px; font-size: 18px; margin-top: 40px; }
+.alt-hbtn.lg .ico { width: 22px; height: 22px; }
+.alt-hbtn.lg .divider { height: 24px; }
+
+/* 主區：右側主標、左下資訊與按鈕 */
+/* 內容區：最寬 --content-max（1280px），畫面中央置中；header 維持貼齊畫面邊緣 */
+.alt-main, .alt-rule, .alt-word { width: min(100% - 80px, var(--content-max)); margin-inline: auto; }
+.alt-main { display: grid; grid-template-columns: .9fr 1.1fr; }
+.alt-copy { grid-column: 2; align-self: center; position: relative; top: clamp(56px, 11vh, 120px); }  /* 比垂直置中再往下一些，對齊網點球 */
+.alt-title { margin: 0; font-size: 52px; line-height: 1.25; font-weight: 600; letter-spacing: 1px; }
+.alt-title .lead { display: block; width: fit-content; }
+/* 淺色模式：主標與數據用 Figma 4297:1883 的徑向漸層（中心 #0090E2 → 外圍 #0A0A4C，圓心在文字左上方） */
+[data-theme="light"] .alt-title .lead {
+  color: transparent; -webkit-background-clip: text; background-clip: text;
+  background-image: radial-gradient(ellipse 64% 125% at 41% -25%, var(--alt-grad-in), var(--alt-grad-out));
+}
+/* 灰字：四組數據輪播，用 Warp 效果切換（canvas 比文字四周多留 24px 給扭曲） */
+.alt-rot { position: relative; display: block; height: 1.25em; margin-top: 20px; font-size: 32px; }
+.alt-rot canvas { position: absolute; left: -24px; top: -24px; width: calc(100% + 48px); height: calc(100% + 48px); }
+.alt-rot .fallback { display: none; color: var(--alt-ink-soft); transition: opacity .4s; }
+.no-gl .alt-rot .fallback { display: block; }
+.no-gl .alt-rot canvas { display: none; }
+
+
+/* 底部大字：細分隔線＋左對齊的 SENSE（logo 標準字的字母，Figma 4297:1864），不撐滿 */
+.alt-rule { margin-block: 0; border: 0; border-top: 1px solid var(--alt-line); }
+/* SENSE 五個字母各自一欄，上下各一條隔線、超出隔線的部分裁掉；
+   每欄疊三份字母，捲動時依字母不同速度上下錯位滑動（JS 設定 transform），停下就靜止 */
+.alt-word {
+  --lh: calc(min(21vw, 25vh) * .72); --gap-y: 40px;
+  display: flex; gap: calc(var(--lh) * .4375); padding: 20px 0; margin-bottom: 24px; overflow: hidden;
+  border-bottom: 1px solid var(--alt-line); color: var(--alt-ink);
+}
+.alt-word .ltr { flex: none; height: var(--lh); }
+.alt-word .col { display: flex; flex-direction: column; gap: var(--gap-y); transform: translateY(calc(-1 * (var(--lh) + var(--gap-y)))); will-change: transform; }
+.alt-word svg { display: block; height: var(--lh); width: calc(var(--lh) * var(--w)); fill: currentColor; }
+/* 淺色模式：和主標同一組徑向漸層（#0090E2 → #0A0A4C），從 SENSE 最左上角開始 */
+[data-theme="light"] .alt-word path { fill: url(#alt-word-grad); }
+.alt-word-grad .in { stop-color: var(--alt-grad-in); }
+.alt-word-grad .out { stop-color: var(--alt-grad-out); }
+
+/* 首屏之後：四張資料卡（Figma 4302:1955），背景延續首屏的細點點 */
+.alt-next {
+  padding: 60px 40px 160px;
+  background: radial-gradient(circle, var(--alt-grain) .7px, transparent 1px) 0 0 / 4px 4px, var(--alt-page);
+}
+.feat-grid { width: min(1200px, 100%); margin: 0 auto; display: grid; grid-template-columns: 480px 480px; column-gap: 80px; row-gap: 70px; }
+.feat-grid .feat:nth-child(n+3) { margin-left: 160px; }   /* 第二排往右錯開 */
+.feat-grid .feat:nth-child(even) { top: 40px; }            /* 右欄往下錯開 40px（不影響排高） */
+/* 卡片：左側一個放彩球的頁籤，和右側卡片之間用 20px 的內凹圓角接起來 */
+.feat { position: relative; display: grid; grid-template-columns: 80px 400px; align-items: start; }
+/* 進場：由下往上輕微淡入（JS 加上 .is-reveal 才隱藏，沒有 JS 時直接顯示） */
+.feat-grid.is-reveal .feat { opacity: 0; transform: translateY(16px); }
+.feat-grid.is-reveal .feat.is-in { opacity: 1; transform: none; transition: opacity .7s ease-out, transform .7s ease-out; }   /* 只在進場時有過場，隱藏時不會先淡出 */
+/* 淺色模式：卡片外形（頁籤＋內凹圓角＋本體）是組合的，用 drop-shadow 沿外形描 1px 淺灰邊（不加陰影） */
+[data-theme="light"] .feat {
+  filter: drop-shadow(1px 0 0 var(--alt-card-line)) drop-shadow(-1px 0 0 var(--alt-card-line))
+          drop-shadow(0 1px 0 var(--alt-card-line)) drop-shadow(0 -1px 0 var(--alt-card-line));
+}
+.feat-tab { height: 100px; display: grid; place-items: center; background: var(--alt-card); border-radius: var(--r-20) 0 0 var(--r-20); }
+.feat-fillet { position: absolute; left: 60px; top: 100px; width: 20px; height: 20px; fill: var(--alt-card); }
+.feat-ball { width: 40px; height: 40px; border-radius: 50%; filter: blur(.5px); }
+.feat-body { display: flex; flex-direction: column; gap: 10px; padding: 30px 40px 20px; background: var(--alt-card); border-radius: 0 var(--r-20) var(--r-20) var(--r-20); }
+.feat-img { height: 160px; margin-bottom: 20px; border-radius: var(--r-20); background: var(--alt-card-img); }   /* 未來放圖或動態，先留位 */
+/* 卡片點陣動態（2026-11-10）：四張卡各一種點陣資訊圖，底層淡網點，顏色取自該卡彩球（淺色底上改用較飽和的同色系）。 */
+.feat-img:has(.feat-fx) { position: relative; overflow: hidden; }
+.feat-fx { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+[data-theme="light"] .feat-fx { --fx-dot: rgba(31,42,107,.14); --fx-mute: rgba(31,42,107,.32); }
+[data-theme="dark"] .feat-fx  { --fx-dot: rgba(255,255,255,.14); --fx-mute: rgba(255,255,255,.4); }
+.feat-fx.fx-blue  { --fx-lo: #3A9EF5; --fx-hi: #3FC9C3; }
+.feat-fx.fx-coral { --fx-lo: #FF7A66; --fx-hi: #FFAA8F; }
+.feat-fx.fx-lav   { --fx-lo: #8E8CF2; --fx-hi: #F2B705; }
+.feat-fx.fx-mint  { --fx-lo: #2BC2B5; --fx-hi: #7FDB9A; --fx-deep: #26ADA3; }   /* --fx-deep：掃過時轉成的深色 */
+[data-theme="dark"] .feat-fx.fx-mint { --fx-deep: #D2F7E6; }                    /* 深色底上改成轉亮 */
+/* 卡片光邊：SVG 由 JS 加在 .feat-grid 上；亮度由 --glow（0–1）控制，出現 .25 秒、淡出 .75 秒 */
+.feat-grid { position: relative; }
+.feat-glow { position: absolute; left: 0; top: 0; z-index: 2; overflow: visible; pointer-events: none;
+  opacity: calc(var(--glow, 0) * .75); transition: opacity .75s ease-in-out; }
+.feat-glow.is-on { transition: opacity .25s ease-out; }
+.feat-glow .halo { opacity: .3; }
+[data-theme="dark"] .feat-glow .halo { opacity: .2; }
+.feat h3 { margin: 0; font-size: 20px; line-height: 24px; font-weight: 600; letter-spacing: var(--tracking-wider); color: var(--alt-ink); }
+[data-theme="light"] .feat h3 {
+  width: fit-content; color: transparent; -webkit-background-clip: text; background-clip: text;
+  background-image: radial-gradient(ellipse 64% 125% at 41% -25%, var(--alt-grad-in), var(--alt-grad-out));
+}
+.feat p { margin: 0; font-size: 16px; line-height: 24px; font-weight: 300; letter-spacing: var(--tracking-wider); color: var(--alt-card-text); }
+/* 彩球：沿用 Figma 的徑向漸層（偏心圓心＋多段色標） */
+.b-blue { --ball: radial-gradient(circle 35px at 80% 80%, #91E0DD 0 22%, #A3E5E3 40%, #94D9EA 50%, #6DC1F5 66%, #55B1FD 78%, #8FCAFF 90%, #B1DBFA 98%); background: var(--ball); }
+.b-coral { --ball: radial-gradient(circle 36px at 40% 95%, #DBDECE 0 6%, #F6D9C4 17%, #FFBBA7 29%, #FF9886 40%, #FF8574 52%, #FF917C 63%, #FDAE99 75%, #FAC7B6 83%, #F8BCAD 98%); background: var(--ball); }
+.b-lav { --ball: radial-gradient(circle 40px at 5% 5%, #CAD0FD 0 19%, #D9DCFB 26%, #D0D5FD 45%, #DADEFC 57%, #E2DFDF 67%, #EBDBAC 78%, #F4D160 88%, #FECC24 98%); background: var(--ball); }
+/* 第四顆（原本和第一顆重複）：同樣的畫法——淺色圓心、中段最飽和、外緣再轉淡；配色改用黃綠 → 薄荷 → 青綠 */
+.b-mint { --ball: radial-gradient(circle 36px at 22% 22%, #F3F6D2 0 8%, #E4F2B8 20%, #B9E7A3 34%, #7FDB9A 48%, #3FCFA8 62%, #2BC2B5 74%, #6FD6CB 86%, #B8EEE6 98%); background: var(--ball); }
+/* 油膜流動（2026-11-10，四顆都套用）：
+   底層＝原本的色系漸層緩慢轉動（偏心圓心跟著繞，顏色在色系內流動）；
+   上層＝一圈圈的彩虹波紋（薄膜干涉色），經 SVG 雜訊扭曲成油膜紋路，反向轉動後以 overlay 疊在底色上。 */
+.feat-ball.is-oil { position: relative; overflow: hidden; isolation: isolate; background: none; }
+.feat-ball.is-oil::before,
+.feat-ball.is-oil::after { content: ''; position: absolute; border-radius: 50%; }
+.feat-ball.is-oil::before { inset: 0; background: var(--ball); animation: oil-spin 14s linear infinite; }
+.feat-ball.is-oil::after {
+  inset: -30%;
+  background: repeating-radial-gradient(circle at 35% 30%, #FF9FD8 0, #A99BFF 4px, #7FD0FF 8px, #8FF0C8 12px, #FFF09A 16px, #FFB38A 20px, #FF9FD8 24px);
+  filter: url(#oil-flow); mix-blend-mode: overlay; opacity: .7;
+  animation: oil-spin 9s linear infinite reverse;
+}
+/* 四顆錯開起始角度，避免同步轉動 */
+.feat-ball.b-coral::before { animation-delay: -4s; }  .feat-ball.b-coral::after { animation-delay: -3s; }
+.feat-ball.b-lav::before   { animation-delay: -8s; }  .feat-ball.b-lav::after   { animation-delay: -6s; }
+.feat-ball.b-mint::before  { animation-delay: -11s; } .feat-ball.b-mint::after  { animation-delay: -2s; }
+@keyframes oil-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .feat-ball.is-oil::before, .feat-ball.is-oil::after { animation: none; }
+}
+
+/* 深淺色切換（比較用，非頁面設計） */
+.alt-theme {
+  position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 3px;
+  border-radius: var(--r-30); background: rgba(128,128,128,.25); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  box-shadow: 0 4px 16px rgba(0,0,0,.12); font-size: 13px; font-weight: 700; letter-spacing: var(--tracking-wider);
+}
+.alt-theme button {
+  border: 0; border-radius: var(--r-30); padding: 7px 14px; font: inherit; cursor: pointer; color: var(--alt-ink); background: none;
+}
+.alt-theme button[aria-pressed="true"] { background: var(--alt-page); box-shadow: 0 1px 4px rgba(0,0,0,.15); }
+
+@media (max-width: 1239px) {
+  .feat-grid { width: fit-content; }
+  .feat-grid .feat:nth-child(n+3) { margin-left: 0; }
+}
+@media (max-width: 1079px) {
+  .feat-grid { grid-template-columns: 480px; }
+  .feat-grid .feat:nth-child(even) { top: 0; }
+}
+@media (max-width: 767px) {
+  .alt-header { padding: 16px 20px; }
+  .alt-header:not(.is-compact) { padding-top: 10px; padding-bottom: 10px; }
+  .alt-screen { padding-top: 72px; }
+  .alt-hbtn.lg { height: 52px; padding: 0 26px 0 18px; font-size: 16px; margin-top: 24px; }
+  .alt-next { padding: 64px 20px 96px; }
+  .feat-grid { width: 100%; grid-template-columns: 1fr; row-gap: 40px; }
+  .feat-grid .feat:nth-child(n+3) { margin-left: 0; }
+  .feat { grid-template-columns: 64px 1fr; }
+  .feat-tab { height: 84px; }
+  .feat-fillet { left: 44px; top: 84px; }
+  .feat-body { padding: 26px 20px 20px; }
+  .feat-img { height: auto; aspect-ratio: 2 / 1; }
+  .alt-brand { --logo-h: 32px; }
+  .alt-hbtn { height: 36px; padding: 0 14px; font-size: 13px; letter-spacing: .5px; }
+  .alt-hbtn.book { gap: 10px; padding: 0 14px 0 12px; }
+  .alt-main, .alt-rule, .alt-word { width: calc(100% - 40px); }
+  .alt-main { display: flex; flex-direction: column; justify-content: flex-end; gap: 32px; padding-bottom: 24px; }
+  .alt-copy { align-self: stretch; top: 0; }
+  .alt-title { font-size: 30px; }
+  .alt-rot { margin-top: 10px; font-size: 20px; }
+  .alt-word { --lh: calc((100vw - 40px) / 5.496); --gap-y: 28px; padding: 14px 0; margin-bottom: 16px; }
+  .alt-theme { right: 12px; bottom: 12px; }
+}
+</style>
+</head>
+<body>
+<header class="alt-header is-compact">
+  <a class="alt-brand" href="#" aria-label="SENSE 首頁"><svg class="alt-logo" viewBox="0 0 112 185" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10.81 44.57C10.33 42.93 7.2 34.58 21.84 24.05C24.37 22.23 28.72 20.58 32.22 19.28C47.74 12.65 54.39 9.6 74.57 .98C80.29-1.46 86.7.7 89.36 7.18C96.3 24.02 101.8 36.97 108.85 53.68L108.92 53.65C111.9 60 109.16 66.18 103.5 68.75C101.62 69.6 77.22 80.87 69.7 84.06C63.98 86.48 57.57 84.29 54.93 77.81H54.95C49.58 65.05 37.1 35.53 35.89 33.74C33.09 29.55 24.75 28.45 18.98 31.16C14.43 33.29 9.09 38.56 10.81 44.58Z" fill="url(#p0)"/><path d="M105.83 157.14C81.67 168.1 76.86 169.98 52.75 181.03C52.04 181.35 51.18 181.73 50.22 182.11C36.01 182.86 31.54 175.97 31.54 175.97L31.51 175.93C35.1 179.98 41.76 179.52 46.03 177.76C51.93 175.33 56.74 168.43 55.55 163.54C55.04 161.44 54.15 159.42 53.25 157.44L26.63 97.53L31.25 94.33C35.16 101.74 40.29 103.63 46.5 102.3C51.89 101.18 73.5 90.84 75.39 90.03C81.11 87.59 87.51 89.75 90.19 96.23L90.13 96.26C97.69 112.74 103.52 125.55 111.25 142.03C114.23 148.37 111.49 154.56 105.84 157.13Z" fill="url(#p1)"/><path d="M18.98 31.15C21.36 30.13 25.58 29.43 29.47 30.02C32.24 30.79 34.01 31.35 35.9 33.73C40.25 42.51 54.96 77.8 54.96 77.8C54.96 77.8 58.35 86.75 66.83 84.86L45.49 31.31C41.97 22.88 28.16 18.77 15.25 26.41C10.22 29.38 6.4 32.06 4.86 39.61C3.65 45.8 5.99 50.77 5.99 50.77C5.99 50.77 22.85 88.99 26.35 96.9C26.37 96.94 26.38 96.98 26.4 97.02C28.38 101.48 31.1 107.6 31.2 107.82L53.26 157.45C53.26 157.45 55.57 162.19 55.74 164.85C55.74 164.85 56.21 168.18 52.97 172.27C52.97 172.27 49.76 176.25 47.05 177.31C44.34 178.37 42.8 178.74 42.8 178.74C42.8 178.74 39.33 180.11 34.25 177.98C34.25 177.98 32.88 177.42 31.66 176.12C31.59 176.03 31.56 175.98 31.56 175.98L30.64 174.74L26.85 168C26.85 168 6.88 124.34 5.89 122.22C4.87 121.02 4.14 119.81 1.65 121C-.84 122.19.22 124.56.22 124.56L7.54 140.82L16.73 160.94L22.78 174.13C22.78 174.13 23.69 176.28 25.68 178.65C29.35 183.04 33.67 184.45 37.91 184.9C42.14 185.35 50.22 182.13 50.22 182.13L52.45 181.12C61.74 176.93 65.75 165.9 61.32 156.72L31.24 94.35L30.17 91.79C28.64 88.26 23.33 75.82 23.33 75.82L11.93 48.48C11.93 48.48 11.36 46.49 10.8 44.57C10.67 44.14 10.45 43.31 10.45 42.12V42.34C10.45 42.34 10.54 35.22 18.96 31.15Z" fill="url(#p2)"/><path d="M45.5 91.5C43.85 92.23 41.92 91.47 41.19 89.82L21.1 44.19C20.37 42.54 21.13 40.61 22.78 39.88C24.44 39.15 26.37 39.9 27.1 41.56L47.18 87.19C47.91 88.84 47.16 90.77 45.5 91.5Z" fill="url(#p3)"/><path d="M17.58 115.81C19.23 115.07 21.16 115.81 21.9 117.46L42.25 162.97C42.98 164.61 42.25 166.56 40.59 167.29C38.94 168.03 37.01 167.29 36.27 165.64L15.92 120.14C15.18 118.49 15.92 116.55 17.57 115.81Z" fill="url(#p4)"/><defs><linearGradient id="p0" x1="76.09" y1="82.74" x2="13.82" y2="-53.48" gradientUnits="userSpaceOnUse"><stop offset=".09" stop-color="#0073F5"/><stop offset=".18" stop-color="#1495E9"/><stop offset=".3" stop-color="#29B8DC"/><stop offset=".39" stop-color="#37CED4"/><stop offset=".45" stop-color="#3CD7D2"/></linearGradient><radialGradient id="p1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(51.61 88.5) scale(110.73)"><stop stop-color="#0073F5"/><stop offset=".08" stop-color="#0D83EB"/><stop offset=".19" stop-color="#1D96E1"/><stop offset=".25" stop-color="#2CB6D9"/><stop offset=".31" stop-color="#37CED3"/><stop offset=".34" stop-color="#3CD7D2"/><stop offset=".55" stop-color="#AAC874"/><stop offset=".71" stop-color="#FFBE2D"/><stop offset=".73" stop-color="#FFAF2B"/><stop offset=".88" stop-color="#FF6025"/><stop offset=".95" stop-color="#FF4123"/></radialGradient><linearGradient id="p2" x1="51.27" y1="33.58" x2="17.61" y2="169.09" gradientUnits="userSpaceOnUse"><stop offset=".12" stop-color="#0073F5"/><stop offset=".15" stop-color="#1677F6"/><stop offset=".22" stop-color="#4F84FA"/><stop offset=".28" stop-color="#8791FF"/><stop offset=".31" stop-color="#8B92F7"/><stop offset=".36" stop-color="#9797E2"/><stop offset=".42" stop-color="#AB9EBF"/><stop offset=".49" stop-color="#C6A88F"/><stop offset=".57" stop-color="#E9B553"/><stop offset=".62" stop-color="#FFBE2D"/><stop offset=".87" stop-color="#FFBE2D"/><stop offset="1" stop-color="#FF6E2D"/></linearGradient><linearGradient id="p3" x1="23.57" y1="41.88" x2="39.94" y2="78.73" gradientUnits="userSpaceOnUse"><stop stop-color="#0073F5"/><stop offset=".2" stop-color="#1677F6"/><stop offset=".63" stop-color="#4F84FA"/><stop offset="1" stop-color="#8791FF"/></linearGradient><radialGradient id="p4" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(25.57 96.03) scale(76.77)"><stop stop-color="#0073F5"/><stop offset=".08" stop-color="#0D83EB"/><stop offset=".19" stop-color="#1D96E1"/><stop offset=".27" stop-color="#2CB6D9"/><stop offset=".34" stop-color="#37CED3"/><stop offset=".38" stop-color="#3CD7D2"/><stop offset=".42" stop-color="#4FD4C1"/><stop offset=".51" stop-color="#83CD95"/><stop offset=".64" stop-color="#D4C350"/><stop offset=".71" stop-color="#FFBE2D"/><stop offset=".73" stop-color="#FFAF2B"/><stop offset=".88" stop-color="#FF6025"/><stop offset=".95" stop-color="#FF4123"/></radialGradient></defs></svg><span class="alt-brand-word"><svg viewBox="171.8 53.7 426.1 77.5" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M203.06 131.15C212.22 131.15 233.52 128.93 233.52 108.32C233.52 96.75 226.23 90.31 209.15 86.79L199.21 84.8C190.94 83.09 189.21 78.74 189.21 75.39C189.21 70.56 192.68 65.4 202.4 65.4C207.44 65.4 211.4 66.73 213.83 69.24C215.45 70.92 216.34 73.04 216.47 75.57H231.41C230.94 61.5 220.8 53.77 202.74 53.77C184.68 53.77 173.94 61.85 173.94 75.39C173.94 86.67 180.84 93.23 195.64 96.03L206.49 98.24C212.2 99.4 218.04 101.52 218.04 108.43C218.04 115.34 212.49 119.52 203.19 119.52C193.89 119.52 187.78 114.91 186.98 106.81H171.87C172.35 122.29 183.67 131.15 203.08 131.15H203.06Z"/><path d="M314.87 97.34V86.48H281.94V67.06H318.18V54.77H267.43V130.05H319.29V117.75H281.94V97.34H314.87Z"/><path d="M400.15 130.05H416.43V54.77H401.93V105.6H399.98L368.82 54.77H353.2V130.05H367.71V80.21H369.65L400.15 130.05Z"/><path d="M481.58 131.15C490.74 131.15 512.04 128.93 512.04 108.32C512.04 96.75 504.75 90.31 487.67 86.79L477.73 84.8C469.46 83.09 467.73 78.74 467.73 75.39C467.73 70.56 471.2 65.4 480.92 65.4C485.96 65.4 489.92 66.73 492.35 69.24C493.98 70.92 494.86 73.04 494.99 75.57H509.93C509.46 61.5 499.32 53.77 481.26 53.77C463.2 53.77 452.46 61.85 452.46 75.39C452.46 86.67 459.36 93.23 474.16 96.03L485 98.24C490.71 99.4 496.55 101.52 496.55 108.43C496.55 115.34 491 119.52 481.7 119.52C472.4 119.52 466.29 114.91 465.49 106.81H450.38C450.86 122.29 462.18 131.15 481.59 131.15H481.58Z"/><path d="M593.38 97.34V86.48H560.46V67.06H596.7V54.77H545.95V130.05H597.81V117.75H560.46V97.34H593.38Z"/></svg></span></a>
+  <nav class="alt-actions" aria-label="會員">
+    <a class="alt-hbtn book" href="#book" aria-label="預約洽談" title="預約洽談"><svg class="ico" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21.4 2.6a.6.6 0 0 0-.65-.13L2.9 9.6a.6.6 0 0 0-.03 1.1l7.2 3.2 3.2 7.2a.6.6 0 0 0 1.1-.03l7.13-17.85a.6.6 0 0 0-.1-.62Z" fill="currentColor"/></svg><span class="divider" aria-hidden="true"></span><span class="label">預約洽談</span></a>
+    <a class="alt-hbtn ghost" href="login.html" aria-label="登入" title="登入"><svg class="ico" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M4 20.5c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5" fill="currentColor"/></svg><span class="label">登入</span></a>
+  </nav>
+</header>
+
+<section class="alt-screen" id="hero">
+  <canvas class="alt-dots" aria-hidden="true"></canvas>
+
+
+  <div class="alt-main">
+    <div class="alt-copy">
+      <h1 class="alt-title">
+        <span class="lead">跨品牌合作，一站搞定。</span>
+        <span class="sr-only">99+ 合作夥伴、900萬+ 可觸及會員、999+ 受眾包、999+ 商品 / 服務（數字為佔位）</span>
+        <span class="alt-rot" aria-hidden="true"><canvas></canvas><span class="fallback">99+ 合作夥伴</span></span>
+      </h1>
+      <a class="alt-hbtn lg book" href="#book"><svg class="ico" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21.4 2.6a.6.6 0 0 0-.65-.13L2.9 9.6a.6.6 0 0 0-.03 1.1l7.2 3.2 3.2 7.2a.6.6 0 0 0 1.1-.03l7.13-17.85a.6.6 0 0 0-.1-.62Z" fill="currentColor"/></svg><span class="divider" aria-hidden="true"></span><span class="label">預約洽談</span></a>
+    </div>
+  </div>
+
+  <hr class="alt-rule">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <radialGradient id="alt-word-grad" class="alt-word-grad" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="1" gradientTransform="translate(171.8 53.7) scale(440 125)">
+      <stop class="in" offset="0"/><stop class="out" offset="1"/>
+    </radialGradient>
+  </defs></svg>
+  <div class="alt-word" aria-hidden="true"><span class="ltr" style="--w:0.7955"><span class="col"><svg viewBox="171.87 53.7 61.65 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M203.06 131.15C212.22 131.15 233.52 128.93 233.52 108.32C233.52 96.75 226.23 90.31 209.15 86.79L199.21 84.8C190.94 83.09 189.21 78.74 189.21 75.39C189.21 70.56 192.68 65.4 202.4 65.4C207.44 65.4 211.4 66.73 213.83 69.24C215.45 70.92 216.34 73.04 216.47 75.57H231.41C230.94 61.5 220.8 53.77 202.74 53.77C184.68 53.77 173.94 61.85 173.94 75.39C173.94 86.67 180.84 93.23 195.64 96.03L206.49 98.24C212.2 99.4 218.04 101.52 218.04 108.43C218.04 115.34 212.49 119.52 203.19 119.52C193.89 119.52 187.78 114.91 186.98 106.81H171.87C172.35 122.29 183.67 131.15 203.08 131.15H203.06Z"/></svg><svg viewBox="171.87 53.7 61.65 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M203.06 131.15C212.22 131.15 233.52 128.93 233.52 108.32C233.52 96.75 226.23 90.31 209.15 86.79L199.21 84.8C190.94 83.09 189.21 78.74 189.21 75.39C189.21 70.56 192.68 65.4 202.4 65.4C207.44 65.4 211.4 66.73 213.83 69.24C215.45 70.92 216.34 73.04 216.47 75.57H231.41C230.94 61.5 220.8 53.77 202.74 53.77C184.68 53.77 173.94 61.85 173.94 75.39C173.94 86.67 180.84 93.23 195.64 96.03L206.49 98.24C212.2 99.4 218.04 101.52 218.04 108.43C218.04 115.34 212.49 119.52 203.19 119.52C193.89 119.52 187.78 114.91 186.98 106.81H171.87C172.35 122.29 183.67 131.15 203.08 131.15H203.06Z"/></svg><svg viewBox="171.87 53.7 61.65 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M203.06 131.15C212.22 131.15 233.52 128.93 233.52 108.32C233.52 96.75 226.23 90.31 209.15 86.79L199.21 84.8C190.94 83.09 189.21 78.74 189.21 75.39C189.21 70.56 192.68 65.4 202.4 65.4C207.44 65.4 211.4 66.73 213.83 69.24C215.45 70.92 216.34 73.04 216.47 75.57H231.41C230.94 61.5 220.8 53.77 202.74 53.77C184.68 53.77 173.94 61.85 173.94 75.39C173.94 86.67 180.84 93.23 195.64 96.03L206.49 98.24C212.2 99.4 218.04 101.52 218.04 108.43C218.04 115.34 212.49 119.52 203.19 119.52C193.89 119.52 187.78 114.91 186.98 106.81H171.87C172.35 122.29 183.67 131.15 203.08 131.15H203.06Z"/></svg></span></span><span class="ltr" style="--w:0.6692"><span class="col"><svg viewBox="267.43 53.7 51.86 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M314.87 97.34V86.48H281.94V67.06H318.18V54.77H267.43V130.05H319.29V117.75H281.94V97.34H314.87Z"/></svg><svg viewBox="267.43 53.7 51.86 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M314.87 97.34V86.48H281.94V67.06H318.18V54.77H267.43V130.05H319.29V117.75H281.94V97.34H314.87Z"/></svg><svg viewBox="267.43 53.7 51.86 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M314.87 97.34V86.48H281.94V67.06H318.18V54.77H267.43V130.05H319.29V117.75H281.94V97.34H314.87Z"/></svg></span></span><span class="ltr" style="--w:0.8159"><span class="col"><svg viewBox="353.2 53.7 63.23 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M400.15 130.05H416.43V54.77H401.93V105.6H399.98L368.82 54.77H353.2V130.05H367.71V80.21H369.65L400.15 130.05Z"/></svg><svg viewBox="353.2 53.7 63.23 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M400.15 130.05H416.43V54.77H401.93V105.6H399.98L368.82 54.77H353.2V130.05H367.71V80.21H369.65L400.15 130.05Z"/></svg><svg viewBox="353.2 53.7 63.23 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M400.15 130.05H416.43V54.77H401.93V105.6H399.98L368.82 54.77H353.2V130.05H367.71V80.21H369.65L400.15 130.05Z"/></svg></span></span><span class="ltr" style="--w:0.7956"><span class="col"><svg viewBox="450.38 53.7 61.66 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M481.58 131.15C490.74 131.15 512.04 128.93 512.04 108.32C512.04 96.75 504.75 90.31 487.67 86.79L477.73 84.8C469.46 83.09 467.73 78.74 467.73 75.39C467.73 70.56 471.2 65.4 480.92 65.4C485.96 65.4 489.92 66.73 492.35 69.24C493.98 70.92 494.86 73.04 494.99 75.57H509.93C509.46 61.5 499.32 53.77 481.26 53.77C463.2 53.77 452.46 61.85 452.46 75.39C452.46 86.67 459.36 93.23 474.16 96.03L485 98.24C490.71 99.4 496.55 101.52 496.55 108.43C496.55 115.34 491 119.52 481.7 119.52C472.4 119.52 466.29 114.91 465.49 106.81H450.38C450.86 122.29 462.18 131.15 481.59 131.15H481.58Z"/></svg><svg viewBox="450.38 53.7 61.66 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M481.58 131.15C490.74 131.15 512.04 128.93 512.04 108.32C512.04 96.75 504.75 90.31 487.67 86.79L477.73 84.8C469.46 83.09 467.73 78.74 467.73 75.39C467.73 70.56 471.2 65.4 480.92 65.4C485.96 65.4 489.92 66.73 492.35 69.24C493.98 70.92 494.86 73.04 494.99 75.57H509.93C509.46 61.5 499.32 53.77 481.26 53.77C463.2 53.77 452.46 61.85 452.46 75.39C452.46 86.67 459.36 93.23 474.16 96.03L485 98.24C490.71 99.4 496.55 101.52 496.55 108.43C496.55 115.34 491 119.52 481.7 119.52C472.4 119.52 466.29 114.91 465.49 106.81H450.38C450.86 122.29 462.18 131.15 481.59 131.15H481.58Z"/></svg><svg viewBox="450.38 53.7 61.66 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M481.58 131.15C490.74 131.15 512.04 128.93 512.04 108.32C512.04 96.75 504.75 90.31 487.67 86.79L477.73 84.8C469.46 83.09 467.73 78.74 467.73 75.39C467.73 70.56 471.2 65.4 480.92 65.4C485.96 65.4 489.92 66.73 492.35 69.24C493.98 70.92 494.86 73.04 494.99 75.57H509.93C509.46 61.5 499.32 53.77 481.26 53.77C463.2 53.77 452.46 61.85 452.46 75.39C452.46 86.67 459.36 93.23 474.16 96.03L485 98.24C490.71 99.4 496.55 101.52 496.55 108.43C496.55 115.34 491 119.52 481.7 119.52C472.4 119.52 466.29 114.91 465.49 106.81H450.38C450.86 122.29 462.18 131.15 481.59 131.15H481.58Z"/></svg></span></span><span class="ltr" style="--w:0.6692"><span class="col"><svg viewBox="545.95 53.7 51.86 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M593.38 97.34V86.48H560.46V67.06H596.7V54.77H545.95V130.05H597.81V117.75H560.46V97.34H593.38Z"/></svg><svg viewBox="545.95 53.7 51.86 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M593.38 97.34V86.48H560.46V67.06H596.7V54.77H545.95V130.05H597.81V117.75H560.46V97.34H593.38Z"/></svg><svg viewBox="545.95 53.7 51.86 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M593.38 97.34V86.48H560.46V67.06H596.7V54.77H545.95V130.05H597.81V117.75H560.46V97.34H593.38Z"/></svg></span></span></div>
+</section>
+
+<section class="alt-next" id="book" aria-label="SENSE 能幫你做什麼">
+  <!-- 彩球油膜紋路：雜訊緩慢變化，把彩虹光澤扭曲成流動的油膜 -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <filter id="oil-flow" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="7">
+        <animate attributeName="baseFrequency" values="0.045;0.07;0.045" dur="13s" repeatCount="indefinite"/>
+      </feTurbulence>
+      <feDisplacementMap in="SourceGraphic" scale="22" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs></svg>
+  <div class="feat-grid">
+    <article class="feat" data-glow>
+      <div class="feat-tab"><span class="feat-ball b-blue is-oil" aria-hidden="true"></span></div><svg class="feat-fillet" viewBox="0 0 20 20" aria-hidden="true"><path d="M0 0H20V20C20 20 20 12.31 14.5 6.81C9 1.31 0 0 0 0Z"/></svg>
+      <div class="feat-body"><div class="feat-img" aria-hidden="true"><canvas class="feat-fx fx-blue" data-fx="overlap"></canvas></div><h3>資料安全互補</h3><p>透過標籤與彙總結果合作，不交換原始名單也能補足會員洞察。</p></div>
+    </article>
+    <article class="feat" data-glow>
+      <div class="feat-tab"><span class="feat-ball b-coral is-oil" aria-hidden="true"></span></div><svg class="feat-fillet" viewBox="0 0 20 20" aria-hidden="true"><path d="M0 0H20V20C20 20 20 12.31 14.5 6.81C9 1.31 0 0 0 0Z"/></svg>
+      <div class="feat-body"><div class="feat-img" aria-hidden="true"><canvas class="feat-fx fx-coral" data-fx="channels"></canvas></div><h3>會員場景互通</h3><p>上架受眾包與行銷資源，進入彼此的 EDM、APP、SMS 會員場景。</p></div>
+    </article>
+    <article class="feat" data-glow>
+      <div class="feat-tab"><span class="feat-ball b-lav is-oil" aria-hidden="true"></span></div><svg class="feat-fillet" viewBox="0 0 20 20" aria-hidden="true"><path d="M0 0H20V20C20 20 20 12.31 14.5 6.81C9 1.31 0 0 0 0Z"/></svg>
+      <div class="feat-body"><div class="feat-img" aria-hidden="true"><canvas class="feat-fx fx-lav" data-fx="match"></canvas></div><h3>商品快速媒合</h3><p>上架商品、服務或合作需求，讓夥伴快速找到適合的合作項目。</p></div>
+    </article>
+    <article class="feat" data-glow>
+      <div class="feat-tab"><span class="feat-ball b-mint is-oil" aria-hidden="true"></span></div><svg class="feat-fillet" viewBox="0 0 20 20" aria-hidden="true"><path d="M0 0H20V20C20 20 20 12.31 14.5 6.81C9 1.31 0 0 0 0Z"/></svg>
+      <div class="feat-body"><div class="feat-img" aria-hidden="true"><canvas class="feat-fx fx-mint" data-fx="growth"></canvas></div><h3>成效持續驗證</h3><p>追蹤觸達、互動、名單與訂單轉換，回看合作成果與數據收益。</p></div>
+    </article>
+  </div>
+</section>
+
+<div class="alt-theme" role="group" aria-label="配色切換（比較用）">
+  <button type="button" data-set="light">淺色</button>
+  <button type="button" data-set="dark">深色</button>
+</div>
+
+<script>
+/* 網點球（WebGL：每格依球體明暗決定點的大小，緩慢轉動、變形，滑鼠靠近時散開）
+   ＋ 灰字輪播（文字先畫進 canvas，再用 Warp 扭曲效果切換；原生 WebGL，不依賴套件）。 */
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hero = document.getElementById('hero');
+  const dotsCanvas = document.querySelector('.alt-dots');
+  const rotBox = document.querySelector('.alt-rot'), rotCanvas = rotBox.querySelector('canvas'), rotFallback = rotBox.querySelector('.fallback');
+
+  // ── WebGL 小工具 ──
+  const VS = 'attribute vec2 p;varying vec2 v;void main(){v=p*.5+.5;gl_Position=vec4(p,0.,1.);}';
+  const NOISE = `
+    float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+    float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+      return mix(mix(h(i),h(i+vec2(1.,0.)),f.x),mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),f.x),f.y);}
+    float fbm(vec2 p){float s=0.,a=.5;for(int i=0;i<4;i++){s+=a*n(p);p=p*2.03+vec2(1.7,9.2);a*=.5;}return s;}`;
+  function setup(canvas, fs) {
+    const gl = canvas.getContext('webgl', { alpha: true, premultipliedAlpha: true, antialias: false });
+    if (!gl) return null;
+    const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
+    const prog = gl.createProgram();
+    gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+    gl.useProgram(prog);
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    const u = {}; const U = name => (u[name] ??= gl.getUniformLocation(prog, name));
+    return { gl, U };
+  }
+  function fit(canvas, gl, maxDpr) {
+    const dpr = Math.min(devicePixelRatio || 1, maxDpr), r = canvas.getBoundingClientRect();
+    const w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
+    if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; gl && gl.viewport(0, 0, w, h); }
+    return dpr;
+  }
+
+  // ── 網點球：球體明暗（光源繞著轉）＋雜訊扭曲，週期性拉長成弧形光帶再聚回球形 ──
+  const DOTS_FS = `precision highp float;varying vec2 v;uniform vec2 res;uniform float t;uniform vec2 ctr;uniform float R;uniform float cell;uniform vec3 ptr;uniform float light;uniform vec3 pal[12];${NOISE}
+    vec3 palette(float x){x=mod(x,12.);float i=floor(x),f=smoothstep(0.,1.,fract(x));vec3 a=pal[0],b=pal[0];
+      for(int j=0;j<12;j++){float fj=float(j);if(fj==i)a=pal[j];if(fj==mod(i+1.,12.))b=pal[j];}return mix(a,b,f);}
+    float field(vec2 p){
+      vec2 q=(p-ctr)/R;
+      float m=.5+.5*sin(t*.35);
+      q+=(vec2(fbm(q*1.2+t*.08),fbm(q*1.2+vec2(4.,t*.06)))-.5)*(.25+.45*m);
+      float a=t*.15; q=mat2(cos(a),-sin(a),sin(a),cos(a))*q;
+      q.y+=.35*m*q.x*q.x; q.x*=1.+.35*m;
+      float r=length(q);
+      if(r>1.2)return 0.;
+      float z=sqrt(max(0.,1.-r*r));
+      vec3 nn=normalize(vec3(q.x,-q.y,z+.001));
+      vec3 L=normalize(vec3(cos(t*.4)*.8,.6,sin(t*.4)*.4+.6));
+      float dif=max(dot(nn,L),0.);
+      float spec=pow(max(dot(reflect(-L,nn),vec3(0.,0.,1.)),0.),18.);
+      float rim=pow(1.-z,3.)*.6;
+      float mask=1.-smoothstep(.85,1.05,r);
+      float band=smoothstep(.2,.8,fbm(q*2.+t*.1));
+      float m2=mask*(.65+.5*band);
+      // 深色：亮面點大；淺色：暗面點大（像印刷網點的陰影）
+      // 深色時暗面也留一點點，讓每個方位的彩色都看得到
+      return light<.5 ? clamp((.35+.65*(dif*dif*.85+spec*.9+rim*.4))*m2,0.,1.)
+                      : clamp(m2*(.22+.85*(1.-clamp(dif*dif*.9+spec,0.,1.))),0.,1.);
+    }
+    void main(){
+      vec2 px=vec2(v.x,1.-v.y)*res;
+      vec2 c=(floor(px/cell)+.5)*cell;
+      vec2 dp=c-ptr.xy; float d=length(dp);
+      float near=exp(-d*d/(R*R*.06))*ptr.z;
+      float it=field(c+dp/(d+.001)*near*R*.3)*(1.-.5*near);
+      float rad=cell*.5*pow(it,.8);
+      float al=(1.-smoothstep(rad-.8,rad+.4,length(px-c)))*step(.04,it);
+      // 彩色：依網點在球上的方位套用正規版極光球的配色（從正上方順時針），隨時間緩慢旋轉、扭曲；中心偏白
+      vec2 q=(c-ctr)/R; float r=length(q);
+      float x=atan(q.x,-q.y)/6.28318*12.+r*1.2-t*.25+(fbm(q*1.1+t*.05)-.5)*2.2;
+      vec3 col=palette(x);
+      col=mix(vec3(dot(col,vec3(.299,.587,.114))),col,1.15);  // 再提高一點飽和度，避免混濁
+      col=mix(vec3(.95,.97,.99),col,smoothstep(.05,.5,r));
+      // 淺色：最大的點只稍微加深；深色：點越大（越亮）越接近白
+      col=light>.5 ? col*mix(1.,.92,smoothstep(.7,1.,it)) : mix(col,vec3(1.),smoothstep(.8,1.,it)*.35);
+      gl_FragColor=vec4(col*al,al);
+    }`;
+
+  // ── 灰字輪播：四組數據（佔位）依序以 Warp 效果切換 ──
+  const PHRASES = ['99+ 合作夥伴', '900萬+ 可觸及會員', '999+ 受眾包', '999+ 商品 / 服務'];
+  const IN = 900, HOLD = 2400, OUT = 600, PAD = 24;
+  const TEXT_FS = `precision highp float;varying vec2 v;uniform sampler2D tex;uniform vec2 res;uniform float t;uniform float warp;${NOISE}
+    void main(){
+      vec2 px=vec2(v.x,1.-v.y)*res; float H=res.y;
+      vec2 a=vec2(n(px/H*1.7+vec2(t*.55,0.)),n(px/H*1.7+vec2(3.1,t*.55)))-.5;
+      px+=a*H*warp*.35;
+      gl_FragColor=texture2D(tex,px/res)*(1.-warp*warp);
+    }`;
+  const tex = document.createElement('canvas');
+  function drawPhrase(text) {
+    const w = rotCanvas.width, hgt = rotCanvas.height, k = w / rotCanvas.getBoundingClientRect().width;
+    tex.width = w; tex.height = hgt;
+    const c = tex.getContext('2d'), cs = getComputedStyle(rotBox);
+    c.clearRect(0, 0, w, hgt);
+    c.font = `${cs.fontWeight} ${parseFloat(cs.fontSize) * k}px ${cs.fontFamily}`;
+    c.letterSpacing = cs.letterSpacing;
+    const root = getComputedStyle(document.documentElement), x0 = PAD * k;
+    c.fillStyle = root.getPropertyValue('--alt-ink-soft').trim();
+    if (theme === 'light') {
+      // 和主標同一組徑向漸層：以文字外框為準，圓心在左上方 (41%, -25%)，半徑 64% 寬 × 125% 高
+      const tw = c.measureText(text).width, th = parseFloat(cs.fontSize) * k * 1.25, y0 = hgt / 2 - th / 2;
+      c.textBaseline = 'middle'; c.fillStyle = '#000'; c.fillText(text, x0, hgt / 2);
+      const g = c.createRadialGradient(0, 0, 0, 0, 0, 1);
+      g.addColorStop(0, root.getPropertyValue('--alt-grad-in').trim()); g.addColorStop(1, root.getPropertyValue('--alt-grad-out').trim());
+      c.globalCompositeOperation = 'source-in';
+      c.save(); c.translate(x0 + tw * .41, y0 - th * .25); c.scale(tw * .64, th * 1.25);
+      c.fillStyle = g; c.fillRect(-50, -50, 100, 100);
+      c.restore(); c.globalCompositeOperation = 'source-over';
+      return;
+    }
+    c.textBaseline = 'middle';
+    c.fillText(text, x0, hgt / 2);
+  }
+
+  let dots = null, txt = null, texObj = null;
+  try { dots = setup(dotsCanvas, DOTS_FS); txt = setup(rotCanvas, TEXT_FS); } catch (e) { console.warn(e); dots = txt = null; }
+  if (!dots || !txt) document.documentElement.classList.add('no-gl');
+
+  let idx = 0, phaseStart = performance.now(), fontsReady = false;
+  function uploadPhrase() {
+    if (!txt || !fontsReady) return;
+    fit(rotCanvas, txt.gl, 2);
+    drawPhrase(PHRASES[idx]);
+    const gl = txt.gl;
+    texObj ??= gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texObj);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, tex);
+    for (const [key, val] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, key, val);
+  }
+
+  // 滑鼠：靠近網點球時，附近的點散開（ptr.z 為強度，緩動）
+  const pointer = { x: -1e4, y: -1e4, on: 0, amt: 0 };
+
+  // 深淺色切換：選擇記在 localStorage（只是方便比較）
+  const rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
+  // 網點配色：沿用正規版極光球（Figma 4294:1635）的色相順序，改成明亮飽滿的版本（2026-11-09 使用者覺得原色偏混濁）
+  const PAL = ['#4FD1C5', '#3CC6DC', '#2BB5EE', '#1E9BF0', '#2F86F5', '#5C7CFA', '#8B7CF8', '#B77FE8', '#F27BAF', '#FF8A5C', '#FFC13B', '#7FDB9A'].flatMap(rgb);
+  let theme = 'light';
+  try { theme = localStorage.getItem('sense.altTheme') === 'dark' ? 'dark' : 'light'; } catch (e) {}
+  const toggle = [...document.querySelectorAll('.alt-theme button')];
+  function setTheme(next) {
+    theme = next; document.documentElement.dataset.theme = next;
+    toggle.forEach(b => b.setAttribute('aria-pressed', b.dataset.set === next));
+    try { localStorage.setItem('sense.altTheme', next); } catch (e) {}
+    uploadPhrase();  // 灰字顏色跟著主題重畫
+  }
+  toggle.forEach(b => b.addEventListener('click', () => setTheme(b.dataset.set)));
+  addEventListener('pointermove', e => { pointer.x = e.clientX; pointer.y = e.clientY; pointer.on = e.pointerType === 'mouse' ? 1 : 0; });
+  document.documentElement.addEventListener('pointerleave', () => { pointer.on = 0; });
+
+  const start = performance.now();
+  function frame(now) {
+    const t = reduce ? 6 : (now - start) / 1000;
+    if (dots) {
+      const dpr = fit(dotsCanvas, dots.gl, 1.5), gl = dots.gl, W = dotsCanvas.width, H = dotsCanvas.height;
+      const mobile = innerWidth < 768;
+      // 桌機：位置依置中的內容區（最寬 1280px）計算，寬螢幕時球跟著內容走
+      const cw = Math.min(W / dpr - 80, 1280) * dpr, cl = (W - cw) / 2;
+      const cx = mobile ? .5 * W : cl + .26 * cw, cy = (mobile ? .3 : .46) * H, R = mobile ? .34 * W : Math.min(.2 * cw, .28 * H);
+      pointer.amt += (pointer.on - pointer.amt) * .08;
+      const r = dotsCanvas.getBoundingClientRect();
+      gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.uniform2f(dots.U('res'), W, H); gl.uniform1f(dots.U('t'), t);
+      gl.uniform2f(dots.U('ctr'), cx, cy); gl.uniform1f(dots.U('R'), R); gl.uniform1f(dots.U('cell'), 9 * dpr);
+      gl.uniform3f(dots.U('ptr'), (pointer.x - r.left) * dpr, (pointer.y - r.top) * dpr, reduce ? 0 : pointer.amt);
+      gl.uniform1f(dots.U('light'), theme === 'light' ? 1 : 0);
+      gl.uniform3fv(dots.U('pal'), PAL);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    }
+    // 灰字：進場 IN → 停留 HOLD → 退場 OUT → 換下一組
+    let el = now - phaseStart;
+    if (!reduce && el > IN + HOLD + OUT) { idx = (idx + 1) % PHRASES.length; phaseStart = now; el = 0; uploadPhrase(); rotFallback.textContent = PHRASES[idx]; }
+    const ez = x => x * x * (3 - 2 * x);
+    const warp = reduce ? 0 : el < IN ? ez(1 - el / IN) : el < IN + HOLD ? 0 : ez((el - IN - HOLD) / OUT);
+    if (txt && texObj) {
+      const gl = txt.gl;
+      gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.uniform1i(txt.U('tex'), 0); gl.uniform2f(txt.U('res'), rotCanvas.width, rotCanvas.height);
+      gl.uniform1f(txt.U('t'), t); gl.uniform1f(txt.U('warp'), warp);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    }
+    rotFallback.style.opacity = 1 - warp;
+    raf = requestAnimationFrame(frame);
+  }
+
+  // 只在首屏可見、分頁在前景時才跑動畫
+  let raf = 0, visible = true;
+  const run = () => { cancelAnimationFrame(raf); if (visible && !document.hidden) raf = requestAnimationFrame(frame); };
+  new IntersectionObserver(([e]) => { visible = e.isIntersecting; run(); }).observe(hero);
+  document.addEventListener('visibilitychange', run);
+  new ResizeObserver(uploadPhrase).observe(rotBox);
+
+  // 等字型載入後再把灰字畫進 canvas，避免先出現系統字型
+  Promise.all(['600 52px "Roboto Condensed"', '600 52px "Noto Sans TC"'].map(f => document.fonts.load(f, PHRASES.join(''))))
+    .catch(() => {}).then(() => { fontsReady = true; phaseStart = performance.now(); uploadPhrase(); });
+  // 底部 SENSE：捲動時五個字母以不同速度往上滑（S 最快、E 最慢），循環出現；停止捲動就靜止
+  const cols = [...document.querySelectorAll('.alt-word .col')], SPEEDS = [1.4, 1.15, .9, .65, .4];  // 最左的 S 移動最多，往右遞減
+  function slideWord() {
+    if (reduce) return;
+    const svg = cols[0].firstElementChild, P = svg.getBoundingClientRect().height + parseFloat(getComputedStyle(cols[0]).rowGap), y = scrollY;
+    cols.forEach((c, i) => { c.style.transform = `translateY(${-P - (y * SPEEDS[i]) % P}px)`; });
+  }
+  addEventListener('scroll', () => requestAnimationFrame(slideWord), { passive: true }); addEventListener('resize', slideWord); slideWord();
+
+  // 資料卡進場：依左上、右上、左下、右下的順序，由下往上輕微淡入
+  const featGrid = document.querySelector('.feat-grid');
+  if (featGrid && !reduce && 'IntersectionObserver' in window) {
+    const feats = [...featGrid.querySelectorAll('.feat')];
+    featGrid.classList.add('is-reveal');
+    const io = new IntersectionObserver(entries => {
+      entries.filter(e => e.isIntersecting).map(e => e.target)
+        .sort((a, b) => feats.indexOf(a) - feats.indexOf(b))
+        .forEach((el, i) => { el.style.transitionDelay = `${i * 150}ms`; el.classList.add('is-in'); io.unobserve(el); });
+    }, { threshold: .2 });
+    feats.forEach(el => io.observe(el));
+  }
+
+  // Header：首屏還在 header 底下時維持圖示，首屏捲過 header 後展開成文字按鈕
+  const header = document.querySelector('.alt-header');
+  const syncHeader = () => header.classList.toggle('is-compact', hero.getBoundingClientRect().bottom > header.offsetHeight);
+  addEventListener('scroll', syncHeader, { passive: true }); addEventListener('resize', syncHeader); syncHeader();
+
+  setTheme(theme);
+  run();
+})();
+</script>
+<script>
+/* 卡片點陣動態（Canvas 2D，不依賴套件；file:// 可用）。
+   四種：overlap 資料安全互補／channels 會員場景互通／match 商品快速媒合／growth 成效持續驗證。
+   共用：底層淡網點、依卡片彩球取色（--fx-lo／--fx-hi）、離開畫面暫停、減少動態效果時只畫靜態畫面。 */
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const GAP = 8;   // 網點間距（px）
+
+  const hex = h => [1, 3, 5].map(i => parseInt(h.trim().slice(i, i + 2), 16));
+  const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
+  const rgba = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+  const ease = t => t < .5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+  const clamp = t => Math.max(0, Math.min(1, t));
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const dot = (ctx, x, y, r, style) => { ctx.fillStyle = style; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); };
+  const ring = (ctx, x, y, r, style) => { ctx.strokeStyle = style; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.stroke(); };
+
+  // ── 01 資料安全互補：兩群點（兩家企業的資料）靠近、重疊，只有交集的點亮起來；兩群點本身不交換，之後再分開 ──
+  const overlap = () => {
+    let t0 = null;
+    return (e, ctx, now) => {
+      if (t0 === null) t0 = now;
+      const P = 6400, p = reduce ? .5 : ((now - t0) % P) / P;
+      const k = p < .3 ? ease(p / .3) : p < .7 ? 1 : 1 - ease((p - .7) / .3);   // 靠近 → 停留 → 分開
+      const R = e.H * .36, cy = e.H / 2, d = R * (1.15 - .5 * k);   // 最近時只重疊約三分之一
+      const ax = e.W / 2 - d, bx = e.W / 2 + d, glow = .5 + .5 * Math.sin(now / 380);
+      for (let c = 0; c < e.cols; c++) for (let r = 0; r < e.rows; r++) {
+        const x = e.gx(c), y = e.gy(r);
+        const da = Math.hypot(x - ax, y - cy) / R, db = Math.hypot(x - bx, y - cy) / R;
+        if (da < 1 && db < 1) dot(ctx, x, y, 2.4 + .3 * glow * k, rgba(mix(e.lo, e.hi, (x - bx + R) / (ax + R - (bx - R))), 1));   // 交集：放大、不透明，由左色漸變到右色
+        else if (da < 1) dot(ctx, x, y, 1.6 - .5 * da ** 3, rgba(e.lo, .6));
+        else if (db < 1) dot(ctx, x, y, 1.6 - .5 * db ** 3, rgba(e.hi, .7));
+        else dot(ctx, x, y, .75, e.dot);
+      }
+    };
+  };
+
+  // ── 02 會員場景互通：三條通道（代表 EDM／APP／SMS，畫面上不標文字），受眾像光點一格一格前進，途中可以轉進另一條通道 ──
+  const channels = () => {
+    const packets = []; let last = null;
+    const spawn = (e, x) => {
+      const lane = Math.floor(Math.random() * 3), to = (lane + 1 + Math.floor(Math.random() * 2)) % 3;
+      return { lane, to, x, speed: rand(6, 10), sw: Math.random() < .7 ? Math.floor(rand(e.start + 3, e.cols - 10)) : null };
+    };
+    return (e, ctx, now) => {
+      const lanes = [.22, .5, .78].map(f => Math.round((e.rows - 1) * f));
+      e.start = 0;
+      if (!packets.length) for (let i = 0; i < 4; i++) packets.push(spawn(e, e.start - i * 11 + (reduce ? 30 : 0)));
+      const dt = last === null || reduce ? 0 : Math.min(.05, (now - last) / 1000); last = now;
+      // 底層網點
+      for (let c = 0; c < e.cols; c++) for (let r = 0; r < e.rows; r++) if (!(c >= e.start && lanes.includes(r))) dot(ctx, e.gx(c), e.gy(r), .75, e.dot);
+      // 通道
+      lanes.forEach(r => { for (let c = e.start; c < e.cols; c++) dot(ctx, e.gx(c), e.gy(r), 1.1, e.mute); });
+      // 光點：頭最亮，後面拖 5 格漸淡的尾巴；轉通道時沿 45° 斜線一格一格移過去
+      packets.forEach((p, i) => {
+        p.x += p.speed * dt;
+        const span = Math.abs(lanes[p.to] - lanes[p.lane]), dir = Math.sign(lanes[p.to] - lanes[p.lane]);
+        const rowAt = c => p.sw === null || c < p.sw ? lanes[p.lane] : c >= p.sw + span ? lanes[p.to] : lanes[p.lane] + dir * (c - p.sw);
+        const head = Math.floor(p.x);
+        for (let k = 5; k >= 0; k--) {
+          const c = head - k; if (c < e.start || c >= e.cols) continue;
+          dot(ctx, e.gx(c), e.gy(rowAt(c)), 2.5 - k * .28, rgba(mix(e.lo, e.hi, k / 5), 1 - k * .15));
+        }
+        if (head - 6 > e.cols) packets[i] = spawn(e, e.start - rand(2, 14));
+      });
+    };
+  };
+
+  // ── 03 商品快速媒合：上排是商品／服務，下排是合作需求；兩端先亮起，再由點一格格連起來，配對成功時亮一圈 ──
+  const match = () => {
+    const links = []; let next = 0;
+    return (e, ctx, now) => {
+      const rT = Math.round((e.rows - 1) * .14), rB = e.rows - 1 - rT, n = rB - rT;
+      const sockets = []; for (let c = 3; c < e.cols - 3; c += 3) sockets.push(c);
+      const LIFE = 3600;
+      if (reduce && !links.length) links.push({ a: sockets[2], b: sockets[4], t0: now - 2000 }, { a: sockets[8], b: sockets[6], t0: now - 2000 });
+      if (!reduce && now > next && links.length < 3) {
+        const used = links.flatMap(l => [l.a, l.b]);
+        const free = sockets.filter(s => !used.includes(s));
+        const a = free[Math.floor(Math.random() * free.length)];
+        const near = free.filter(s => s !== a && Math.abs(s - a) <= 9);
+        if (a !== undefined && near.length) { links.push({ a, b: near[Math.floor(Math.random() * near.length)], t0: now }); next = now + rand(700, 1200); }
+      }
+      for (let i = links.length - 1; i >= 0; i--) if (!reduce && now - links[i].t0 > LIFE) links.splice(i, 1);
+      // 底層網點與兩排插座
+      for (let c = 0; c < e.cols; c++) for (let r = 0; r < e.rows; r++) dot(ctx, e.gx(c), e.gy(r), .75, e.dot);
+      sockets.forEach(c => { dot(ctx, e.gx(c), e.gy(rT), 1.5, rgba(e.lo, .45)); dot(ctx, e.gx(c), e.gy(rB), 1.5, rgba(e.hi, .5)); });
+      links.forEach(l => {
+        const t = reduce ? 2000 : now - l.t0;
+        const fade = 1 - clamp((t - 3000) / 600);
+        const on = ease(clamp(t / 500)), prog = ease(clamp((t - 500) / 900));
+        // 連線：一格一格往下長
+        for (let k = 0; k <= n * prog; k++) {
+          const c = Math.round(l.a + (l.b - l.a) * k / n);
+          dot(ctx, e.gx(c), e.gy(rT + k), 1.6, rgba(k / n < .5 ? e.lo : e.hi, .9 * fade));   // 上半段商品色、下半段需求色（直接混色會變灰）
+        }
+        dot(ctx, e.gx(l.a), e.gy(rT), 1.5 + 1.2 * on, rgba(e.lo, fade));
+        dot(ctx, e.gx(l.b), e.gy(rB), 1.5 + 1.2 * on, rgba(e.hi, fade));
+        const rt = (t - 1400) / 900;   // 配對成功的光環
+        if (!reduce && rt >= 0 && rt < 1) {
+          ring(ctx, e.gx(l.a), e.gy(rT), 3 + rt * 7, rgba(e.lo, (1 - rt) * .9));
+          ring(ctx, e.gx(l.b), e.gy(rB), 3 + rt * 7, rgba(e.hi, (1 - rt) * .9));
+        }
+      });
+    };
+  };
+
+  // ── 04 成效持續驗證：點陣長條圖往右遞增；一道看不見的掃描由左往右，經過的柱子先轉深色再慢慢變回原色（深淺波動），同時更新高度、柱頂亮一圈「驗證」光環 ──
+  const growth = () => {
+    const COLS = 10, SWEEP = 1800, REST = 1400;
+    const target = i => Math.min(1, .22 + .62 * i / (COLS - 1) + (Math.random() - .5) * .22);
+    const bars = Array.from({ length: COLS }, (_, i) => { const v = reduce ? target(i) : 0; return { cur: v, from: v, to: v, ring: -1e9, at: 0 }; });
+    let cycle = null;
+    return (e, ctx, now) => {
+      if (cycle === null) cycle = now;
+      const step = Math.max(2, Math.floor((e.cols - 4) / (COLS - 1)));
+      const first = Math.round((e.cols - 1 - step * (COLS - 1)) / 2), maxRows = e.rows - 2;
+      const t = reduce ? 2 : (now - cycle) / SWEEP;
+      const scanX = t <= 1 ? e.gx(first - 1 + (step * (COLS - 1) + 2) * ease(t)) : null;   // 掃描位置（不畫出來）
+      const reach = step * GAP * 1.2;
+      for (let c = 0; c < e.cols; c++) for (let r = 0; r < e.rows; r++) dot(ctx, e.gx(c), e.gy(r), .75, e.dot);
+      bars.forEach((b, i) => {
+        const x = e.gx(first + step * i);
+        if (!reduce && scanX !== null && b.at < cycle && scanX >= x) { b.from = b.cur; b.to = target(i); b.at = now; b.ring = now; }
+        if (!reduce) b.cur = b.from + (b.to - b.from) * ease(clamp((now - b.at) / 600));
+        // 深淺：掃描接近時漸深、經過後 1.2 秒內慢慢退回原色
+        const near = scanX === null ? 0 : clamp(1 - Math.abs(scanX - x) / reach);
+        const after = reduce ? 0 : 1 - ease(clamp((now - b.at) / 1200));
+        const I = Math.max(near, after);
+        const h = b.cur * maxRows, full = Math.floor(h), frac = h - full;
+        for (let r = 0; r <= full && r < maxRows; r++) {
+          const a = r < full ? 1 : frac; if (a <= .02) continue;
+          const u = r / maxRows;
+          dot(ctx, x, e.gy(e.rows - 1 - r), 2.4 - 1.1 * u, rgba(mix(mix(e.lo, e.hi, u), e.deep, .75 * I), a * (.5 + .5 * I)));
+        }
+        const rt = (now - b.ring) / 900;
+        if (rt >= 0 && rt < 1) ring(ctx, x, e.gy(e.rows - Math.max(1, Math.round(h))), 2.5 + rt * 7, rgba(e.deep, (1 - rt) * .8));
+      });
+      if (!reduce && now - cycle > SWEEP + REST) cycle = now;
+    };
+  };
+
+  const FX = { overlap, channels, match, growth };
+
+  document.querySelectorAll('.feat-fx[data-fx]').forEach(cv => {
+    const make = FX[cv.dataset.fx]; if (!make) return;
+    const ctx = cv.getContext('2d'), paint = make();
+    const e = { W: 0, H: 0, cols: 0, rows: 0, x0: 0, y0: 0 };
+    e.gx = c => e.x0 + c * GAP; e.gy = r => e.y0 + r * GAP;
+    let visible = false, raf = 0;
+    const size = () => {
+      const r = cv.getBoundingClientRect(), d = devicePixelRatio || 1;
+      e.W = r.width; e.H = r.height; cv.width = Math.round(e.W * d); cv.height = Math.round(e.H * d);
+      ctx.setTransform(d, 0, 0, d, 0, 0);
+      e.cols = Math.floor((e.W - GAP) / GAP); e.rows = Math.floor((e.H - GAP) / GAP);
+      e.x0 = (e.W - (e.cols - 1) * GAP) / 2; e.y0 = (e.H - (e.rows - 1) * GAP) / 2;
+    };
+    const draw = now => {
+      const cs = getComputedStyle(cv);
+      e.dot = cs.getPropertyValue('--fx-dot'); e.mute = cs.getPropertyValue('--fx-mute');
+      e.lo = hex(cs.getPropertyValue('--fx-lo')); e.hi = hex(cs.getPropertyValue('--fx-hi'));
+      const deep = cs.getPropertyValue('--fx-deep').trim(); e.deep = deep ? hex(deep) : e.lo;
+      ctx.clearRect(0, 0, e.W, e.H);
+      if (e.W > 0) paint(e, ctx, now);
+    };
+    const loop = now => { draw(now); raf = visible ? requestAnimationFrame(loop) : 0; };
+    size();
+    new ResizeObserver(() => { size(); if (!raf) draw(performance.now()); }).observe(cv);
+    new MutationObserver(() => { if (!raf) draw(performance.now()); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    if (reduce || !('IntersectionObserver' in window)) { draw(performance.now()); if (!reduce) { visible = true; raf = requestAnimationFrame(loop); } return; }
+    new IntersectionObserver(([en]) => {
+      visible = en.isIntersecting;
+      if (visible && !raf) raf = requestAnimationFrame(loop);
+    }).observe(cv);
+  });
+})();
+</script>
+<script>
+/* 卡片光邊（2026-11-10，四張都套用）：游標靠近卡片外框時，沿「頁籤＋內凹圓角＋本體」的整個輪廓
+   亮起一小段 logo 漸層色（--accent-ring），光斑跟著游標位置移動；只在有滑鼠的裝置顯示。
+   光邊畫在 .feat-grid 上的 SVG（不放進 .feat，避免被淺色模式描邊用的 drop-shadow 再描一圈）。 */
+(() => {
+  if (!matchMedia('(hover: hover)').matches) return;
+  const grid = document.querySelector('.feat-grid'); if (!grid) return;
+  const feats = [...grid.querySelectorAll('.feat[data-glow]')]; if (!feats.length) return;
+  const NS = 'http://www.w3.org/2000/svg';
+  const PAD = 24;      // SVG 比卡片外擴的距離（留給光暈）
+  const REACH = 60;    // 游標距外框多近開始亮（px）
+  const SPOT = 130;    // 光斑半徑（px）
+  const R = 20;        // 卡片圓角（--r-20）
+
+  // 從 tokens 的 --accent-ring 讀出 logo 漸層色標
+  const ring = getComputedStyle(document.documentElement).getPropertyValue('--accent-ring');
+  const stops = [...ring.matchAll(/(#[0-9a-f]{6})\s+([\d.]+)%/gi)].map(m => `<stop offset="${m[2] / 100}" stop-color="${m[1]}"/>`).join('');
+
+  const items = feats.map((feat, i) => {
+    const svg = document.createElementNS(NS, 'svg');
+    svg.classList.add('feat-glow'); svg.setAttribute('aria-hidden', 'true');
+    svg.innerHTML = `<defs>
+      <linearGradient id="fg-c${i}" gradientUnits="userSpaceOnUse" y1="0" y2="0">${stops}</linearGradient>
+      <radialGradient id="fg-s${i}" gradientUnits="userSpaceOnUse" r="${SPOT}">
+        <stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#fff" stop-opacity=".4"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+      </radialGradient>
+      <mask id="fg-m${i}" maskUnits="userSpaceOnUse"><rect x="0" y="0" width="100%" height="100%" fill="url(#fg-s${i})"/></mask>
+      <filter id="fg-b${i}" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="5"/></filter>
+    </defs>
+    <g mask="url(#fg-m${i})">
+      <path class="halo" fill="none" stroke="url(#fg-c${i})" stroke-width="8" filter="url(#fg-b${i})"/>
+      <path class="line" fill="none" stroke="url(#fg-c${i})" stroke-width="2"/>
+    </g>`;
+    grid.append(svg);
+    return { feat, svg, tab: feat.querySelector('.feat-tab'), body: feat.querySelector('.feat-body'),
+             grad: svg.querySelector('linearGradient'), spot: svg.querySelector('radialGradient'), paths: [...svg.querySelectorAll('path')], key: '' };
+  });
+
+  // 組合外形的輪廓（順時針）：頁籤左上 → 本體右上、右下、左下 → 內凹圓角（與 .feat-fillet 同一條曲線）→ 頁籤左下
+  const outline = (T, Ht, W, H) => {
+    const p = v => +(v + PAD).toFixed(2);
+    return `M${p(R)} ${p(0)}H${p(W - R)}A${R} ${R} 0 0 1 ${p(W)} ${p(R)}V${p(H - R)}A${R} ${R} 0 0 1 ${p(W - R)} ${p(H)}`
+      + `H${p(T + R)}A${R} ${R} 0 0 1 ${p(T)} ${p(H - R)}V${p(Ht + 20)}`
+      + `C${p(T)} ${p(Ht + 20)} ${p(T)} ${p(Ht + 12.31)} ${p(T - 5.5)} ${p(Ht + 6.81)}C${p(T - 11)} ${p(Ht + 1.31)} ${p(T - 20)} ${p(Ht)} ${p(T - 20)} ${p(Ht)}`
+      + `H${p(R)}A${R} ${R} 0 0 1 ${p(0)} ${p(Ht - R)}V${p(R)}A${R} ${R} 0 0 1 ${p(R)} ${p(0)}Z`;
+  };
+
+  let mx = -1e5, my = -1e5, raf = 0;
+  const update = () => {
+    raf = 0;
+    const g = grid.getBoundingClientRect();
+    items.forEach(it => {
+      const f = it.feat.getBoundingClientRect(), t = it.tab.getBoundingClientRect(), b = it.body.getBoundingClientRect();
+      const T = t.width, Ht = t.height, W = b.right - f.left, H = b.bottom - f.top;
+      const key = [T, Ht, W, H].join();
+      if (key !== it.key) {
+        it.key = key;
+        it.paths.forEach(p => p.setAttribute('d', outline(T, Ht, W, H)));
+        it.svg.setAttribute('width', W + PAD * 2); it.svg.setAttribute('height', H + PAD * 2);
+        it.grad.setAttribute('x1', PAD); it.grad.setAttribute('x2', PAD + W);
+      }
+      it.svg.style.left = `${f.left - g.left - PAD}px`; it.svg.style.top = `${f.top - g.top - PAD}px`;
+      // 亮度：游標離外框（卡片外接矩形）越近越亮；在卡片中央或離很遠時不亮
+      const x = mx - f.left, y = my - f.top, inside = x >= 0 && y >= 0 && x <= W && y <= H;
+      const d = inside ? Math.min(x, y, W - x, H - y) : Math.hypot(Math.max(0, -x, x - W), Math.max(0, -y, y - H));
+      const k = Math.max(0, 1 - d / REACH);
+      it.svg.style.setProperty('--glow', k.toFixed(3)); it.svg.classList.toggle('is-on', k > 0);
+      it.spot.setAttribute('cx', x + PAD); it.spot.setAttribute('cy', y + PAD);
+    });
+  };
+  const queue = () => { if (!raf) raf = requestAnimationFrame(update); };
+  addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY; queue(); }, { passive: true });
+  document.documentElement.addEventListener('pointerleave', () => { mx = my = -1e5; queue(); });
+  addEventListener('scroll', queue, { passive: true }); addEventListener('resize', queue);
+  update();
+})();
+</script>
+</body>
+</html>
