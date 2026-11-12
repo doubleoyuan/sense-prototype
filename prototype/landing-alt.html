@@ -27,6 +27,7 @@
   --alt-card-img: rgba(255,255,255,.06);
   --alt-card-text: rgba(255,255,255,.75);
   --band-tint: #13264E; --band-tint2: #1C3768;  /* MAKE SENSE 區塊的漸層底（暫定） */
+  --glow-core: rgba(150,195,255,.55); --glow-mid: rgba(90,140,230,.28); --glow-ring: rgba(150,195,255,.35);  /* 弧形後方的光暈 */
 }
 [data-theme="light"] {
   --alt-page: var(--white);
@@ -45,7 +46,8 @@
   --alt-card-img: #F5F5F5;                 /* 卡片內預留的灰色區塊 */
   --alt-card-text: #333333;
   --alt-card-line: #EBEBEB;                /* 卡片外框（非常淺的灰） */
-  --band-tint: #DCE6F1; --band-tint2: #C9DAEC;  /* MAKE SENSE 區塊的漸層底（暫定，淡藍灰） */
+  --band-tint: #E4ECF6; --band-tint2: #D5E3F2;  /* MAKE SENSE 區塊的漸層底（暫定，淡藍灰；2026-11-12 再調淡） */
+  --glow-core: rgba(58,118,214,.72); --glow-mid: rgba(140,188,242,.45); --glow-ring: rgba(150,195,245,.4);  /* 弧形後方的光暈：中心藍、往外淡藍（2026-11-12 使用者指定，後再調淡） */
 }
 * { box-sizing: border-box; }
 html { background: var(--alt-page); }
@@ -337,9 +339,9 @@ body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-
   .mod, .mod::before, .mod-ic, .mod-more { transition: none; }
   .mod-ic * { animation: none !important; }
 }
-/* MAKE SENSE 區塊（2026-11-12）：服務模組與價值四卡之間。頁面底色往下漸變成淡藍灰，白色大字「MAKE SENSE」橫向跑馬；
-   下緣用「曲線分隔」做法切回價值四卡的底色；曲線改為置中的平緩山丘（2026-11-12 使用者選定）。網點質感疊在最上層，讓曲線下方與下一區塊的網點接得起來。 */
-.alt-band { position: relative; height: clamp(300px, 30vw, 440px); overflow: hidden;
+/* MAKE SENSE 區塊（2026-11-12）：服務模組與價值四卡之間。頁面底色往下漸變成淡藍灰，白色大字「ALL MAKING SENSE」橫向跑馬；
+   下緣用「曲線分隔」做法切回價值四卡的底色；曲線為橫跨全寬的單一弧形（兩端不落到底、中間最高，2026-11-12 使用者依 Figma 草圖指定）。網點質感疊在最上層，讓曲線下方與下一區塊的網點接得起來。 */
+.alt-band { position: relative; height: clamp(340px, 34vw, 500px); overflow: hidden;   /* 加高讓跑馬燈與弧頂之間多留空間（2026-11-12） */
   background: linear-gradient(180deg, var(--alt-page) 0%, var(--band-tint) 45%, var(--band-tint2) 100%); }
 .alt-band::after { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
   background: radial-gradient(circle, var(--alt-grain) .7px, transparent 1px) 0 0 / 4px 4px; }
@@ -348,6 +350,20 @@ body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-
 .band-track span { flex: none; padding-right: .9em; font-family: "Roboto Condensed", sans-serif; font-size: clamp(56px, 8.5vw, 128px); line-height: 1; font-weight: 700;
   letter-spacing: .32em; color: var(--white); white-space: nowrap; }
 @keyframes band-marquee { to { transform: translateX(-50%); } }
+/* 日出前的光暈（2026-11-12）：從弧形後方（區塊底部中央）透出，中心深藍、往外淡藍；核心緩慢呼吸、外圈一圈圈往外暈開後淡出 */
+.band-glow { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.band-glow::before, .band-glow::after { content: ''; position: absolute; inset: 0; transform-origin: 50% 82%; }   /* 中心在弧頂稍下方（2026-11-12 使用者要求下移），深藍一半露出、一半藏在弧形後 */
+.band-glow::before { background: radial-gradient(ellipse 46% 70% at 50% 82%, var(--glow-core) 0%, var(--glow-mid) 42%, transparent 76%);
+  animation: band-breathe 9s ease-in-out infinite alternate; }
+.band-glow::after { background: radial-gradient(ellipse 50% 74% at 50% 82%, transparent 34%, var(--glow-ring) 52%, transparent 74%);
+  animation: band-spread 7s ease-out infinite; }
+@media (max-width: 767px) {   /* 手機畫面窄，光暈改寬、改矮，避免變成直立的光團 */
+  .band-glow::before { background: radial-gradient(ellipse 95% 48% at 50% 82%, var(--glow-core) 0%, var(--glow-mid) 42%, transparent 76%); }
+  .band-glow::after { background: radial-gradient(ellipse 100% 52% at 50% 82%, transparent 34%, var(--glow-ring) 52%, transparent 74%); }
+}
+@keyframes band-breathe { from { opacity: .65; transform: scale(.92); } to { opacity: 1; transform: scale(1.12); } }
+@keyframes band-spread { 0% { opacity: 0; transform: scale(.7); } 30% { opacity: 1; } 100% { opacity: 0; transform: scale(1.55); } }
+@media (prefers-reduced-motion: reduce) { .band-glow::before, .band-glow::after { animation: none; } .band-glow::after { opacity: 0; } }
 .band-curve { position: absolute; left: 0; bottom: -1px; z-index: 1; width: 100%; height: clamp(72px, 12vw, 200px); display: block; fill: var(--alt-page); }
 @media (prefers-reduced-motion: reduce) { .band-track { animation: none; } }
 
@@ -496,10 +512,11 @@ body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-
   </div>
 </section>
 
-<section class="alt-band" aria-label="MAKE SENSE">
-  <div class="band-marquee" aria-hidden="true"><div class="band-track"><span>MAKE SENSE</span><span>MAKE SENSE</span><span>MAKE SENSE</span><span>MAKE SENSE</span><span>MAKE SENSE</span><span>MAKE SENSE</span></div></div>
+<section class="alt-band" aria-label="ALL MAKING SENSE">
+  <div class="band-glow" aria-hidden="true"></div>
+  <div class="band-marquee" aria-hidden="true"><div class="band-track"><span>ALL MAKING SENSE</span><span>ALL MAKING SENSE</span><span>ALL MAKING SENSE</span><span>ALL MAKING SENSE</span><span>ALL MAKING SENSE</span><span>ALL MAKING SENSE</span></div></div>
   <svg class="band-curve" viewBox="0 0 1440 200" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M0 160C400 160 520 70 720 70C920 70 1040 160 1440 160V200H0Z"/>
+    <path d="M0 165Q720 -127 1440 165V200H0Z"/>
   </svg>
 </section>
 
