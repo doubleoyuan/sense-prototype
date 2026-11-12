@@ -26,6 +26,7 @@
   --alt-card: #14264F;
   --alt-card-img: rgba(255,255,255,.06);
   --alt-card-text: rgba(255,255,255,.75);
+  --band-tint: #13264E; --band-tint2: #1C3768;  /* MAKE SENSE 區塊的漸層底（暫定） */
 }
 [data-theme="light"] {
   --alt-page: var(--white);
@@ -44,6 +45,7 @@
   --alt-card-img: #F5F5F5;                 /* 卡片內預留的灰色區塊 */
   --alt-card-text: #333333;
   --alt-card-line: #EBEBEB;                /* 卡片外框（非常淺的灰） */
+  --band-tint: #DCE6F1; --band-tint2: #C9DAEC;  /* MAKE SENSE 區塊的漸層底（暫定，淡藍灰） */
 }
 * { box-sizing: border-box; }
 html { background: var(--alt-page); }
@@ -148,7 +150,7 @@ body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-
 
 /* 首屏之後：四張資料卡（Figma 4302:1955），背景延續首屏的細點點 */
 .alt-next {
-  padding: 60px 40px 160px;
+  padding: 60px 40px 160px; overflow-x: clip;   /* 卡片從左右滑入時不產生水平捲動 */
   background: radial-gradient(circle, var(--alt-grain) .7px, transparent 1px) 0 0 / 4px 4px, var(--alt-page);
 }
 .feat-grid { width: min(1200px, 100%); margin: 0 auto; display: grid; grid-template-columns: 480px 480px; column-gap: 80px; row-gap: 70px; }
@@ -156,9 +158,11 @@ body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-
 .feat-grid .feat:nth-child(even) { top: 40px; }            /* 右欄往下錯開 40px（不影響排高） */
 /* 卡片：左側一個放彩球的頁籤，和右側卡片之間用 20px 的內凹圓角接起來 */
 .feat { position: relative; display: grid; grid-template-columns: 80px 400px; align-items: start; }
-/* 進場：由下往上輕微淡入（JS 加上 .is-reveal 才隱藏，沒有 JS 時直接顯示） */
-.feat-grid.is-reveal .feat { opacity: 0; transform: translateY(16px); }
-.feat-grid.is-reveal .feat.is-in { opacity: 1; transform: none; transition: opacity .7s ease-out, transform .7s ease-out; }   /* 只在進場時有過場，隱藏時不會先淡出 */
+/* 進場（2026-11-12 改）：上排兩張由左側、下排兩張由右側滑入並淡入；0.9 秒、前段快後段慢慢收住。
+   JS 加上 .is-reveal 才隱藏，沒有 JS 時直接顯示；同一排同時進入時第二張晚 0.15 秒 */
+.feat-grid.is-reveal .feat { opacity: 0; transform: translateX(-80px); }
+.feat-grid.is-reveal .feat:nth-child(n+3) { transform: translateX(80px); }
+.feat-grid.is-reveal .feat.is-in { opacity: 1; transform: none; transition: opacity .9s cubic-bezier(.25, 1, .5, 1), transform .9s cubic-bezier(.25, 1, .5, 1); }   /* 只在進場時有過場，隱藏時不會先淡出 */
 /* 淺色模式：卡片外形（頁籤＋內凹圓角＋本體）是組合的，用 drop-shadow 沿外形描 1px 淺灰邊（不加陰影） */
 [data-theme="light"] .feat {
   filter: drop-shadow(1px 0 0 var(--alt-card-line)) drop-shadow(-1px 0 0 var(--alt-card-line))
@@ -168,6 +172,11 @@ body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-
 .feat-fillet { position: absolute; left: 60px; top: 100px; width: 20px; height: 20px; fill: var(--alt-card); }
 .feat-ball { width: 40px; height: 40px; border-radius: 50%; filter: blur(.5px); }
 .feat-body { display: flex; flex-direction: column; gap: 10px; padding: 30px 40px 20px; background: var(--alt-card); border-radius: 0 var(--r-20) var(--r-20) var(--r-20); }
+/* 頁籤改到右側（2026-11-12 試做，只套在下排兩張 .feat.is-flip；拿掉 class 即回到左側）：本體在左、彩球頁籤在右，內凹圓角水平鏡像 */
+.feat.is-flip { grid-template-columns: 400px 80px; }
+.feat.is-flip .feat-tab { grid-column: 2; grid-row: 1; border-radius: 0 var(--r-20) var(--r-20) 0; }
+.feat.is-flip .feat-body { grid-column: 1; grid-row: 1; border-radius: var(--r-20) 0 var(--r-20) var(--r-20); }
+.feat.is-flip .feat-fillet { left: auto; right: 60px; transform: scaleX(-1); }
 .feat-img { height: 160px; margin-bottom: 20px; border-radius: var(--r-20); background: var(--alt-card-img); }   /* 未來放圖或動態，先留位 */
 /* 卡片點陣動態（2026-11-10）：四張卡各一種點陣資訊圖，底層淡網點，顏色取自該卡彩球（淺色底上改用較飽和的同色系）。 */
 .feat-img:has(.feat-fx) { position: relative; overflow: hidden; }
@@ -220,6 +229,128 @@ body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-
   .feat-ball.is-oil::before, .feat-ball.is-oil::after { animation: none; }
 }
 
+/* 服務模組（2026-11-12）：接在 SENSE 大字下方、價值四卡上方，不放標題；兩列（3＋4）卡片，滑鼠移入或鍵盤聚焦的那張橫向展開，其餘收合；
+   一開始全部收合（2026-11-12 使用者要求不預設展開）；收合時標題與說明各一行（超出以 … 截斷），展開才顯示完整說明與主要內容。不連結、不放箭頭。
+   平板與手機改成垂直排列，點一下往下展開。icon 取自 doc/design resource/sense-icons 的選定組合。 */
+.alt-mods { padding: 60px 40px 0; background: radial-gradient(circle, var(--alt-grain) .7px, transparent 1px) 0 0 / 4px 4px, var(--alt-page); }
+.mods-inner { width: min(1200px, 100%); margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+.mods-row { display: flex; gap: 20px; height: 320px; }
+.mods-inner.is-reveal .mods-row { opacity: 0; transform: translateY(100px); }
+.mods-inner.is-reveal .mods-row.is-in { opacity: 1; transform: none; transition: opacity .8s cubic-bezier(.25, 1, .5, 1), transform .8s cubic-bezier(.25, 1, .5, 1); }
+/* 進場：由下方 100px 滑入並淡入，0.8 秒、前段快後段慢慢收住；列頂端進到畫面 90% 時觸發 */
+.mod {
+  position: relative; flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; justify-content: flex-end; gap: 20px;
+  padding: 30px; border-radius: var(--r-20); background: var(--mod-bg); color: var(--mod-fg); cursor: default; outline: none;
+  transition: flex-grow .5s ease, background-color .35s ease, color .35s ease;
+}
+.mod.is-open { flex-grow: 2.4; background: var(--mod-open-bg); color: var(--mod-open-fg); }
+.mod::before {   /* 展開時的網點質感 */
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .35s ease;
+  background: radial-gradient(circle, rgba(255,255,255,.09) .7px, transparent 1px) 0 0 / 4px 4px;
+}
+.mod.is-open::before { opacity: 1; }
+.mod:focus-visible { box-shadow: 0 0 0 2px var(--cta-orange); }
+.mod-ic { position: relative; width: 64px; height: 64px; flex: none; color: var(--mod-ic); transition: color .35s ease; }
+.mod.is-open .mod-ic { color: var(--mod-open-fg); }
+/* 策略（2026-11-12 調整）：外框深色；收合時交集內只有一顆淺色圓點，展開時圓點淡出、細點點照原動畫彈出，收合再回到一顆圓點 */
+.mod-ic[data-anim="strategy"] .ic-dot { opacity: 0; }
+.mod.is-open .mod-ic[data-anim="strategy"] .ic-dot { opacity: 1; }
+.mod-ic .ic-one { transition: opacity .25s ease; }
+.mod.is-open .mod-ic .ic-one { opacity: 0; }
+/* 行銷（2026-11-12 調整）：收合時圈內只留中心一顆淺色點，展開時其餘八顆照原動畫彈出 */
+.mod-ic[data-anim="marketing"] .ic-dot:not(.ic-center) { opacity: 0; }
+.mod.is-open .mod-ic[data-anim="marketing"] .ic-dot { opacity: 1; }
+/* icon 深淺兩色（2026-11-12）：主要框架用深色，點點等點綴用淺色（.lt） */
+.mod-ic .lt { color: var(--mod-ic-lt); transition: color .35s ease; }
+.mod.is-open .mod-ic .lt { color: var(--mod-open-lt); }
+/* 展開時「會變化的點點」改用 logo 漸層色並停在漸層（2026-11-12）：各點的顏色寫在 --c（取自 --accent-ring 的四個色標內插）。
+   商品由左到右、行銷與策略由中心往外、兌換由左到右、點數由上到下、公關內圈藍外圈橘；財務的圓點在飛行中依序換色，最後停在橘 */
+.mod-ic .gc { transition: color .35s ease; }
+.mod.is-open .mod-ic .gc { color: var(--c); }
+@keyframes ic-gem-hue { 0% { color: #0073F5; } 33% { color: #71D1A6; } 66% { color: #FAB431; } 100% { color: #FF5B26; } }
+.mod.is-open .mod-ic .ic-gem { animation: ic-land .28s ease-out 1.3s, ic-gem-hue .6s linear .7s backwards; }
+.mod-ic * { vector-effect: non-scaling-stroke; }
+.mod-text { position: relative; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.mod-name, .mod-tag { margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mod-name { font-size: 20px; line-height: 24px; font-weight: 600; letter-spacing: var(--tracking-wider); }
+.mod-tag { font-size: 16px; line-height: 24px; font-weight: 300; letter-spacing: var(--tracking-wider); }
+.mod.is-open .mod-name, .mod.is-open .mod-tag { white-space: normal; }
+/* 即將推出的模組（第二列）：展開時標題後加一個圓角標籤（尺寸比照共用 StatusTag：高 24、左右 10、12px 粗體） */
+.mod-soon { display: none; align-items: center; height: 24px; padding: 0 10px; border-radius: 20px; font-size: 12px; font-weight: 600; letter-spacing: .06em; white-space: nowrap;
+  background: rgba(255,255,255,.16); color: var(--white); }
+.mod.is-open .mod-name:has(.mod-soon) { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.mod.is-open .mod-soon { display: inline-flex; }
+.mod-more { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .45s ease, opacity .3s ease; }
+.mod.is-open .mod-more { grid-template-rows: 1fr; opacity: 1; transition-delay: .12s; }
+.mod-detail { min-height: 0; overflow: hidden; margin: 0; font-size: 16px; line-height: 24px; font-weight: 300; letter-spacing: var(--tracking-wider); opacity: .8; }
+.mod-detail::before { content: ''; display: block; width: 24px; height: 1px; margin: 10px 0 12px; background: currentColor; opacity: .5; }
+[data-theme="light"] .alt-mods { --mod-bg: #F0F1F4; --mod-fg: var(--alt-ink); --mod-ic: #555555; --mod-ic-lt: #ABB0BA; --mod-open-bg: #142A63; --mod-open-fg: var(--white); --mod-open-lt: rgba(255,255,255,.45); }
+[data-theme="dark"] .alt-mods  { --mod-bg: var(--alt-card); --mod-fg: var(--white); --mod-ic: rgba(255,255,255,.85); --mod-ic-lt: rgba(255,255,255,.38); --mod-open-bg: #24427F; --mod-open-fg: var(--white); --mod-open-lt: rgba(255,255,255,.45); }
+/* icon 語意小動作（2026-11-12）：卡片展開時播一次，收合即回到原狀。
+   策略：兩個圓從左右滑到交疊，交集的點陣由中心往外依序亮起。 */
+.mod-ic .ic-l, .mod-ic .ic-r, .mod-ic .ic-dot { transform-box: fill-box; transform-origin: center; }
+@keyframes ic-slide-l { from { transform: translateX(-9px); } }
+@keyframes ic-slide-r { from { transform: translateX(9px); } }
+@keyframes ic-pop { 0% { opacity: 0; transform: scale(.2); } 60% { opacity: 1; transform: scale(1.6); } 100% { opacity: 1; transform: scale(1); } }
+.mod.is-open .ic-l { animation: ic-slide-l .6s cubic-bezier(.2, .8, .2, 1); }
+.mod.is-open .ic-r { animation: ic-slide-r .6s cubic-bezier(.2, .8, .2, 1); }
+.mod.is-open .ic-dot { animation: ic-pop .4s ease-out calc(.45s + var(--i) * 70ms) backwards; }
+/* 其餘六個（2026-11-12）：節奏與策略相同，約 1.1 秒、先快後慢。 */
+.mod-ic .ic-tdot, .mod-ic .ic-bag, .mod-ic .ic-ring, .mod-ic .ic-lift, .mod-ic .ic-coin, .mod-ic .ic-wave, .mod-ic .ic-col, .mod-ic .ic-roof { transform-box: fill-box; transform-origin: center; }
+.mod-ic .ic-bag { transform-origin: 50% 100%; }
+.mod-ic .ic-lift { transform-origin: 0% 100%; }
+.mod-ic .ic-col { transform-origin: 50% 100%; }
+@keyframes ic-bounce { 0% { transform: translateY(0) scale(1, 1); } 25% { transform: translateY(-6px) scale(.97, 1.03); } 50% { transform: translateY(0) scale(1.04, .96); } 70% { transform: translateY(-1.5px) scale(1, 1); } 100% { transform: none; } }
+@keyframes ic-tighten { from { opacity: 0; transform: scale(1.45); } 60% { opacity: 1; } to { opacity: 1; transform: scale(1); } }
+@keyframes ic-lift { 0% { transform: translateY(12px) rotate(10deg); } 65% { transform: translateY(-2px) rotate(-2deg); } 100% { transform: none; } }
+@keyframes ic-shrink-in { from { opacity: 0; transform: scale(2.4); } to { opacity: 1; transform: scale(1); } }
+@keyframes ic-flip { 0% { transform: scaleX(1); } 50% { transform: scaleX(-1); } 100% { transform: scaleX(1); } }
+@keyframes ic-wave { 0% { opacity: 0; transform: scale(.7); } 60% { opacity: 1; transform: scale(1.12); } 100% { opacity: 1; transform: scale(1); } }   /* 公關：聲波點靜態也顯示，展開時從麥克風往外冒出後停住（2026-11-12） */
+@keyframes ic-grow { from { transform: scaleY(0); } }
+@keyframes ic-drop { from { opacity: 0; transform: translateY(-9px); } }
+/* 財務：屋頂的圓點最後從右上方畫面外沿拋物線丟進屋頂（水平等速＋垂直先上後下），落定時彈一下（2026-11-12） */
+@keyframes ic-throw-x { from { opacity: 0; transform: translateX(52px); } 8% { opacity: 1; } to { opacity: 1; transform: translateX(0); } }
+@keyframes ic-throw-y { 0% { transform: translateY(-14px); animation-timing-function: cubic-bezier(.2, .6, .4, 1); } 35% { transform: translateY(-30px); animation-timing-function: cubic-bezier(.6, 0, .9, .5); } 100% { transform: translateY(0); } }
+@keyframes ic-land { 0% { transform: scale(1); } 45% { transform: scale(1.9); } 100% { transform: scale(1); } }
+.mod.is-open .ic-bag { animation: ic-bounce .7s ease-out; }
+.mod.is-open .ic-ring { animation: ic-tighten .6s cubic-bezier(.2, .8, .2, 1); }
+.mod.is-open .ic-lift { animation: ic-lift .7s cubic-bezier(.2, .8, .2, 1); }
+.mod.is-open .ic-tdot { animation: ic-shrink-in .45s ease-out calc(.35s + var(--i) * 90ms) backwards; }   /* 兌換：票券點陣由左到右、由大到小漸入（不閃撕線，2026-11-12） */
+.mod.is-open .ic-coin { animation: ic-flip .9s cubic-bezier(.45, 0, .2, 1); }
+.mod.is-open .ic-wave { animation: ic-wave .7s ease-out calc(.15s + var(--i) * 180ms) backwards; }
+.mod.is-open .ic-col { animation: ic-grow .5s cubic-bezier(.2, .8, .2, 1) calc(var(--i) * 90ms) backwards; }
+.mod.is-open .ic-roof { animation: ic-drop .45s cubic-bezier(.2, .8, .2, 1) .5s backwards; }
+.mod-ic .ic-gem { transform-box: fill-box; transform-origin: center; }
+.mod-ic[data-anim="finance"] { overflow: visible; }   /* 讓圓點從 icon 外飛進來時看得到整段弧線 */
+.mod.is-open .ic-throw-x { animation: ic-throw-x .6s linear .7s backwards; }
+.mod.is-open .ic-throw-y { animation: ic-throw-y .6s .7s backwards; }
+@media (max-width: 1079px) {
+  .mods-row { flex-direction: column; height: auto; gap: 12px; }
+  .mod { flex: none; display: grid; grid-template-columns: 48px minmax(0, 1fr); align-items: start; gap: 4px 16px; padding: 20px; cursor: pointer; }
+  .mod.is-open { flex-grow: 0; }
+  .mod-ic { width: 48px; height: 48px; }
+}
+@media (max-width: 767px) {
+  .alt-mods { padding: 40px 20px 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mod, .mod::before, .mod-ic, .mod-more { transition: none; }
+  .mod-ic * { animation: none !important; }
+}
+/* MAKE SENSE 區塊（2026-11-12）：服務模組與價值四卡之間。頁面底色往下漸變成淡藍灰，白色大字「MAKE SENSE」橫向跑馬；
+   下緣用「曲線分隔」做法切回價值四卡的底色；曲線改為置中的平緩山丘（2026-11-12 使用者選定）。網點質感疊在最上層，讓曲線下方與下一區塊的網點接得起來。 */
+.alt-band { position: relative; height: clamp(300px, 30vw, 440px); overflow: hidden;
+  background: linear-gradient(180deg, var(--alt-page) 0%, var(--band-tint) 45%, var(--band-tint2) 100%); }
+.alt-band::after { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: radial-gradient(circle, var(--alt-grain) .7px, transparent 1px) 0 0 / 4px 4px; }
+.band-marquee { position: absolute; left: 0; right: 0; top: 30%; z-index: 3; overflow: hidden; pointer-events: none; }
+.band-track { display: flex; width: max-content; animation: band-marquee 40s linear infinite; }
+.band-track span { flex: none; padding-right: .9em; font-family: "Roboto Condensed", sans-serif; font-size: clamp(56px, 8.5vw, 128px); line-height: 1; font-weight: 700;
+  letter-spacing: .32em; color: var(--white); white-space: nowrap; }
+@keyframes band-marquee { to { transform: translateX(-50%); } }
+.band-curve { position: absolute; left: 0; bottom: -1px; z-index: 1; width: 100%; height: clamp(72px, 12vw, 200px); display: block; fill: var(--alt-page); }
+@media (prefers-reduced-motion: reduce) { .band-track { animation: none; } }
+
 /* 深淺色切換（比較用，非頁面設計） */
 .alt-theme {
   position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 3px;
@@ -250,6 +381,8 @@ body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-
   .feat { grid-template-columns: 64px 1fr; }
   .feat-tab { height: 84px; }
   .feat-fillet { left: 44px; top: 84px; }
+  .feat.is-flip { grid-template-columns: 1fr 64px; }
+  .feat.is-flip .feat-fillet { left: auto; right: 44px; }
   .feat-body { padding: 26px 20px 20px; }
   .feat-img { height: auto; aspect-ratio: 2 / 1; }
   .alt-brand { --logo-h: 32px; }
@@ -298,6 +431,78 @@ body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-
   <div class="alt-word" aria-hidden="true"><span class="ltr" style="--w:0.7955"><span class="col"><svg viewBox="171.87 53.7 61.65 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M203.06 131.15C212.22 131.15 233.52 128.93 233.52 108.32C233.52 96.75 226.23 90.31 209.15 86.79L199.21 84.8C190.94 83.09 189.21 78.74 189.21 75.39C189.21 70.56 192.68 65.4 202.4 65.4C207.44 65.4 211.4 66.73 213.83 69.24C215.45 70.92 216.34 73.04 216.47 75.57H231.41C230.94 61.5 220.8 53.77 202.74 53.77C184.68 53.77 173.94 61.85 173.94 75.39C173.94 86.67 180.84 93.23 195.64 96.03L206.49 98.24C212.2 99.4 218.04 101.52 218.04 108.43C218.04 115.34 212.49 119.52 203.19 119.52C193.89 119.52 187.78 114.91 186.98 106.81H171.87C172.35 122.29 183.67 131.15 203.08 131.15H203.06Z"/></svg><svg viewBox="171.87 53.7 61.65 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M203.06 131.15C212.22 131.15 233.52 128.93 233.52 108.32C233.52 96.75 226.23 90.31 209.15 86.79L199.21 84.8C190.94 83.09 189.21 78.74 189.21 75.39C189.21 70.56 192.68 65.4 202.4 65.4C207.44 65.4 211.4 66.73 213.83 69.24C215.45 70.92 216.34 73.04 216.47 75.57H231.41C230.94 61.5 220.8 53.77 202.74 53.77C184.68 53.77 173.94 61.85 173.94 75.39C173.94 86.67 180.84 93.23 195.64 96.03L206.49 98.24C212.2 99.4 218.04 101.52 218.04 108.43C218.04 115.34 212.49 119.52 203.19 119.52C193.89 119.52 187.78 114.91 186.98 106.81H171.87C172.35 122.29 183.67 131.15 203.08 131.15H203.06Z"/></svg><svg viewBox="171.87 53.7 61.65 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M203.06 131.15C212.22 131.15 233.52 128.93 233.52 108.32C233.52 96.75 226.23 90.31 209.15 86.79L199.21 84.8C190.94 83.09 189.21 78.74 189.21 75.39C189.21 70.56 192.68 65.4 202.4 65.4C207.44 65.4 211.4 66.73 213.83 69.24C215.45 70.92 216.34 73.04 216.47 75.57H231.41C230.94 61.5 220.8 53.77 202.74 53.77C184.68 53.77 173.94 61.85 173.94 75.39C173.94 86.67 180.84 93.23 195.64 96.03L206.49 98.24C212.2 99.4 218.04 101.52 218.04 108.43C218.04 115.34 212.49 119.52 203.19 119.52C193.89 119.52 187.78 114.91 186.98 106.81H171.87C172.35 122.29 183.67 131.15 203.08 131.15H203.06Z"/></svg></span></span><span class="ltr" style="--w:0.6692"><span class="col"><svg viewBox="267.43 53.7 51.86 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M314.87 97.34V86.48H281.94V67.06H318.18V54.77H267.43V130.05H319.29V117.75H281.94V97.34H314.87Z"/></svg><svg viewBox="267.43 53.7 51.86 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M314.87 97.34V86.48H281.94V67.06H318.18V54.77H267.43V130.05H319.29V117.75H281.94V97.34H314.87Z"/></svg><svg viewBox="267.43 53.7 51.86 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M314.87 97.34V86.48H281.94V67.06H318.18V54.77H267.43V130.05H319.29V117.75H281.94V97.34H314.87Z"/></svg></span></span><span class="ltr" style="--w:0.8159"><span class="col"><svg viewBox="353.2 53.7 63.23 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M400.15 130.05H416.43V54.77H401.93V105.6H399.98L368.82 54.77H353.2V130.05H367.71V80.21H369.65L400.15 130.05Z"/></svg><svg viewBox="353.2 53.7 63.23 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M400.15 130.05H416.43V54.77H401.93V105.6H399.98L368.82 54.77H353.2V130.05H367.71V80.21H369.65L400.15 130.05Z"/></svg><svg viewBox="353.2 53.7 63.23 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M400.15 130.05H416.43V54.77H401.93V105.6H399.98L368.82 54.77H353.2V130.05H367.71V80.21H369.65L400.15 130.05Z"/></svg></span></span><span class="ltr" style="--w:0.7956"><span class="col"><svg viewBox="450.38 53.7 61.66 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M481.58 131.15C490.74 131.15 512.04 128.93 512.04 108.32C512.04 96.75 504.75 90.31 487.67 86.79L477.73 84.8C469.46 83.09 467.73 78.74 467.73 75.39C467.73 70.56 471.2 65.4 480.92 65.4C485.96 65.4 489.92 66.73 492.35 69.24C493.98 70.92 494.86 73.04 494.99 75.57H509.93C509.46 61.5 499.32 53.77 481.26 53.77C463.2 53.77 452.46 61.85 452.46 75.39C452.46 86.67 459.36 93.23 474.16 96.03L485 98.24C490.71 99.4 496.55 101.52 496.55 108.43C496.55 115.34 491 119.52 481.7 119.52C472.4 119.52 466.29 114.91 465.49 106.81H450.38C450.86 122.29 462.18 131.15 481.59 131.15H481.58Z"/></svg><svg viewBox="450.38 53.7 61.66 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M481.58 131.15C490.74 131.15 512.04 128.93 512.04 108.32C512.04 96.75 504.75 90.31 487.67 86.79L477.73 84.8C469.46 83.09 467.73 78.74 467.73 75.39C467.73 70.56 471.2 65.4 480.92 65.4C485.96 65.4 489.92 66.73 492.35 69.24C493.98 70.92 494.86 73.04 494.99 75.57H509.93C509.46 61.5 499.32 53.77 481.26 53.77C463.2 53.77 452.46 61.85 452.46 75.39C452.46 86.67 459.36 93.23 474.16 96.03L485 98.24C490.71 99.4 496.55 101.52 496.55 108.43C496.55 115.34 491 119.52 481.7 119.52C472.4 119.52 466.29 114.91 465.49 106.81H450.38C450.86 122.29 462.18 131.15 481.59 131.15H481.58Z"/></svg><svg viewBox="450.38 53.7 61.66 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M481.58 131.15C490.74 131.15 512.04 128.93 512.04 108.32C512.04 96.75 504.75 90.31 487.67 86.79L477.73 84.8C469.46 83.09 467.73 78.74 467.73 75.39C467.73 70.56 471.2 65.4 480.92 65.4C485.96 65.4 489.92 66.73 492.35 69.24C493.98 70.92 494.86 73.04 494.99 75.57H509.93C509.46 61.5 499.32 53.77 481.26 53.77C463.2 53.77 452.46 61.85 452.46 75.39C452.46 86.67 459.36 93.23 474.16 96.03L485 98.24C490.71 99.4 496.55 101.52 496.55 108.43C496.55 115.34 491 119.52 481.7 119.52C472.4 119.52 466.29 114.91 465.49 106.81H450.38C450.86 122.29 462.18 131.15 481.59 131.15H481.58Z"/></svg></span></span><span class="ltr" style="--w:0.6692"><span class="col"><svg viewBox="545.95 53.7 51.86 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M593.38 97.34V86.48H560.46V67.06H596.7V54.77H545.95V130.05H597.81V117.75H560.46V97.34H593.38Z"/></svg><svg viewBox="545.95 53.7 51.86 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M593.38 97.34V86.48H560.46V67.06H596.7V54.77H545.95V130.05H597.81V117.75H560.46V97.34H593.38Z"/></svg><svg viewBox="545.95 53.7 51.86 77.5" xmlns="http://www.w3.org/2000/svg"><path d="M593.38 97.34V86.48H560.46V67.06H596.7V54.77H545.95V130.05H597.81V117.75H560.46V97.34H593.38Z"/></svg></span></span></div>
 </section>
 
+<section class="alt-mods" aria-label="SENSE 服務模組">
+  <div class="mods-inner">
+    <div class="mods-row">
+      <article class="mod" tabindex="0" aria-expanded="false">
+        <svg class="mod-ic" data-anim="product" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="ic-bag"><path d="M20 30H60L57 64H23Z"/><path d="M31 30V24a9 9 0 0 1 18 0V30"/></g><g fill="currentColor" stroke="none"><circle class="ic-dot lt gc" style="--i:2;--c:#0073F5" cx="31" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#56BBB9" cx="35.5" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#A9C576" cx="40" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#FAB431" cx="44.5" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="49" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#0073F5" cx="31" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#56BBB9" cx="35.5" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="40" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#FAB431" cx="44.5" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#FF5B26" cx="49" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#0073F5" cx="31" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#56BBB9" cx="35.5" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#A9C576" cx="40" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#FAB431" cx="44.5" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#FF5B26" cx="49" cy="53" r="1.1"/></g></svg>
+        <div class="mod-text">
+          <h3 class="mod-name">商品 SENSE</h3>
+          <p class="mod-tag">讓商品進入現成的會員場景</p>
+          <div class="mod-more"><p class="mod-detail">上架自有商品或服務、瀏覽生態圈合作品項</p></div>
+        </div>
+      </article>
+      <article class="mod" tabindex="0" aria-expanded="false">
+        <svg class="mod-ic" data-anim="marketing" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g fill="currentColor" stroke="none"><circle cx="16" cy="16" r="1.1"/><circle cx="24" cy="16" r="1.1"/><circle cx="32" cy="16" r="1.1"/><circle cx="40" cy="16" r="1.1"/><circle cx="48" cy="16" r="1.1"/><circle cx="56" cy="16" r="1.1"/><circle cx="64" cy="16" r="1.1"/><circle cx="16" cy="24" r="1.1"/><circle cx="24" cy="24" r="1.1"/><circle cx="32" cy="24" r="1.1"/><circle cx="64" cy="24" r="1.1"/><circle cx="16" cy="32" r="1.1"/><circle cx="24" cy="32" r="1.1"/><circle cx="32" cy="32" r="1.1"/><circle cx="64" cy="32" r="1.1"/><circle cx="16" cy="40" r="1.1"/><circle cx="24" cy="40" r="1.1"/><circle cx="32" cy="40" r="1.1"/><circle cx="64" cy="40" r="1.1"/><circle cx="16" cy="48" r="1.1"/><circle cx="24" cy="48" r="1.1"/><circle cx="32" cy="48" r="1.1"/><circle cx="40" cy="48" r="1.1"/><circle cx="48" cy="48" r="1.1"/><circle cx="56" cy="48" r="1.1"/><circle cx="64" cy="48" r="1.1"/><circle cx="16" cy="56" r="1.1"/><circle cx="24" cy="56" r="1.1"/><circle cx="32" cy="56" r="1.1"/><circle cx="40" cy="56" r="1.1"/><circle cx="48" cy="56" r="1.1"/><circle cx="56" cy="56" r="1.1"/><circle cx="64" cy="56" r="1.1"/><circle cx="16" cy="64" r="1.1"/><circle cx="24" cy="64" r="1.1"/><circle cx="32" cy="64" r="1.1"/><circle cx="40" cy="64" r="1.1"/><circle cx="48" cy="64" r="1.1"/><circle cx="56" cy="64" r="1.1"/><circle cx="64" cy="64" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="40" cy="24" r="2.2"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="48" cy="24" r="2.2"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="56" cy="24" r="2.2"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="40" cy="32" r="2.2"/><circle class="ic-dot lt gc ic-center" style="--i:0;--c:#0073F5" cx="48" cy="32" r="2.2"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="56" cy="32" r="2.2"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="40" cy="40" r="2.2"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="48" cy="40" r="2.2"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="56" cy="40" r="2.2"/></g><circle class="ic-ring" cx="48" cy="32" r="14"/></svg>
+        <div class="mod-text">
+          <h3 class="mod-name">行銷 SENSE</h3>
+          <p class="mod-tag">選受眾、選渠道，由夥伴具名觸及會員</p>
+          <div class="mod-more"><p class="mod-detail">上架和瀏覽受眾包，透過 EDM、APP、SMS 渠道觸及最多潛在用戶</p></div>
+        </div>
+      </article>
+      <article class="mod" tabindex="0" aria-expanded="false">
+        <svg class="mod-ic" data-anim="strategy" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle class="ic-l" cx="31" cy="40" r="17"/><circle class="ic-r" cx="49" cy="40" r="17"/><g fill="currentColor" stroke="none"><circle class="ic-dot gc" style="--i:0;--c:#0073F5" cx="40" cy="38" r="1.25"/><circle class="ic-dot gc" style="--i:0;--c:#0073F5" cx="40" cy="42" r="1.25"/><circle class="ic-dot gc" style="--i:1;--c:#56BBB9" cx="36" cy="38" r="1.25"/><circle class="ic-dot gc" style="--i:1;--c:#56BBB9" cx="44" cy="38" r="1.25"/><circle class="ic-dot gc" style="--i:1;--c:#56BBB9" cx="36" cy="42" r="1.25"/><circle class="ic-dot gc" style="--i:1;--c:#56BBB9" cx="44" cy="42" r="1.25"/><circle class="ic-dot gc" style="--i:2;--c:#A9C576" cx="40" cy="34" r="1.25"/><circle class="ic-dot gc" style="--i:2;--c:#A9C576" cx="40" cy="46" r="1.25"/><circle class="ic-dot gc" style="--i:3;--c:#FAB431" cx="36" cy="34" r="1.25"/><circle class="ic-dot gc" style="--i:3;--c:#FAB431" cx="44" cy="34" r="1.25"/><circle class="ic-dot gc" style="--i:3;--c:#FAB431" cx="36" cy="46" r="1.25"/><circle class="ic-dot gc" style="--i:3;--c:#FAB431" cx="44" cy="46" r="1.25"/><circle class="ic-dot gc" style="--i:4;--c:#FF5B26" cx="40" cy="30" r="1.25"/><circle class="ic-dot gc" style="--i:4;--c:#FF5B26" cx="40" cy="50" r="1.25"/></g><circle class="ic-one lt" fill="currentColor" stroke="none" cx="40" cy="40" r="2.4"/></svg>
+        <div class="mod-text">
+          <h3 class="mod-name">策略 SENSE</h3>
+          <p class="mod-tag">讓會員資料變成可合作的資產</p>
+          <div class="mod-more"><p class="mod-detail">用標籤交叉補足會員輪廓，可以單向或雙向交換策略服務</p></div>
+        </div>
+      </article>
+    </div>
+    <div class="mods-row">
+      <article class="mod" tabindex="0" aria-expanded="false">
+        <svg class="mod-ic" data-anim="exchange" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="ic-lift"><g transform="rotate(-10 40 30)"><path d="M16 18H64V25a4 4 0 0 0 0 8V40H16V33a4 4 0 0 0 0-8Z"/><path stroke-width="2.2" stroke-dasharray="0 3.6" d="M52 21V37"/><g fill="currentColor" stroke="none"><circle class="ic-tdot lt gc" style="--i:0;--c:#0073F5" cx="22" cy="25" r="1.1"/><circle class="ic-tdot lt gc" style="--i:1;--c:#73D1A4" cx="26" cy="25" r="1.1"/><circle class="ic-tdot lt gc" style="--i:2;--c:#DFBA48" cx="30" cy="25" r="1.1"/><circle class="ic-tdot lt gc" style="--i:3;--c:#FF5B26" cx="34" cy="25" r="1.1"/><circle class="ic-tdot lt gc" style="--i:0;--c:#0073F5" cx="22" cy="29" r="1.1"/><circle class="ic-tdot lt gc" style="--i:1;--c:#73D1A4" cx="26" cy="29" r="1.1"/><circle class="ic-tdot lt gc" style="--i:2;--c:#DFBA48" cx="30" cy="29" r="1.1"/><circle class="ic-tdot lt gc" style="--i:3;--c:#FF5B26" cx="34" cy="29" r="1.1"/></g></g></g><path d="M16 46H64M16 54H64M16 62H64"/><path d="M16 46V62M64 46V62"/></svg>
+        <div class="mod-text">
+          <h3 class="mod-name">兌換 SENSE<span class="mod-soon">COMING SOON</span></h3>
+          <p class="mod-tag">跨平台兌換票券與商品</p>
+          <div class="mod-more"><p class="mod-detail">票券商品兌換、協助建構票券兌換平台</p></div>
+        </div>
+      </article>
+      <article class="mod" tabindex="0" aria-expanded="false">
+        <svg class="mod-ic" data-anim="points" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="ic-coin"><circle cx="40" cy="40" r="23"/><circle class="lt" stroke-width="2.2" stroke-dasharray="0 3.6" cx="40" cy="40" r="18.5"/><g fill="currentColor" stroke="none"><circle class="gc" style="--c:#0073F5" cx="34" cy="30" r="1.5"/><circle class="gc" style="--c:#0073F5" cx="38" cy="30" r="1.5"/><circle class="gc" style="--c:#0073F5" cx="42" cy="30" r="1.5"/><circle class="gc" style="--c:#45ACC5" cx="34" cy="34" r="1.5"/><circle class="gc" style="--c:#45ACC5" cx="46" cy="34" r="1.5"/><circle class="gc" style="--c:#89CC92" cx="34" cy="38" r="1.5"/><circle class="gc" style="--c:#89CC92" cx="46" cy="38" r="1.5"/><circle class="gc" style="--c:#C9BE5A" cx="34" cy="42" r="1.5"/><circle class="gc" style="--c:#C9BE5A" cx="38" cy="42" r="1.5"/><circle class="gc" style="--c:#C9BE5A" cx="42" cy="42" r="1.5"/><circle class="gc" style="--c:#FBA22F" cx="34" cy="46" r="1.5"/><circle class="gc" style="--c:#FF5B26" cx="34" cy="50" r="1.5"/></g></g></svg>
+        <div class="mod-text">
+          <h3 class="mod-name">點數 SENSE<span class="mod-soon">COMING SOON</span></h3>
+          <p class="mod-tag">企業之間的點數互通</p>
+          <div class="mod-more"><p class="mod-detail">跨企業點數交換，點數使用範圍橫跨票券、商品、服務</p></div>
+        </div>
+      </article>
+      <article class="mod" tabindex="0" aria-expanded="false">
+        <svg class="mod-ic" data-anim="pr" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 36H58L54 43H26Z"/><path d="M30 43V64H50V43"/><path d="M46 36V28"/><rect x="42.5" y="13" width="7" height="13" rx="3.5"/><g class="ic-wave lt gc" style="--i:0;--c:#0073F5"><path stroke-width="2.2" stroke-dasharray="0 3.6" d="M53 15a7 7 0 0 1 0 9"/><path stroke-width="2.2" stroke-dasharray="0 3.6" d="M39 15a7 7 0 0 0 0 9"/></g><g class="ic-wave lt gc" style="--i:1;--c:#FF5B26"><path stroke-width="2.2" stroke-dasharray="0 3.6" d="M57.5 11.5a12 12 0 0 1 0 16"/><path stroke-width="2.2" stroke-dasharray="0 3.6" d="M34.5 11.5a12 12 0 0 0 0 16"/></g><path d="M12 64H68"/></svg>
+        <div class="mod-text">
+          <h3 class="mod-name">公關 SENSE<span class="mod-soon">COMING SOON</span></h3>
+          <p class="mod-tag">與其他企業主面對面交流</p>
+          <div class="mod-more"><p class="mod-detail">構築產業交流的平台，以活動串連企業的資訊交換</p></div>
+        </div>
+      </article>
+      <article class="mod" tabindex="0" aria-expanded="false">
+        <svg class="mod-ic" data-anim="finance" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="ic-roof"><path d="M14 30L40 16L66 30Z"/><path d="M16 34H64"/></g><rect class="ic-col" style="--i:0" x="20" y="38" width="5" height="20"/><rect class="ic-col" style="--i:1" x="31" y="38" width="5" height="20"/><rect class="ic-col" style="--i:2" x="44" y="38" width="5" height="20"/><rect class="ic-col" style="--i:3" x="55" y="38" width="5" height="20"/><path d="M14 61H66M10 65H70"/><g class="ic-throw-x"><g class="ic-throw-y"><circle class="ic-gem lt gc" style="--c:#FF5B26" fill="currentColor" stroke="none" cx="40" cy="24.5" r="1.8"/></g></g></svg>
+        <div class="mod-text">
+          <h3 class="mod-name">財務 SENSE<span class="mod-soon">COMING SOON</span></h3>
+          <p class="mod-tag">募資、融資、併購從這裡開始</p>
+          <div class="mod-more"><p class="mod-detail">提供標的財務細節，協助全方位投資決策</p></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="alt-band" aria-label="MAKE SENSE">
+  <div class="band-marquee" aria-hidden="true"><div class="band-track"><span>MAKE SENSE</span><span>MAKE SENSE</span><span>MAKE SENSE</span><span>MAKE SENSE</span><span>MAKE SENSE</span><span>MAKE SENSE</span></div></div>
+  <svg class="band-curve" viewBox="0 0 1440 200" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 160C400 160 520 70 720 70C920 70 1040 160 1440 160V200H0Z"/>
+  </svg>
+</section>
+
 <section class="alt-next" id="book" aria-label="SENSE 能幫你做什麼">
   <!-- 彩球油膜紋路：雜訊緩慢變化，把彩虹光澤扭曲成流動的油膜 -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -317,11 +522,11 @@ body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-
       <div class="feat-tab"><span class="feat-ball b-coral is-oil" aria-hidden="true"></span></div><svg class="feat-fillet" viewBox="0 0 20 20" aria-hidden="true"><path d="M0 0H20V20C20 20 20 12.31 14.5 6.81C9 1.31 0 0 0 0Z"/></svg>
       <div class="feat-body"><div class="feat-img" aria-hidden="true"><canvas class="feat-fx fx-coral" data-fx="channels"></canvas></div><h3>會員場景互通</h3><p>上架受眾包與行銷資源，進入彼此的 EDM、APP、SMS 會員場景。</p></div>
     </article>
-    <article class="feat" data-glow>
+    <article class="feat is-flip" data-glow>
       <div class="feat-tab"><span class="feat-ball b-lav is-oil" aria-hidden="true"></span></div><svg class="feat-fillet" viewBox="0 0 20 20" aria-hidden="true"><path d="M0 0H20V20C20 20 20 12.31 14.5 6.81C9 1.31 0 0 0 0Z"/></svg>
       <div class="feat-body"><div class="feat-img" aria-hidden="true"><canvas class="feat-fx fx-lav" data-fx="match"></canvas></div><h3>商品快速媒合</h3><p>上架商品、服務或合作需求，讓夥伴快速找到適合的合作項目。</p></div>
     </article>
-    <article class="feat" data-glow>
+    <article class="feat is-flip" data-glow>
       <div class="feat-tab"><span class="feat-ball b-mint is-oil" aria-hidden="true"></span></div><svg class="feat-fillet" viewBox="0 0 20 20" aria-hidden="true"><path d="M0 0H20V20C20 20 20 12.31 14.5 6.81C9 1.31 0 0 0 0Z"/></svg>
       <div class="feat-body"><div class="feat-img" aria-hidden="true"><canvas class="feat-fx fx-mint" data-fx="growth"></canvas></div><h3>成效持續驗證</h3><p>追蹤觸達、互動、名單與訂單轉換，回看合作成果與數據收益。</p></div>
     </article>
@@ -544,7 +749,7 @@ body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-
   }
   addEventListener('scroll', () => requestAnimationFrame(slideWord), { passive: true }); addEventListener('resize', slideWord); slideWord();
 
-  // 資料卡進場：依左上、右上、左下、右下的順序，由下往上輕微淡入
+  // 資料卡進場：上排由左、下排由右滑入（方向寫在 CSS）；同時進入的依左上、右上、左下、右下的順序錯開
   const featGrid = document.querySelector('.feat-grid');
   if (featGrid && !reduce && 'IntersectionObserver' in window) {
     const feats = [...featGrid.querySelectorAll('.feat')];
@@ -796,13 +1001,14 @@ body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-
     const g = grid.getBoundingClientRect();
     items.forEach(it => {
       const f = it.feat.getBoundingClientRect(), t = it.tab.getBoundingClientRect(), b = it.body.getBoundingClientRect();
-      const T = t.width, Ht = t.height, W = b.right - f.left, H = b.bottom - f.top;
-      const key = [T, Ht, W, H].join();
+      const flip = t.left > b.left;   // 頁籤在右側時，輪廓水平鏡像
+      const T = t.width, Ht = t.height, W = Math.max(b.right, t.right) - f.left, H = b.bottom - f.top;
+      const key = [T, Ht, W, H, flip].join();
       if (key !== it.key) {
         it.key = key;
-        it.paths.forEach(p => p.setAttribute('d', outline(T, Ht, W, H)));
+        it.paths.forEach(p => { p.setAttribute('d', outline(T, Ht, W, H)); if (flip) p.setAttribute('transform', `matrix(-1 0 0 1 ${W + PAD * 2} 0)`); else p.removeAttribute('transform'); });
         it.svg.setAttribute('width', W + PAD * 2); it.svg.setAttribute('height', H + PAD * 2);
-        it.grad.setAttribute('x1', PAD); it.grad.setAttribute('x2', PAD + W);
+        it.grad.setAttribute('x1', flip ? PAD + W : PAD); it.grad.setAttribute('x2', flip ? PAD : PAD + W);
       }
       it.svg.style.left = `${f.left - g.left - PAD}px`; it.svg.style.top = `${f.top - g.top - PAD}px`;
       // 亮度：游標離外框（卡片外接矩形）越近越亮；在卡片中央或離很遠時不亮
@@ -818,6 +1024,36 @@ body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-
   document.documentElement.addEventListener('pointerleave', () => { mx = my = -1e5; queue(); });
   addEventListener('scroll', queue, { passive: true }); addEventListener('resize', queue);
   update();
+})();
+</script>
+<script>
+/* 服務模組：一開始全部收合；每列同時只展開一張。桌機滑鼠移入或鍵盤聚焦即展開，滑鼠離開該列或焦點移出就全部收回；
+   平板／手機點一下展開（再點一次收合）。 */
+(() => {
+  const wide = matchMedia('(min-width: 1080px)');
+  // 進場：每列頂端進到畫面 90% 時滑入；同時進入時第二列晚 0.2 秒。減少動態效果或不支援時直接顯示
+  const inner = document.querySelector('.mods-inner');
+  if (inner && !matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+    const rows = [...inner.querySelectorAll('.mods-row')];
+    inner.classList.add('is-reveal');
+    const io = new IntersectionObserver(entries => {
+      entries.filter(e => e.isIntersecting).map(e => e.target).sort((a, b) => rows.indexOf(a) - rows.indexOf(b))
+        .forEach((el, i) => { el.style.transitionDelay = `${i * 200}ms`; el.classList.add('is-in'); io.unobserve(el); });
+    }, { threshold: 0, rootMargin: '0px 0px -10% 0px' });
+    rows.forEach(el => io.observe(el));
+  }
+  document.querySelectorAll('.mods-row').forEach(row => {
+    const mods = [...row.querySelectorAll('.mod')];
+    const open = m => mods.forEach(x => { const on = x === m; x.classList.toggle('is-open', on); x.setAttribute('aria-expanded', on); });
+    row.addEventListener('mouseleave', () => { if (wide.matches) open(null); });
+    row.addEventListener('focusout', e => { if (wide.matches && !row.contains(e.relatedTarget)) open(null); });
+    mods.forEach(m => {
+      m.addEventListener('mouseenter', () => { if (wide.matches) open(m); });
+      m.addEventListener('focus', () => open(m));
+      m.addEventListener('click', () => { if (!wide.matches && m.classList.contains('is-open')) { m.classList.remove('is-open'); m.setAttribute('aria-expanded', false); } else open(m); });
+      m.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(m); } });
+    });
+  });
 })();
 </script>
 </body>
