@@ -246,6 +246,9 @@ body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-
   transition: flex-grow .5s ease, background-color .35s ease, color .35s ease;
 }
 .mod.is-open { flex-grow: 2.4; background: var(--mod-open-bg); color: var(--mod-open-fg); }
+/* 彈性寬度（2026-11-12，兩列都套用 [data-elastic]；參考 dock 式放大）：寬度由 JS 依游標位置連續計算——最近的卡最寬、鄰近的依距離次寬，
+   再以彈簧動畫過去（停下時略為超過再彈回）。這些列的寬度不走 CSS 過場。 */
+.mods-row.is-elastic .mod { transition: background-color .35s ease, color .35s ease; }
 .mod::before {   /* 展開時的網點質感 */
   content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .35s ease;
   background: radial-gradient(circle, rgba(255,255,255,.09) .7px, transparent 1px) 0 0 / 4px 4px;
@@ -449,7 +452,7 @@ body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-
 
 <section class="alt-mods" aria-label="SENSE 服務模組">
   <div class="mods-inner">
-    <div class="mods-row">
+    <div class="mods-row" data-elastic>
       <article class="mod" tabindex="0" aria-expanded="false">
         <svg class="mod-ic" data-anim="product" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="ic-bag"><path d="M20 30H60L57 64H23Z"/><path d="M31 30V24a9 9 0 0 1 18 0V30"/></g><g fill="currentColor" stroke="none"><circle class="ic-dot lt gc" style="--i:2;--c:#0073F5" cx="31" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#56BBB9" cx="35.5" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#A9C576" cx="40" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#FAB431" cx="44.5" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="49" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#0073F5" cx="31" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#56BBB9" cx="35.5" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="40" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#FAB431" cx="44.5" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#FF5B26" cx="49" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#0073F5" cx="31" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#56BBB9" cx="35.5" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#A9C576" cx="40" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#FAB431" cx="44.5" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#FF5B26" cx="49" cy="53" r="1.1"/></g></svg>
         <div class="mod-text">
@@ -475,7 +478,7 @@ body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-
         </div>
       </article>
     </div>
-    <div class="mods-row">
+    <div class="mods-row" data-elastic>
       <article class="mod" tabindex="0" aria-expanded="false">
         <svg class="mod-ic" data-anim="exchange" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="ic-lift"><g transform="rotate(-10 40 30)"><path d="M16 18H64V25a4 4 0 0 0 0 8V40H16V33a4 4 0 0 0 0-8Z"/><path stroke-width="2.2" stroke-dasharray="0 3.6" d="M52 21V37"/><g fill="currentColor" stroke="none"><circle class="ic-tdot lt gc" style="--i:0;--c:#0073F5" cx="22" cy="25" r="1.1"/><circle class="ic-tdot lt gc" style="--i:1;--c:#73D1A4" cx="26" cy="25" r="1.1"/><circle class="ic-tdot lt gc" style="--i:2;--c:#DFBA48" cx="30" cy="25" r="1.1"/><circle class="ic-tdot lt gc" style="--i:3;--c:#FF5B26" cx="34" cy="25" r="1.1"/><circle class="ic-tdot lt gc" style="--i:0;--c:#0073F5" cx="22" cy="29" r="1.1"/><circle class="ic-tdot lt gc" style="--i:1;--c:#73D1A4" cx="26" cy="29" r="1.1"/><circle class="ic-tdot lt gc" style="--i:2;--c:#DFBA48" cx="30" cy="29" r="1.1"/><circle class="ic-tdot lt gc" style="--i:3;--c:#FF5B26" cx="34" cy="29" r="1.1"/></g></g></g><path d="M16 46H64M16 54H64M16 62H64"/><path d="M16 46V62M64 46V62"/></svg>
         <div class="mod-text">
@@ -1070,6 +1073,49 @@ body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-
       m.addEventListener('click', () => { if (!wide.matches && m.classList.contains('is-open')) { m.classList.remove('is-open'); m.setAttribute('aria-expanded', false); } else open(m); });
       m.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(m); } });
     });
+  });
+})();
+</script>
+<script>
+/* 服務模組的彈性寬度：只在桌機、有滑鼠、未開啟減少動態效果時啟用；手機維持點擊展開。 */
+(() => {
+  const ok = matchMedia('(min-width: 1080px) and (hover: hover)'), reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) return;
+  const MAG = 2.4, REACH = 1.25, K = 210, ZETA = .75;   // 最近那張的寬度倍率、影響範圍（以卡寬計）、彈簧剛度、阻尼比（<1 會略為回彈；0.5 時最右側卡片位移大、回彈約 20px 像晃動，2026-11-12 調高到 0.75）
+  document.querySelectorAll('.mods-row[data-elastic]').forEach(row => {
+    const cards = [...row.querySelectorAll('.mod')], n = cards.length;
+    const st = cards.map(() => ({ g: 1, v: 0, t: 1 }));
+    let mx = null, raf = 0, last = 0;
+    const targets = () => {
+      if (mx === null) return st.forEach((s, i) => { s.t = cards[i].classList.contains('is-open') ? MAG : 1; });   // 沒有游標（例如鍵盤聚焦）時，展開的那張照樣變寬
+      const W = row.clientWidth, gap = parseFloat(getComputedStyle(row).columnGap) || 20, w = (W - gap * (n - 1)) / n;
+      st.forEach((s, i) => {   // 用「平均寬度時」的中心點算距離，寬度變化不會回頭影響計算
+        const d = Math.abs(mx - (i * (w + gap) + w / 2)), f = Math.max(0, 1 - d / (w * REACH));
+        s.t = 1 + (MAG - 1) * f * f * (3 - 2 * f);
+      });
+    };
+    const frame = now => {
+      if (!ok.matches) { raf = 0; return; }   // 切到手機寬度時停止，不再寫入寬度
+      const dt = Math.min(.032, (now - (last || now)) / 1000); last = now;
+      targets();
+      let moving = false;
+      st.forEach((s, i) => {
+        const c = 2 * Math.sqrt(K) * ZETA;
+        s.v += (K * (s.t - s.g) - c * s.v) * dt; s.g += s.v * dt;
+        if (Math.abs(s.t - s.g) > .001 || Math.abs(s.v) > .001) moving = true; else { s.g = s.t; s.v = 0; }
+        cards[i].style.flexGrow = s.g.toFixed(4);
+      });
+      raf = moving || mx !== null ? requestAnimationFrame(frame) : 0;
+    };
+    const kick = () => { if (!raf) { last = 0; raf = requestAnimationFrame(frame); } };
+    const enable = () => {
+      row.classList.toggle('is-elastic', ok.matches);
+      if (!ok.matches) { mx = null; cards.forEach(c => { c.style.flexGrow = ''; }); st.forEach(s => { s.g = 1; s.v = 0; }); }
+    };
+    row.addEventListener('pointermove', e => { if (!ok.matches) return; mx = e.clientX - row.getBoundingClientRect().left; kick(); });
+    row.addEventListener('pointerleave', () => { mx = null; kick(); });
+    row.addEventListener('focusin', kick); row.addEventListener('focusout', () => setTimeout(kick));
+    ok.addEventListener('change', enable); enable();
   });
 })();
 </script>
