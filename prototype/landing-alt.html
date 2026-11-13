@@ -26,6 +26,7 @@
   --alt-card: #14264F;
   --alt-card-img: rgba(255,255,255,.06);
   --alt-card-text: rgba(255,255,255,.75);
+  --foot-card: rgba(255,255,255,.05); --foot-divider: var(--alt-page); --foot-ic-bg: rgba(255,255,255,.1);  /* footer 卡片 */
   --band-tint: #13264E; --band-tint2: #1C3768;  /* MAKE SENSE 區塊的漸層底（暫定） */
   --glow-core: rgba(150,195,255,.55); --glow-mid: rgba(90,140,230,.28); --glow-ring: rgba(150,195,255,.35);  /* 弧形後方的光暈 */
 }
@@ -46,6 +47,7 @@
   --alt-card-img: #F5F5F5;                 /* 卡片內預留的灰色區塊 */
   --alt-card-text: #333333;
   --alt-card-line: #EBEBEB;                /* 卡片外框（非常淺的灰） */
+  --foot-card: #F6F8FB; --foot-divider: var(--alt-page); --foot-ic-bg: #E6EBF3;  /* footer 卡片（淡藍灰） */
   --band-tint: #E4ECF6; --band-tint2: #D5E3F2;  /* MAKE SENSE 區塊的漸層底（暫定，淡藍灰；2026-11-12 再調淡） */
   --glow-core: rgba(58,118,214,.72); --glow-mid: rgba(140,188,242,.45); --glow-ring: rgba(150,195,245,.4);  /* 弧形後方的光暈：中心藍、往外淡藍（2026-11-12 使用者指定，後再調淡） */
 }
@@ -370,6 +372,52 @@ body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-
 .band-curve { position: absolute; left: 0; bottom: -1px; z-index: 1; width: 100%; height: clamp(72px, 12vw, 200px); display: block; fill: var(--alt-page); }
 @media (prefers-reduced-motion: reduce) { .band-track { animation: none; } }
 
+/* Footer（2026-11-13）：版面參考使用者提供的風格（左 logo 與主選單、右圓角卡片列表），內容依 PM 的連結表。
+   左：logo、已上線的三個模組、公司資訊；中：股感集團（開新分頁）；右：關於我們／業務合作（寄信）；底：版權 */
+.alt-foot { --foot-r: 64px; position: relative; margin-top: calc(-1 * var(--foot-r)); border-radius: var(--foot-r) var(--foot-r) 0 0;   /* 往上疊進網點區塊，左右上角用大圓角銜接 */
+  padding: 120px 40px 40px; background: var(--alt-page); color: var(--alt-ink); }
+.foot-inner { width: min(1200px, 100%); margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 360px) minmax(0, 360px); gap: 40px; align-items: start; }
+.foot-brand-col { display: flex; flex-direction: column; gap: 30px; min-width: 0; }
+.foot-brand { --logo-h: 40px; width: fit-content; }
+.foot-info { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; font-size: 14px; line-height: 24px; color: var(--alt-ink-soft); }
+.foot-info li { display: flex; align-items: flex-start; gap: 10px; }
+.foot-info .foot-co { letter-spacing: var(--tracking-wider); }
+.foot-info svg, .foot-bottom svg { flex: none; width: 16px; height: 16px; margin-top: 4px; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+.foot-info a { color: inherit; text-decoration: none; }
+.foot-info a:hover { color: var(--alt-ink); text-decoration: underline; text-underline-offset: 3px; }
+.foot-nav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 18px; }
+.foot-nav a { display: inline-flex; align-items: center; gap: 10px; font-size: 20px; line-height: 28px; font-weight: 700; letter-spacing: var(--tracking-wider); color: var(--alt-ink); text-decoration: none; white-space: nowrap; }
+.foot-nav a { transition: color .2s ease; }
+.foot-nav a:hover { color: var(--cta-orange); }
+.foot-col { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿用 .foot-label 的 8px */
+.foot-label { margin: 0 0 8px 4px; font-size: 12px; line-height: 20px; font-weight: 600; letter-spacing: .1em; color: var(--alt-ink-soft); }
+.foot-card { list-style: none; margin: 0; padding: 6px; border-radius: var(--r-20); background: var(--foot-card); }
+.foot-card li + li { border-top: 1px solid var(--foot-divider); }   /* 分隔線用頁面底色，像卡片被切開 */
+.foot-row { display: flex; align-items: center; gap: 16px; padding: 12px 14px; border-radius: 14px; font-size: 15px; line-height: 22px; letter-spacing: var(--tracking-wider); color: var(--alt-ink); text-decoration: none; }
+.foot-row:focus-visible, .foot-nav a:focus-visible, .foot-info a:focus-visible { outline: 2px solid var(--cta-orange); outline-offset: 2px; }
+.foot-ic { flex: none; width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--foot-ic-bg); }
+.foot-ic svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .25s ease; }
+/* hover：箭頭往前微移、信封往上微移（不變色、不變底色） */
+.foot-row:hover .foot-ic svg { transform: translateX(2px); }
+.foot-row[target="_blank"]:hover .foot-ic svg { transform: translate(1.5px, -1.5px); }
+.foot-row:hover .foot-ic .ic-mail { transform: translateY(-2px); }
+@media (prefers-reduced-motion: reduce) { .foot-ic svg { transition: none; } }
+.foot-bottom { width: min(1200px, 100%); margin: 80px auto 0; padding-top: 24px; border-top: 1px solid var(--alt-line); }
+.foot-bottom p { margin: 0; display: flex; align-items: flex-start; gap: 8px; font-size: 13px; line-height: 24px; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); }
+@media (max-width: 1079px) {
+  .foot-inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px 32px; }
+  .foot-brand-col { grid-column: 1 / -1; }
+}
+@media (max-width: 767px) {
+  .alt-foot { --foot-r: 32px; padding: 80px 20px 32px; }
+  .foot-inner { grid-template-columns: 1fr; gap: 40px; }
+  .foot-brand { --logo-h: 32px; }
+  .foot-nav ul { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; }
+  .foot-nav a { font-size: 16px; line-height: 24px; flex-wrap: wrap; gap: 4px 8px; white-space: normal; }
+  .foot-bottom { margin-top: 48px; }
+}
+
 /* 深淺色切換（比較用，非頁面設計） */
 .alt-theme {
   position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 3px;
@@ -552,6 +600,31 @@ body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-
     </article>
   </div>
 </section>
+
+<footer class="alt-foot">
+  <div class="foot-inner">
+    <div class="foot-brand-col">
+      <a class="alt-brand foot-brand" href="#hero" aria-label="SENSE 首頁"><svg class="alt-logo" viewBox="0 0 112 185" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10.81 44.57C10.33 42.93 7.2 34.58 21.84 24.05C24.37 22.23 28.72 20.58 32.22 19.28C47.74 12.65 54.39 9.6 74.57 .98C80.29-1.46 86.7.7 89.36 7.18C96.3 24.02 101.8 36.97 108.85 53.68L108.92 53.65C111.9 60 109.16 66.18 103.5 68.75C101.62 69.6 77.22 80.87 69.7 84.06C63.98 86.48 57.57 84.29 54.93 77.81H54.95C49.58 65.05 37.1 35.53 35.89 33.74C33.09 29.55 24.75 28.45 18.98 31.16C14.43 33.29 9.09 38.56 10.81 44.58Z" fill="url(#p0)"/><path d="M105.83 157.14C81.67 168.1 76.86 169.98 52.75 181.03C52.04 181.35 51.18 181.73 50.22 182.11C36.01 182.86 31.54 175.97 31.54 175.97L31.51 175.93C35.1 179.98 41.76 179.52 46.03 177.76C51.93 175.33 56.74 168.43 55.55 163.54C55.04 161.44 54.15 159.42 53.25 157.44L26.63 97.53L31.25 94.33C35.16 101.74 40.29 103.63 46.5 102.3C51.89 101.18 73.5 90.84 75.39 90.03C81.11 87.59 87.51 89.75 90.19 96.23L90.13 96.26C97.69 112.74 103.52 125.55 111.25 142.03C114.23 148.37 111.49 154.56 105.84 157.13Z" fill="url(#p1)"/><path d="M18.98 31.15C21.36 30.13 25.58 29.43 29.47 30.02C32.24 30.79 34.01 31.35 35.9 33.73C40.25 42.51 54.96 77.8 54.96 77.8C54.96 77.8 58.35 86.75 66.83 84.86L45.49 31.31C41.97 22.88 28.16 18.77 15.25 26.41C10.22 29.38 6.4 32.06 4.86 39.61C3.65 45.8 5.99 50.77 5.99 50.77C5.99 50.77 22.85 88.99 26.35 96.9C26.37 96.94 26.38 96.98 26.4 97.02C28.38 101.48 31.1 107.6 31.2 107.82L53.26 157.45C53.26 157.45 55.57 162.19 55.74 164.85C55.74 164.85 56.21 168.18 52.97 172.27C52.97 172.27 49.76 176.25 47.05 177.31C44.34 178.37 42.8 178.74 42.8 178.74C42.8 178.74 39.33 180.11 34.25 177.98C34.25 177.98 32.88 177.42 31.66 176.12C31.59 176.03 31.56 175.98 31.56 175.98L30.64 174.74L26.85 168C26.85 168 6.88 124.34 5.89 122.22C4.87 121.02 4.14 119.81 1.65 121C-.84 122.19.22 124.56.22 124.56L7.54 140.82L16.73 160.94L22.78 174.13C22.78 174.13 23.69 176.28 25.68 178.65C29.35 183.04 33.67 184.45 37.91 184.9C42.14 185.35 50.22 182.13 50.22 182.13L52.45 181.12C61.74 176.93 65.75 165.9 61.32 156.72L31.24 94.35L30.17 91.79C28.64 88.26 23.33 75.82 23.33 75.82L11.93 48.48C11.93 48.48 11.36 46.49 10.8 44.57C10.67 44.14 10.45 43.31 10.45 42.12V42.34C10.45 42.34 10.54 35.22 18.96 31.15Z" fill="url(#p2)"/><path d="M45.5 91.5C43.85 92.23 41.92 91.47 41.19 89.82L21.1 44.19C20.37 42.54 21.13 40.61 22.78 39.88C24.44 39.15 26.37 39.9 27.1 41.56L47.18 87.19C47.91 88.84 47.16 90.77 45.5 91.5Z" fill="url(#p3)"/><path d="M17.58 115.81C19.23 115.07 21.16 115.81 21.9 117.46L42.25 162.97C42.98 164.61 42.25 166.56 40.59 167.29C38.94 168.03 37.01 167.29 36.27 165.64L15.92 120.14C15.18 118.49 15.92 116.55 17.57 115.81Z" fill="url(#p4)"/><defs><linearGradient id="p0" x1="76.09" y1="82.74" x2="13.82" y2="-53.48" gradientUnits="userSpaceOnUse"><stop offset=".09" stop-color="#0073F5"/><stop offset=".18" stop-color="#1495E9"/><stop offset=".3" stop-color="#29B8DC"/><stop offset=".39" stop-color="#37CED4"/><stop offset=".45" stop-color="#3CD7D2"/></linearGradient><radialGradient id="p1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(51.61 88.5) scale(110.73)"><stop stop-color="#0073F5"/><stop offset=".08" stop-color="#0D83EB"/><stop offset=".19" stop-color="#1D96E1"/><stop offset=".25" stop-color="#2CB6D9"/><stop offset=".31" stop-color="#37CED3"/><stop offset=".34" stop-color="#3CD7D2"/><stop offset=".55" stop-color="#AAC874"/><stop offset=".71" stop-color="#FFBE2D"/><stop offset=".73" stop-color="#FFAF2B"/><stop offset=".88" stop-color="#FF6025"/><stop offset=".95" stop-color="#FF4123"/></radialGradient><linearGradient id="p2" x1="51.27" y1="33.58" x2="17.61" y2="169.09" gradientUnits="userSpaceOnUse"><stop offset=".12" stop-color="#0073F5"/><stop offset=".15" stop-color="#1677F6"/><stop offset=".22" stop-color="#4F84FA"/><stop offset=".28" stop-color="#8791FF"/><stop offset=".31" stop-color="#8B92F7"/><stop offset=".36" stop-color="#9797E2"/><stop offset=".42" stop-color="#AB9EBF"/><stop offset=".49" stop-color="#C6A88F"/><stop offset=".57" stop-color="#E9B553"/><stop offset=".62" stop-color="#FFBE2D"/><stop offset=".87" stop-color="#FFBE2D"/><stop offset="1" stop-color="#FF6E2D"/></linearGradient><linearGradient id="p3" x1="23.57" y1="41.88" x2="39.94" y2="78.73" gradientUnits="userSpaceOnUse"><stop stop-color="#0073F5"/><stop offset=".2" stop-color="#1677F6"/><stop offset=".63" stop-color="#4F84FA"/><stop offset="1" stop-color="#8791FF"/></linearGradient><radialGradient id="p4" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(25.57 96.03) scale(76.77)"><stop stop-color="#0073F5"/><stop offset=".08" stop-color="#0D83EB"/><stop offset=".19" stop-color="#1D96E1"/><stop offset=".27" stop-color="#2CB6D9"/><stop offset=".34" stop-color="#37CED3"/><stop offset=".38" stop-color="#3CD7D2"/><stop offset=".42" stop-color="#4FD4C1"/><stop offset=".51" stop-color="#83CD95"/><stop offset=".64" stop-color="#D4C350"/><stop offset=".71" stop-color="#FFBE2D"/><stop offset=".73" stop-color="#FFAF2B"/><stop offset=".88" stop-color="#FF6025"/><stop offset=".95" stop-color="#FF4123"/></radialGradient></defs></svg><span class="alt-brand-word"><svg viewBox="171.8 53.7 426.1 77.5" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M203.06 131.15C212.22 131.15 233.52 128.93 233.52 108.32C233.52 96.75 226.23 90.31 209.15 86.79L199.21 84.8C190.94 83.09 189.21 78.74 189.21 75.39C189.21 70.56 192.68 65.4 202.4 65.4C207.44 65.4 211.4 66.73 213.83 69.24C215.45 70.92 216.34 73.04 216.47 75.57H231.41C230.94 61.5 220.8 53.77 202.74 53.77C184.68 53.77 173.94 61.85 173.94 75.39C173.94 86.67 180.84 93.23 195.64 96.03L206.49 98.24C212.2 99.4 218.04 101.52 218.04 108.43C218.04 115.34 212.49 119.52 203.19 119.52C193.89 119.52 187.78 114.91 186.98 106.81H171.87C172.35 122.29 183.67 131.15 203.08 131.15H203.06Z"/><path d="M314.87 97.34V86.48H281.94V67.06H318.18V54.77H267.43V130.05H319.29V117.75H281.94V97.34H314.87Z"/><path d="M400.15 130.05H416.43V54.77H401.93V105.6H399.98L368.82 54.77H353.2V130.05H367.71V80.21H369.65L400.15 130.05Z"/><path d="M481.58 131.15C490.74 131.15 512.04 128.93 512.04 108.32C512.04 96.75 504.75 90.31 487.67 86.79L477.73 84.8C469.46 83.09 467.73 78.74 467.73 75.39C467.73 70.56 471.2 65.4 480.92 65.4C485.96 65.4 489.92 66.73 492.35 69.24C493.98 70.92 494.86 73.04 494.99 75.57H509.93C509.46 61.5 499.32 53.77 481.26 53.77C463.2 53.77 452.46 61.85 452.46 75.39C452.46 86.67 459.36 93.23 474.16 96.03L485 98.24C490.71 99.4 496.55 101.52 496.55 108.43C496.55 115.34 491 119.52 481.7 119.52C472.4 119.52 466.29 114.91 465.49 106.81H450.38C450.86 122.29 462.18 131.15 481.59 131.15H481.58Z"/><path d="M593.38 97.34V86.48H560.46V67.06H596.7V54.77H545.95V130.05H597.81V117.75H560.46V97.34H593.38Z"/></svg></span></a>
+      <nav class="foot-nav" aria-label="SENSE 模組">
+      <ul><li><a href="https://sensebiz.tw/sense/product">商品 SENSE</a></li><li><a href="https://sensebiz.tw/sense/audience">行銷 SENSE</a></li><li><a href="https://sensebiz.tw/sense/strategy">策略 SENSE</a></li></ul>
+      </nav>
+      <ul class="foot-info">
+        <li class="foot-co">安錢感科技股份有限公司</li>
+        <li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 14s4.5-4.2 4.5-7.5a4.5 4.5 0 0 0-9 0C3.5 9.8 8 14 8 14Z"/><circle cx="8" cy="6.5" r="1.6"/></svg><span>105 台北市松山區民生東路三段135號3樓</span></li>
+        <li><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3.5" width="12" height="9" rx="1.5"/><path d="m2.5 4.5 5.5 4 5.5-4"/></svg><a href="mailto:service@sensebiz.tw">service@sensebiz.tw</a></li>
+      </ul>
+    </div>
+    <section class="foot-col" aria-labelledby="foot-group"><h2 class="foot-label" id="foot-group">股感集團</h2>
+      <ul class="foot-card"><li><a class="foot-row" href="https://www.stockfeel.com.tw/" target="_blank" rel="noopener"><span class="foot-ic"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></span><span>股感 StockFeel</span><span class="sr-only">（開新分頁）</span></a></li><li><a class="foot-row" href="https://www.housefeel.com.tw/" target="_blank" rel="noopener"><span class="foot-ic"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></span><span>房感 HouseFeel</span><span class="sr-only">（開新分頁）</span></a></li><li><a class="foot-row" href="https://www.cashfeel.com.tw/" target="_blank" rel="noopener"><span class="foot-ic"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></span><span>安錢感 CashFeel</span><span class="sr-only">（開新分頁）</span></a></li><li><a class="foot-row" href="https://www.insfeel.com.tw/" target="_blank" rel="noopener"><span class="foot-ic"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></span><span>保險感 INS.Feel</span><span class="sr-only">（開新分頁）</span></a></li><li><a class="foot-row" href="https://www.lemongrocery.com.tw/" target="_blank" rel="noopener"><span class="foot-ic"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></span><span>檸檬商城 Lemongrocery</span><span class="sr-only">（開新分頁）</span></a></li></ul></section>
+    <div class="foot-col">
+      <section aria-labelledby="foot-about"><h2 class="foot-label" id="foot-about">關於我們</h2>
+        <ul class="foot-card"><li><a class="foot-row" href="https://sensebiz.tw/policy"><span class="foot-ic"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5"/></svg></span><span>服務條款</span></a></li><li><a class="foot-row" href="https://sensebiz.tw/security"><span class="foot-ic"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5"/></svg></span><span>資訊安全政策</span></a></li><li><a class="foot-row" href="https://sensebiz.tw/privacy"><span class="foot-ic"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5"/></svg></span><span>隱私權政策</span></a></li><li><a class="foot-row" href="https://sensebiz.tw/return-policy"><span class="foot-ic"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5"/></svg></span><span>退貨政策</span></a></li></ul></section>
+      <section aria-labelledby="foot-biz"><h2 class="foot-label" id="foot-biz">商業服務</h2>
+        <ul class="foot-card"><li><a class="foot-row" href="mailto:cooperation@sensebiz.tw?subject=%E8%81%AF%E7%B5%A1SENSE%E6%A5%AD%E5%8B%99%E5%90%88%E4%BD%9C%E4%BF%A1%E7%AE%B1"><span class="foot-ic"><svg class="ic-mail" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="6" width="12" height="7.5" rx="1.5"/><path d="M2.6 6.4 8 10.4l5.4-4"/></svg></span><span>業務合作</span></a></li></ul></section>
+    </div>
+  </div>
+  <div class="foot-bottom"><p><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6"/><path d="M10 6.2a2.6 2.6 0 1 0 0 3.6"/></svg><span>CashFeel. All rights reserved.</span></p></div>
+</footer>
 
 <div class="alt-theme" role="group" aria-label="配色切換（比較用）">
   <button type="button" data-set="light">淺色</button>
