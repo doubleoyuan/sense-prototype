@@ -26,6 +26,10 @@
   --alt-card: #14264F;
   --alt-card-img: rgba(255,255,255,.06);
   --alt-card-text: rgba(255,255,255,.75);
+  --ring-a: #8791FF; --ring-b: #2E9BEA; --ring-c: #4FD4C1; --ring-pale: rgba(110,170,235,.26);   /* 留資光環 */
+  --book-glass: rgba(20,38,79,.72); --book-field: rgba(255,255,255,.06); --book-focus: rgba(255,255,255,.5);
+  --book-dot-a: rgba(79,212,193,.34); --book-dot-b: rgba(135,145,255,.4); --book-dot-c: rgba(46,155,234,.34);   /* 網點漸層色 */
+  --book-sweep: #5CC8FF;
   --foot-card: rgba(255,255,255,.05); --foot-divider: var(--alt-page); --foot-ic-bg: rgba(255,255,255,.1);  /* footer 卡片 */
   --band-tint: #13264E; --band-tint2: #1C3768;  /* MAKE SENSE 區塊的漸層底（暫定） */
   --glow-core: rgba(150,195,255,.55); --glow-mid: rgba(90,140,230,.28); --glow-ring: rgba(150,195,255,.35);  /* 弧形後方的光暈 */
@@ -47,6 +51,10 @@
   --alt-card-img: #F5F5F5;                 /* 卡片內預留的灰色區塊 */
   --alt-card-text: #333333;
   --alt-card-line: #EBEBEB;                /* 卡片外框（非常淺的灰） */
+  --ring-a: #A9B0FF; --ring-b: #4BAAF0; --ring-c: #6FDCCB; --ring-pale: #CFE5F7;   /* 留資光環（淺色：彩環偏粉彩、上方淡藍） */
+  --book-glass: rgba(255,255,255,.72); --book-field: rgba(226,232,242,.55); --book-focus: #9AA9C4;   /* 毛玻璃卡片、表單欄位底色（半透明淺藍灰）、聚焦外框 */
+  --book-dot-a: rgba(79,212,193,.55); --book-dot-b: rgba(135,145,255,.5); --book-dot-c: rgba(46,155,234,.4);   /* 網點漸層色（淺色） */
+  --book-sweep: #0090E2;
   --foot-card: #F6F8FB; --foot-divider: var(--alt-page); --foot-ic-bg: #E6EBF3;  /* footer 卡片（淡藍灰） */
   --band-tint: #E4ECF6; --band-tint2: #D5E3F2;  /* MAKE SENSE 區塊的漸層底（暫定，淡藍灰；2026-11-12 再調淡） */
   --glow-core: rgba(58,118,214,.72); --glow-mid: rgba(140,188,242,.45); --glow-ring: rgba(150,195,245,.4);  /* 弧形後方的光暈：中心藍、往外淡藍（2026-11-12 使用者指定，後再調淡） */
@@ -372,6 +380,122 @@ body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-
 .band-curve { position: absolute; left: 0; bottom: -1px; z-index: 1; width: 100%; height: clamp(72px, 12vw, 200px); display: block; fill: var(--alt-page); }
 @media (prefers-reduced-motion: reduce) { .band-track { animation: none; } }
 
+/* 留資區塊（2026-11-13 試做，同日改版）：背景是一串持續往上飄的光環，像氣泡一樣——
+   ① 位置：3 個環輪流從底部升到頂端，一圈 18 秒、等速不停頓；越往上越大、越淡，下方是彩色、上方轉淡藍。
+   ② 形狀：每個環另外以不同週期左右／上下伸縮、微微傾斜（彼此不同步），看起來一直在變化。
+   網點底延續上一區塊，網點顏色改成淡彩漸層（--book-dot-*）。位置用容器高度（cqh）計算，只動 transform／opacity。 */
+.alt-book { position: relative; overflow: hidden; display: grid; place-items: center; text-align: center;
+  min-height: clamp(620px, 60vw, 860px); padding: 120px 40px calc(120px + 64px);   /* 底部多留 footer 往上疊的 64px */
+  background: var(--alt-page); }
+.alt-book::before {   /* 網點：用漸層上色、再以網點形狀遮罩；最上緣是原本的灰網點，和上一區塊接起來 */
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(55% 45% at 84% 26%, var(--book-dot-a), transparent 72%),
+              radial-gradient(55% 45% at 14% 70%, var(--book-dot-b), transparent 72%),
+              radial-gradient(70% 40% at 50% 100%, var(--book-dot-c), transparent 75%), var(--alt-grain);
+  -webkit-mask: radial-gradient(circle, #000 .7px, transparent 1px) 0 0 / 4px 4px;
+          mask: radial-gradient(circle, #000 .7px, transparent 1px) 0 0 / 4px 4px; }
+.book-rings { position: absolute; inset: 0; container-type: size; pointer-events: none;   /* 上下緣淡出，光環不會在區塊邊界被硬切 */
+  -webkit-mask: linear-gradient(transparent, #000 22%, #000 82%, transparent); mask: linear-gradient(transparent, #000 22%, #000 82%, transparent); }
+.book-defs { position: absolute; }
+.book-ring { position: absolute; left: 50%; top: 0; width: min(1400px, 96vw); aspect-ratio: 1400 / 320; opacity: 0;
+  animation: book-ring 18s linear var(--d, 0s) infinite; will-change: transform, opacity; }
+.book-ring svg { display: block; width: 100%; height: 100%; overflow: visible; animation: book-morph 7s ease-in-out infinite alternate; }
+.book-ring ellipse { fill: none; stroke-width: 52; animation: book-stroke 18s linear var(--d, 0s) infinite; }   /* 線條粗細跟著縮放反向調整，下方小環看起來也一樣粗 */
+.book-ring .pale { stroke: var(--ring-pale); }
+.book-ring .vivid { animation: book-stroke 18s linear var(--d, 0s) infinite, book-vivid 18s linear var(--d, 0s) infinite; }
+.book-ring:nth-child(2) { --d: -4s; }    /* 三個環平均錯開 6 秒 */
+.book-ring:nth-child(3) { --d: -10s; }
+.book-ring:nth-child(4) { --d: -16s; }
+.book-ring:nth-child(3) svg { animation-duration: 8.6s; animation-delay: -3s; }   /* 變形週期各不相同，避免整齊劃一 */
+.book-ring:nth-child(4) svg { animation-duration: 6.2s; animation-delay: -5s; animation-direction: alternate-reverse; }
+@keyframes book-ring {
+  0%   { transform: translate(-50%, calc(112cqh - 50%)) scale(.14); opacity: 0; }   /* 最下方出現時縮小為原本的 25%（2026-11-13 使用者要求），上方大小不變 */
+  12%  { opacity: 1; }
+  30%  { transform: translate(-50%, calc(78cqh - 50%))  scale(.175); }
+  70%  { transform: translate(-50%, calc(20cqh - 50%))  scale(1);  opacity: .8; }
+  100% { transform: translate(-50%, calc(-18cqh - 50%)) scale(1.12); opacity: 0; }
+}
+@keyframes book-stroke {   /* 線寬 × 縮放 ≈ 畫面上的粗細：最下方約 25px，往上漸粗到約 50px */
+  0% { stroke-width: 181; } 30% { stroke-width: 145; } 40% { stroke-width: 85; } 50% { stroke-width: 69; } 60% { stroke-width: 59; } 70% { stroke-width: 52; } 100% { stroke-width: 46; }
+}
+@keyframes book-vivid { 0%, 34% { opacity: 1; } 66%, 100% { opacity: 0; } }
+@keyframes book-morph {
+  0%   { transform: scale(1, 1) rotate(0deg); }
+  35%  { transform: scale(1.04, .86) rotate(-1.6deg); }
+  70%  { transform: scale(.95, 1.14) rotate(1.2deg); }
+  100% { transform: scale(1.02, .94) rotate(-.6deg); }
+}
+.book-inner { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 20px; max-width: 720px; }
+.book-title { margin: 0; font-size: clamp(30px, 3.6vw, 48px); line-height: 1.3; font-weight: 700; letter-spacing: var(--tracking-wider); text-wrap: balance; word-break: keep-all; }   /* 手機只在逗號後換行 */
+.book-flow {   /* 一段亮藍從左往右掃過文字，掃完停一下（大標與卡片頁籤共用） */
+  background: linear-gradient(100deg, var(--alt-ink) 0 38%, var(--book-sweep) 50%, var(--alt-ink) 62% 100%) 0 0 / 260% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent; animation: book-sweep 6s ease-in-out infinite; }
+@keyframes book-sweep { 0% { background-position: 100% 0; } 55%, 100% { background-position: 0 0; } }
+.alt-book.is-paused .book-ring, .alt-book.is-paused .book-ring svg, .alt-book.is-paused .book-ring ellipse, .alt-book.is-paused .book-flow { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .book-ring, .book-ring svg, .book-ring ellipse { animation-play-state: paused; }
+  .book-flow { animation: none; background-position: 100% 0; }
+}
+@media (max-width: 767px) {
+  .alt-book { min-height: 560px; padding: 96px 20px calc(96px + 32px); }
+}
+
+/* 留資表單卡片（2026-11-13）：外框參考使用者提供的頁籤卡片（左上頁籤、右側用內凹圓角接進卡片本體）；
+   欄位參考使用者提供的表單（淺灰底大圓角、粗體標籤在上、輸入文字在下、下拉選單右側小三角）。模組專屬，先留在本頁。 */
+.book-inner { max-width: 1040px; width: 100%; }
+/* 半透明毛玻璃（2026-11-13）：光環經過卡片後方時透出模糊的彩色。
+   玻璃底分成三塊（卡片本體 ::before、頁籤 ::before、內凹圓角 ::after），各自加 backdrop-filter；
+   卡片與頁籤本身不能加 filter／backdrop-filter，否則子層的模糊只看得到卡片內部、看不到後面的光環（因此淺色的 1px 外框拿掉）。 */
+.book-card { --tab-h: 56px; --tab-r: 24px; --card-r: var(--r-30); position: relative; z-index: 0; width: 100%; margin-top: calc(40px + var(--tab-h)); padding: 36px 32px 32px; text-align: left; }
+.book-card::before, .book-tab::before, .book-tab::after { content: ''; position: absolute; z-index: -1; pointer-events: none;
+  background: var(--book-glass); -webkit-backdrop-filter: blur(18px) saturate(1.3); backdrop-filter: blur(18px) saturate(1.3); }
+.book-card::before { inset: 0; border-radius: 0 var(--card-r) var(--card-r) var(--card-r); }
+.book-tab { position: absolute; z-index: 0; left: 0; bottom: 100%; margin: 0; height: var(--tab-h); padding: 0 40px; display: flex; align-items: center;
+  font-size: 16px; font-weight: 700; letter-spacing: var(--tracking-wider); color: var(--alt-ink); }
+.book-tab::before { inset: 0; border-radius: var(--tab-r) var(--tab-r) 0 0; }
+.book-tab::after {   /* 頁籤右下角的內凹圓角：用遮罩挖出四分之一圓，模糊也一起被挖掉 */
+  left: 100%; bottom: 0; width: var(--tab-r); height: var(--tab-r);
+  -webkit-mask: radial-gradient(circle at 100% 0, transparent calc(var(--tab-r) - .5px), #000 var(--tab-r));
+          mask: radial-gradient(circle at 100% 0, transparent calc(var(--tab-r) - .5px), #000 var(--tab-r)); }
+.book-head { display: flex; justify-content: space-between; gap: 16px; padding: 0 8px 20px; font-size: 14px; line-height: 22px; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); }
+.book-head span:first-child { font-size: 16px; }
+.book-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.book-field { position: relative; display: flex; flex-direction: column; gap: 4px; padding: 16px 28px; border-radius: var(--r-20); background: var(--book-field); cursor: text; transition: box-shadow .2s; }
+.book-field.is-wide { grid-column: 1 / -1; }
+.book-field:focus-within { box-shadow: inset 0 0 0 1.5px var(--book-focus); }
+.book-field.has-error { box-shadow: inset 0 0 0 1.5px var(--cta-orange); }
+.book-label { font-size: 15px; line-height: 22px; font-weight: 600; letter-spacing: var(--tracking-wider); color: var(--alt-ink); }
+.book-label b { margin-left: 4px; font-weight: 600; }
+.book-field input, .book-field select, .book-field textarea { width: 100%; margin: 0; padding: 0; border: 0; background: none; outline: none;
+  font: inherit; font-size: 14px; line-height: 22px; letter-spacing: var(--tracking-wider); color: var(--alt-ink); }
+.book-field textarea { resize: vertical; min-height: 44px; }
+.book-field ::placeholder { color: var(--alt-ink-soft); opacity: .75; }
+.book-field.is-select { cursor: pointer; }
+.book-field.is-select .book-label { font-size: 12px; line-height: 18px; font-weight: 500; color: var(--alt-ink-soft); }   /* 下拉：小標籤在上、選到的值較大 */
+.book-field select { appearance: none; -webkit-appearance: none; padding-right: 32px; font-size: 16px; font-weight: 600; cursor: pointer; }
+.book-field select option { color: #1F2A6B; }
+.book-caret { position: absolute; right: 28px; top: 50%; width: 12px; height: 8px; margin-top: -4px; fill: var(--alt-ink); pointer-events: none; }
+.book-foot { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-top: 28px; }   /* 同意在上、送出在下，都置中 */
+.book-agree { display: flex; align-items: center; gap: 10px; font-size: 14px; line-height: 22px; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); cursor: pointer; }
+.book-agree input { width: 18px; height: 18px; margin: 0; accent-color: var(--cta-orange); }
+.book-agree a { color: var(--alt-ink); text-underline-offset: 3px; }
+.book-agree.has-error { color: var(--cta-orange); }
+.book-submit { margin-top: 0; border: 0; font-family: inherit; cursor: pointer; }
+.book-msg { margin: 16px 8px 0; text-align: center; min-height: 22px; font-size: 14px; line-height: 22px; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); }
+.book-msg:empty { display: none; }
+.book-msg.is-error { color: var(--cta-orange); }
+@media (max-width: 767px) {
+  .book-card { --tab-h: 48px; --tab-r: 20px; --card-r: var(--r-20); padding: 24px 16px 20px; }
+  .book-tab { padding: 0 28px; font-size: 15px; }
+  .book-head { padding: 0 4px 16px; }
+  .book-grid { grid-template-columns: 1fr; gap: 10px; }
+  .book-field { padding: 14px 20px; }
+  .book-caret { right: 20px; }
+  .book-foot { align-items: stretch; gap: 16px; }
+  .book-agree { justify-content: center; }
+  .book-submit { width: 100%; }
+}
+
 /* Footer（2026-11-13）：版面參考使用者提供的風格（左 logo 與主選單、右圓角卡片列表），內容依 PM 的連結表。
    左：logo、已上線的三個模組、公司資訊；中：股感集團（開新分頁）；右：關於我們／業務合作（寄信）；底：版權 */
 .alt-foot { --foot-r: 64px; position: relative; margin-top: calc(-1 * var(--foot-r)); border-radius: var(--foot-r) var(--foot-r) 0 0;   /* 往上疊進網點區塊，左右上角用大圓角銜接 */
@@ -571,7 +695,7 @@ section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿�
   </svg>
 </section>
 
-<section class="alt-next" id="book" aria-label="SENSE 能幫你做什麼">
+<section class="alt-next" aria-label="SENSE 能幫你做什麼">
   <!-- 彩球油膜紋路：雜訊緩慢變化，把彩虹光澤扭曲成流動的油膜 -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
     <filter id="oil-flow" x="-20%" y="-20%" width="140%" height="140%">
@@ -598,6 +722,43 @@ section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿�
       <div class="feat-tab"><span class="feat-ball b-mint is-oil" aria-hidden="true"></span></div><svg class="feat-fillet" viewBox="0 0 20 20" aria-hidden="true"><path d="M0 0H20V20C20 20 20 12.31 14.5 6.81C9 1.31 0 0 0 0Z"/></svg>
       <div class="feat-body"><div class="feat-img" aria-hidden="true"><canvas class="feat-fx fx-mint" data-fx="growth"></canvas></div><h3>成效持續驗證</h3><p>追蹤觸達、互動、名單與訂單轉換，回看合作成果與數據收益。</p></div>
     </article>
+  </div>
+</section>
+
+<section class="alt-book" id="book" aria-labelledby="book-title">
+  <div class="book-rings" aria-hidden="true">
+    <svg class="book-defs" width="0" height="0"><defs>
+      <linearGradient id="book-grad" gradientUnits="userSpaceOnUse" x1="40" y1="0" x2="1360" y2="0">
+        <stop offset="0" stop-color="var(--ring-a)"/><stop offset=".5" stop-color="var(--ring-b)"/><stop offset="1" stop-color="var(--ring-c)"/>
+      </linearGradient>
+    </defs></svg>
+    <div class="book-ring"><svg viewBox="0 0 1400 320"><ellipse class="pale" cx="700" cy="160" rx="660" ry="128"/><ellipse class="vivid" cx="700" cy="160" rx="660" ry="128" stroke="url(#book-grad)"/></svg></div>
+    <div class="book-ring"><svg viewBox="0 0 1400 320"><ellipse class="pale" cx="700" cy="160" rx="660" ry="128"/><ellipse class="vivid" cx="700" cy="160" rx="660" ry="128" stroke="url(#book-grad)"/></svg></div>
+    <div class="book-ring"><svg viewBox="0 0 1400 320"><ellipse class="pale" cx="700" cy="160" rx="660" ry="128"/><ellipse class="vivid" cx="700" cy="160" rx="660" ry="128" stroke="url(#book-grad)"/></svg></div>
+  </div>
+  <div class="book-inner">
+    <h2 class="book-title" id="book-title"><span class="book-flow">讓合作，從一次對話開始</span></h2>
+  <form class="book-card" id="book-form" novalidate>
+    <p class="book-tab"><span class="book-flow">預約洽談</span></p>
+    <div class="book-head"><span>你的聯絡資訊</span></div>
+    <div class="book-grid">
+      <label class="book-field"><span class="book-label">姓名<b aria-hidden="true">*</b></span><input id="bk-name" name="bk-name" type="text" placeholder="王小明" required autocomplete="name"></label>
+      <label class="book-field"><span class="book-label">公司名稱<b aria-hidden="true">*</b></span><input id="bk-company" name="bk-company" type="text" placeholder="公司全名" required autocomplete="organization"></label>
+      <label class="book-field"><span class="book-label">Email<b aria-hidden="true">*</b></span><input id="bk-email" name="bk-email" type="email" placeholder="name@company.com" required autocomplete="email"></label>
+      <label class="book-field"><span class="book-label">聯絡電話<b aria-hidden="true">*</b></span><input id="bk-phone" name="bk-phone" type="tel" placeholder="02-1234-5678" required autocomplete="tel"></label>
+      <label class="book-field"><span class="book-label">職稱</span><input id="bk-title" name="bk-title" type="text" placeholder="行銷經理" autocomplete="organization-title"></label>
+      <label class="book-field is-select"><span class="book-label">想了解的模組<b aria-hidden="true">*</b></span>
+        <select id="bk-module" name="bk-module" required><option>商品 SENSE</option><option>行銷 SENSE</option><option>策略 SENSE</option><option>其他／尚未確定</option></select>
+        <svg class="book-caret" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1h10L6 7Z"/></svg></label>
+      <label class="book-field is-wide"><span class="book-label">需求說明</span>
+        <textarea id="bk-note" name="bk-note" rows="3" placeholder="簡單描述你想合作的內容或目前遇到的問題"></textarea></label>
+    </div>
+    <div class="book-foot">
+      <label class="book-agree"><input type="checkbox" id="bk-agree" required><span>我已閱讀並同意 <a href="https://sensebiz.tw/privacy">隱私權政策</a></span></label>
+      <button class="alt-hbtn lg book book-submit" type="submit"><svg class="ico" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21.4 2.6a.6.6 0 0 0-.65-.13L2.9 9.6a.6.6 0 0 0-.03 1.1l7.2 3.2 3.2 7.2a.6.6 0 0 0 1.1-.03l7.13-17.85a.6.6 0 0 0-.1-.62Z" fill="currentColor"/></svg><span class="divider" aria-hidden="true"></span><span class="label">送出</span></button>
+    </div>
+    <p class="book-msg" role="status" aria-live="polite"></p>
+  </form>
   </div>
 </section>
 
@@ -1190,6 +1351,32 @@ section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿�
     row.addEventListener('focusin', kick); row.addEventListener('focusout', () => setTimeout(kick));
     ok.addEventListener('change', enable); enable();
   });
+})();
+</script>
+<script>
+/* 留資光環：區塊離開畫面時暫停動畫 */
+(() => {
+  const sec = document.querySelector('.alt-book'); if (!sec || !('IntersectionObserver' in window)) return;
+  new IntersectionObserver(([e]) => sec.classList.toggle('is-paused', !e.isIntersecting)).observe(sec);
+})();
+</script>
+<script>
+/* 留資表單（原型）：檢查必填，不會真的送出 */
+(() => {
+  const form = document.getElementById('book-form'); if (!form) return;
+  const msg = form.querySelector('.book-msg');
+  const mark = el => (el.type === 'checkbox' ? el.closest('.book-agree') : el.closest('.book-field')).classList.toggle('has-error', !el.checkValidity());
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const req = [...form.querySelectorAll('[required]')]; req.forEach(mark);
+    const bad = req.filter(el => !el.checkValidity());
+    msg.classList.toggle('is-error', bad.length > 0);
+    if (bad.length) { msg.textContent = '請完成標示 * 的欄位，並勾選同意隱私權政策。'; bad[0].focus(); return; }
+    msg.textContent = '已收到你的資料，SENSE 團隊會盡快與你聯繫。（原型示意，資料不會送出）';
+    form.reset();
+  });
+  form.addEventListener('input', e => { if (e.target.matches('[required]')) mark(e.target); });
+  form.addEventListener('change', e => { if (e.target.matches('[required]')) mark(e.target); });
 })();
 </script>
 </body>
