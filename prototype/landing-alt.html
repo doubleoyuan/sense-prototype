@@ -78,16 +78,20 @@ body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-
 .alt-screen > :not(.alt-dots) { position: relative; z-index: 1; }
 .alt-screen { padding-top: 88px; grid-template-rows: 1fr auto auto; }
 
-/* Header：固定在頂端。首屏時兩顆按鈕收成圓形圖示（.is-compact），離開首屏後展開成文字按鈕並加半透明模糊底 */
+/* Header：固定在頂端。首屏時兩顆按鈕收成圓形圖示（.is-compact），離開首屏後展開成文字按鈕，
+   底色改成浮在畫面上的膠囊圓框（2026-11-13 試做，::before 從滿版收成膠囊）：半透明模糊底＋細框＋淡陰影 */
 .alt-header {
   position: fixed; top: 0; left: 0; right: 0; z-index: 40; display: flex; align-items: center; justify-content: space-between;
   padding: 24px max(40px, (100% - var(--content-max)) / 2);  /* 左右對齊內容區（最寬 1280px），底色仍滿版 */
-  transition: background .3s, padding .3s, box-shadow .3s;
+  transition: padding .3s;
 }
-.alt-header:not(.is-compact) {
-  padding-top: 14px; padding-bottom: 14px; background: var(--alt-head-bg); box-shadow: 0 1px 0 var(--alt-line);
+.alt-header::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0; border-radius: 0;
+  background: var(--alt-head-bg); border: 1px solid var(--alt-line); box-shadow: 0 10px 30px -18px rgba(31,42,107,.35);
   -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
-}
+  transition: inset .4s cubic-bezier(.3, .9, .3, 1), border-radius .4s, opacity .25s; }
+.alt-header:not(.is-compact) { padding-top: 28px; padding-bottom: 28px; }   /* 膠囊內上下各留 16px */
+.alt-header:not(.is-compact)::before { opacity: 1; border-radius: 40px;
+  inset: 12px max(16px, max(40px, (100% - var(--content-max)) / 2) - 40px); }   /* 膠囊左右比內容各寬 40px */
 .alt-brand { --logo-h: 40px; display: flex; align-items: center; color: var(--alt-logo-ink); text-decoration: none; }
 .alt-logo { display: block; width: auto; height: var(--logo-h); }
 /* logo 的 SENSE 字母：比例依標準字（字高為圖形的 77.5/185，間距 59.8/185） */
@@ -563,7 +567,8 @@ section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿�
 }
 @media (max-width: 767px) {
   .alt-header { padding: 16px 20px; }
-  .alt-header:not(.is-compact) { padding-top: 10px; padding-bottom: 10px; }
+  .alt-header:not(.is-compact) { padding: 20px 36px; }
+  .alt-header:not(.is-compact)::before { inset: 8px 12px; border-radius: 32px; }
   .alt-screen { padding-top: 72px; }
   .alt-hbtn.lg { height: 52px; padding: 0 26px 0 18px; font-size: 16px; margin-top: 24px; }
   .alt-next { padding: 64px 20px 96px; }
