@@ -1,0 +1,1174 @@
+<!doctype html>
+<html lang="zh-Hant-TW" data-theme="light" data-role="seller">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>商品 SENSE｜讓商品進入現成的會員場景｜SENSE</title>
+<meta name="description" content="在商品 SENSE 上架商品，由生態圈夥伴透過電子報、APP 與簡訊推薦給會員；成交才付推廣費，成交追蹤、金流與發票由平台處理。">
+<meta property="og:title" content="商品 SENSE｜讓商品進入現成的會員場景">
+<meta property="og:description" content="上架商品，由夥伴帶進會員場景；有人買，才付推廣費。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="shared/tokens.css">
+<style>
+/* 模組說明頁：商品 SENSE（2026-11-16 試做）。
+   下方「共用」區段取自 landing-alt.html（變數、header、留資、footer、深淺色切換），改首頁時要記得同步。 */
+/* ── 共用：變數 ── */
+:root, [data-theme="dark"] {
+  --alt-page: #0A1530;
+  --alt-bg: radial-gradient(ellipse 70% 60% at 40% 38%, #1E3A6E 0, #142B57 45%, #0A1530 100%);
+  --alt-grain: rgba(255,255,255,.07);      /* 整面細網點 */
+  --alt-ink: var(--white);                 /* 主要文字 */
+  --alt-ink-soft: var(--white);           /* 次要文字：深色模式改為白色（2026-11-10） */
+  --alt-line: rgba(255,255,255,.18);
+  --alt-ghost: rgba(255,255,255,.28);      /* 外框按鈕的框線 */
+  --alt-ghost-hover: rgba(255,255,255,.08);
+  --alt-head-bg: rgba(10,21,48,.72);
+  --alt-logo-ink: var(--white);
+  --alt-card: #14264F;
+  --alt-card-img: rgba(255,255,255,.06);
+  --alt-card-text: rgba(255,255,255,.75);
+  --ring-a: #8791FF; --ring-b: #2E9BEA; --ring-c: #4FD4C1; --ring-pale: rgba(110,170,235,.26);   /* 留資光環 */
+  --book-glass: rgba(20,38,79,.72); --book-field: rgba(255,255,255,.06); --book-focus: rgba(255,255,255,.5);
+  --book-dot-a: rgba(79,212,193,.34); --book-dot-b: rgba(135,145,255,.4); --book-dot-c: rgba(46,155,234,.34);   /* 網點漸層色 */
+  --book-sweep: #5CC8FF;
+  --foot-card: rgba(255,255,255,.05); --foot-divider: var(--alt-page); --foot-ic-bg: rgba(255,255,255,.1);  /* footer 卡片 */
+  --band-tint: #13264E; --band-tint2: #1C3768;  /* MAKE SENSE 區塊的漸層底（暫定） */
+  --glow-core: rgba(150,195,255,.55); --glow-mid: rgba(90,140,230,.28); --glow-ring: rgba(150,195,255,.35);  /* 弧形後方的光暈 */
+}
+[data-theme="light"] {
+  --alt-page: var(--white);
+  --alt-bg: radial-gradient(ellipse 45% 50% at 30% 40%, rgba(124,196,238,.16) 0, rgba(124,196,238,0) 100%), var(--white);
+  --alt-grain: rgba(0,0,0,.055);           /* 中性淡灰 */
+  --alt-ink: #1F2A6B;                      /* 深靛藍 */
+  --alt-ink-soft: #5E7396;                 /* 次要文字：中藍灰 */
+  --alt-line: rgba(31,42,107,.15);
+  --alt-ghost: rgba(31,42,107,.35);
+  --alt-ghost-hover: rgba(31,42,107,.05);
+  --alt-grad-in: #0090E2;                  /* 主標漸層：中心亮藍 */
+  --alt-grad-out: #0A0A4C;                 /* 主標漸層：外圍深靛 */
+  --alt-head-bg: rgba(255,255,255,.72);
+  --alt-logo-ink: #3F3F3F;                 /* logo 字母原色 */
+  --alt-card: var(--white);
+  --alt-card-img: #F5F5F5;                 /* 卡片內預留的灰色區塊 */
+  --alt-card-text: #333333;
+  --alt-card-line: #EBEBEB;                /* 卡片外框（非常淺的灰） */
+  --ring-a: #A9B0FF; --ring-b: #4BAAF0; --ring-c: #6FDCCB; --ring-pale: #CFE5F7;   /* 留資光環（淺色：彩環偏粉彩、上方淡藍） */
+  --book-glass: rgba(255,255,255,.72); --book-field: rgba(226,232,242,.55); --book-focus: #9AA9C4;   /* 毛玻璃卡片、表單欄位底色（半透明淺藍灰）、聚焦外框 */
+  --book-dot-a: rgba(79,212,193,.55); --book-dot-b: rgba(135,145,255,.5); --book-dot-c: rgba(46,155,234,.4);   /* 網點漸層色（淺色） */
+  --book-sweep: #0090E2;
+  --foot-card: #F6F8FB; --foot-divider: var(--alt-page); --foot-ic-bg: #E6EBF3;  /* footer 卡片（淡藍灰） */
+  --band-tint: #E4ECF6; --band-tint2: #D5E3F2;  /* MAKE SENSE 區塊的漸層底（暫定，淡藍灰；2026-11-12 再調淡） */
+  --glow-core: rgba(58,118,214,.72); --glow-mid: rgba(140,188,242,.45); --glow-ring: rgba(150,195,245,.4);  /* 弧形後方的光暈：中心藍、往外淡藍（2026-11-12 使用者指定，後再調淡） */
+}
+* { box-sizing: border-box; }
+html { background: var(--alt-page); }
+body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+
+/* 商品 SENSE 頁的強調色：取模組色（tokens.css 的 --mod-product*） */
+[data-theme="light"] { --mp-accent: var(--mod-product-strong); --mp-tint: rgba(26,129,246,.10); --mp-tint-strong: var(--mod-product-tint); --mp-band: #F6F8FB; --mp-seg: #EEF1F6;
+  --mp-c-net: var(--mod-product-strong); --mp-c-promo: var(--cta-orange); --mp-c-fee: #4D5B7C; --mp-grid-dot: rgba(31,42,107,.09); --st-dot: rgba(26,129,246,.35); --mp-track-dot: rgba(31,42,107,.18); }
+[data-theme="dark"] { --mp-accent: #6FB2FF; --mp-tint: rgba(26,129,246,.18); --mp-tint-strong: rgba(111,178,255,.16); --mp-band: #0E1B3B; --mp-seg: rgba(255,255,255,.08);
+  --mp-c-net: #4D9DF8; --mp-c-promo: #FF7A2A; --mp-c-fee: #8C9BBD; --mp-grid-dot: rgba(255,255,255,.08); --st-dot: rgba(111,178,255,.3); --mp-track-dot: rgba(255,255,255,.2); }
+
+html { background: var(--alt-page); scroll-behavior: smooth; scroll-padding-top: 110px; }
+body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* ── 共用：header ── */
+/* Header：固定在頂端。首屏時兩顆按鈕收成圓形圖示（.is-compact），離開首屏後展開成文字按鈕，
+   底色改成浮在畫面上的膠囊圓框（2026-11-13 試做，::before 從滿版收成膠囊）：半透明模糊底＋細框＋淡陰影 */
+.alt-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 40; display: flex; align-items: center; justify-content: space-between;
+  padding: 24px max(40px, (100% - var(--content-max)) / 2);  /* 左右對齊內容區（最寬 1280px），底色仍滿版 */
+  transition: padding .3s;
+}
+.alt-header::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0; border-radius: 0;
+  background: var(--alt-head-bg); border: 1px solid var(--alt-line); box-shadow: 0 10px 30px -18px rgba(31,42,107,.35);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  transition: inset .4s cubic-bezier(.3, .9, .3, 1), border-radius .4s, opacity .25s; }
+.alt-header:not(.is-compact) { padding-top: 28px; padding-bottom: 28px; }   /* 膠囊內上下各留 16px */
+.alt-header:not(.is-compact)::before { opacity: 1; border-radius: 40px;
+  inset: 12px max(16px, max(40px, (100% - var(--content-max)) / 2) - 40px); }   /* 膠囊左右比內容各寬 40px */
+.alt-brand { --logo-h: 40px; display: flex; align-items: center; color: var(--alt-logo-ink); text-decoration: none; }
+.alt-logo { display: block; width: auto; height: var(--logo-h); }
+/* logo 的 SENSE 字母：比例依標準字（字高為圖形的 77.5/185，間距 59.8/185） */
+.alt-brand-word { display: block; overflow: hidden; max-width: calc(var(--logo-h) * 2.4); margin-left: calc(var(--logo-h) * .323);
+  transition: max-width .3s, opacity .2s, margin .3s; }
+.alt-brand-word svg { display: block; height: calc(var(--logo-h) * .419); width: auto; fill: currentColor; }
+.alt-header.is-compact .alt-brand-word { max-width: 0; margin-left: 0; opacity: 0; }
+.alt-actions { display: flex; gap: 10px; }
+.alt-hbtn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 12px; height: 40px; padding: 0 20px; border-radius: var(--r-30);
+  font-size: 14px; font-weight: 700; letter-spacing: var(--tracking-wider); color: var(--alt-ink); text-decoration: none; white-space: nowrap;
+  transition: background .2s, filter .2s, padding .3s, gap .3s;
+}
+.alt-hbtn.ghost { border: 1px solid var(--alt-ghost); }
+.alt-hbtn.ghost:hover { background: var(--alt-ghost-hover); }
+.alt-hbtn.book { padding: 0 20px 0 14px; background: var(--cta-orange); color: var(--white); }
+.alt-hbtn.book:hover { filter: brightness(1.06); }
+.alt-hbtn .ico { width: 18px; height: 18px; flex: none; }
+.alt-hbtn .divider { width: 1px; height: 20px; background: rgba(255,255,255,.45); flex: none; }
+.alt-hbtn .label, .alt-hbtn .divider, .alt-header .ghost .ico {
+  display: inline-block; max-width: 8em; overflow: hidden; transition: max-width .3s, opacity .2s, margin .3s;
+}
+/* 展開時：登入維持原本的純文字（不顯示會員圖示） */
+.alt-header .ghost .ico { max-width: 0; opacity: 0; margin-right: -12px; }
+/* 首屏：只留圓形圖示（40×40），文字與分隔線收起 */
+.alt-header.is-compact .alt-hbtn { padding: 0 10px; gap: 0; }
+.alt-header.is-compact .label, .alt-header.is-compact .divider { max-width: 0; opacity: 0; }
+.alt-header.is-compact .ghost .ico { max-width: 18px; opacity: 1; margin-right: 0; }
+.alt-header .alt-hbtn { min-width: 40px; }
+/* 瀏覽 SENSE（2026-11-16）：預約洽談與登入之間，樣式同登入（首屏是三條線圓形 icon，捲動後展開成文字「瀏覽 SENSE」）。
+   點擊在 header 下方展開商品／行銷／策略 SENSE；點外面、按 Esc 或選了項目就收起。三個模組頁都可以點。 */
+.alt-browse { border: 1px solid var(--alt-ghost); background: none; font: inherit; font-size: 14px; font-weight: 700; letter-spacing: var(--tracking-wider); color: var(--alt-ink); cursor: pointer; }
+.alt-browse:hover, .alt-browse[aria-expanded="true"] { background: var(--alt-ghost-hover); }
+.alt-header .alt-browse .i-close, .alt-header .alt-browse[aria-expanded="true"] .i-menu { display: none; }   /* 要蓋過 .alt-header .ghost .ico 的 inline-block */
+.alt-header .alt-browse[aria-expanded="true"] .i-close { display: inline-block; }
+.alt-browse:focus-visible { outline: 2px solid var(--cta-orange); outline-offset: 2px; }
+/* 捲動後（膠囊 header）：瀏覽 SENSE 與登入只用文字、不要外框，滑鼠移入時淡出成橘色（2026-11-16）；首屏的圓形 icon 維持外框 */
+.alt-header:not(.is-compact) .alt-hbtn.ghost { border-color: transparent; background: none; padding: 0 12px; transition: color .3s ease, padding .3s, gap .3s; }
+.alt-header:not(.is-compact) .alt-hbtn.ghost:hover, .alt-header:not(.is-compact) .alt-browse[aria-expanded="true"] { color: var(--cta-orange); background: none; }
+.alt-browse-panel { --bp-x: max(16px, max(40px, (100% - var(--content-max)) / 2) - 40px);
+  position: absolute; top: calc(100% - 4px); right: var(--bp-x); width: 400px; padding: 10px;   /* 一欄往下排，靠右對齊膠囊 */ border-radius: 28px; background: var(--alt-card);
+  box-shadow: 0 24px 48px -24px rgba(16,30,80,.45), 0 0 0 1px var(--alt-line); opacity: 0; visibility: hidden; transform: translateY(-8px);
+  transition: opacity .25s ease, transform .3s ease, visibility 0s .3s; }
+.alt-browse-panel.is-open { opacity: 1; visibility: visible; transform: none; transition: opacity .25s ease, transform .3s ease; }
+.alt-browse-panel ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.bp-item { position: relative; display: flex; align-items: center; gap: 16px; padding: 14px 16px; border-radius: 20px; text-decoration: none; color: var(--alt-ink); transition: background .2s; }
+a.bp-item:focus-visible { outline: 2px solid var(--cta-orange); outline-offset: -2px; }
+.bp-item.is-soon { cursor: default; }
+.bp-item.is-soon { outline: none; }   /* 頁面還沒做好：先不能點，但不另外標示 */
+.bp-ic { width: 48px; height: 48px; flex: none; color: var(--alt-ink); }
+/* 目前所在模組：icon 停在動畫最後一格（彩色），名稱橘色、不加底色。
+   其他模組：icon 是初始狀態（灰色、點點收起），滑鼠移入或鍵盤聚焦時加底色並播放一次 icon 動畫（與首頁服務模組同一套動畫）。 */
+.bp-item:not(.is-current):hover, .bp-item:not(.is-current):focus-visible { background: var(--alt-ghost-hover); }
+.bp-item.is-current .bp-txt b { color: var(--cta-orange); }
+.bp-ic .lt, .bp-ic .gc { color: #ABB0BA; transition: color .35s ease; }
+.bp-ic .ic-bag, .bp-ic .ic-ring, .bp-ic .ic-l, .bp-ic .ic-r, .bp-ic .ic-dot { transform-box: fill-box; transform-origin: center; }
+.bp-ic .ic-bag { transform-origin: 50% 100%; }
+.bp-ic[data-anim="marketing"] .ic-dot:not(.ic-center), .bp-ic[data-anim="strategy"] .ic-dot { opacity: 0; transition: opacity .2s; }
+.bp-ic .ic-one { transition: opacity .25s ease; }
+:is(.bp-item:hover, .bp-item:focus-visible, .bp-item.is-current) .bp-ic .gc { color: var(--c); }
+:is(.bp-item:hover, .bp-item:focus-visible, .bp-item.is-current) .bp-ic .ic-dot { opacity: 1; }
+:is(.bp-item:hover, .bp-item:focus-visible, .bp-item.is-current) .bp-ic .ic-one { opacity: 0; }
+.bp-item:not(.is-current):is(:hover, :focus-visible) .ic-bag { animation: bp-bounce .7s ease-out; }
+.bp-item:not(.is-current):is(:hover, :focus-visible) .ic-ring { animation: bp-tighten .6s cubic-bezier(.2, .8, .2, 1); }
+.bp-item:not(.is-current):is(:hover, :focus-visible) .ic-l { animation: bp-slide-l .6s cubic-bezier(.2, .8, .2, 1); }
+.bp-item:not(.is-current):is(:hover, :focus-visible) .ic-r { animation: bp-slide-r .6s cubic-bezier(.2, .8, .2, 1); }
+.bp-item:not(.is-current):is(:hover, :focus-visible) .ic-dot { animation: bp-pop .4s ease-out calc(.45s + var(--i, 0) * 70ms) backwards; }
+@keyframes bp-bounce { 0% { transform: none; } 25% { transform: translateY(-6px) scale(.97, 1.03); } 50% { transform: scale(1.04, .96); } 70% { transform: translateY(-1.5px); } 100% { transform: none; } }
+@keyframes bp-tighten { from { opacity: 0; transform: scale(1.45); } 60% { opacity: 1; } to { opacity: 1; transform: scale(1); } }
+@keyframes bp-slide-l { from { transform: translateX(-9px); } }
+@keyframes bp-slide-r { from { transform: translateX(9px); } }
+@keyframes bp-pop { 0% { opacity: 0; transform: scale(.2); } 60% { opacity: 1; transform: scale(1.6); } 100% { opacity: 1; transform: scale(1); } }
+.bp-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.bp-txt b { font-size: 16px; line-height: 24px; letter-spacing: var(--tracking-wider); }
+.bp-txt em { font-style: normal; font-size: 13px; line-height: 20px; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); }
+@media (max-width: 767px) {
+  .alt-header .alt-browse { padding: 0 10px; gap: 0; }   /* 手機一律只顯示三條線圖示，避免和預約洽談、登入擠在一起 */
+  .alt-header .alt-browse .label { display: none; }
+  .alt-header .alt-browse .ico { max-width: 18px; opacity: 1; margin-right: 0; }
+  .alt-browse-panel { --bp-x: 12px; left: var(--bp-x); width: auto; padding: 8px; border-radius: 22px; }
+  .bp-item { padding: 12px 14px; gap: 12px; } .bp-ic { width: 40px; height: 40px; }
+}
+@media (prefers-reduced-motion: reduce) { .alt-browse-panel { transition: none; } .bp-ic * { animation: none !important; } }
+
+/* 首屏的大按鈕 */
+/* 主標下方的預約按鈕（加大） */
+.alt-hbtn.lg { height: 60px; gap: 14px; padding: 0 34px 0 24px; font-size: 18px; margin-top: 40px; }
+.alt-hbtn.lg .ico { width: 22px; height: 22px; }
+.alt-hbtn.lg .divider { height: 24px; }
+
+
+@media (max-width: 767px) {
+  .alt-header { padding: 16px 20px; }
+  .alt-header:not(.is-compact) { padding: 20px 36px; }
+  .alt-header:not(.is-compact)::before { inset: 8px 12px; border-radius: 32px; }
+  .alt-header:not(.is-compact) .alt-brand-word { max-width: 0; margin-left: 0; opacity: 0; }   /* 手機捲動後只留 logo 圖示，避免和按鈕擠在一起 */
+  .alt-hbtn.lg { height: 52px; padding: 0 26px 0 18px; font-size: 16px; margin-top: 24px; }
+  .alt-brand { --logo-h: 32px; }
+  .alt-hbtn { height: 36px; padding: 0 14px; font-size: 13px; letter-spacing: .5px; }
+  .alt-hbtn.book { gap: 10px; padding: 0 14px 0 12px; }
+  .alt-theme { right: 12px; bottom: 12px; }
+}
+
+/* ── 共用：留資 ── */
+/* 留資區塊（2026-11-13 試做，同日改版）：背景是一串持續往上飄的光環，像氣泡一樣——
+   ① 位置：3 個環輪流從底部升到頂端，一圈 18 秒、等速不停頓；越往上越大、越淡，下方是彩色、上方轉淡藍。
+   ② 形狀：每個環另外以不同週期左右／上下伸縮、微微傾斜（彼此不同步），看起來一直在變化。
+   網點底延續上一區塊，網點顏色改成淡彩漸層（--book-dot-*）。位置用容器高度（cqh）計算，只動 transform／opacity。 */
+.alt-book { position: relative; overflow: hidden; display: grid; place-items: center; text-align: center;
+  min-height: clamp(620px, 60vw, 860px); padding: 120px 40px calc(120px + 64px);   /* 底部多留 footer 往上疊的 64px */
+  background: var(--alt-page); }
+.alt-book::before {   /* 網點：用漸層上色、再以網點形狀遮罩；最上緣是原本的灰網點，和上一區塊接起來 */
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(55% 45% at 84% 26%, var(--book-dot-a), transparent 72%),
+              radial-gradient(55% 45% at 14% 70%, var(--book-dot-b), transparent 72%),
+              radial-gradient(70% 40% at 50% 100%, var(--book-dot-c), transparent 75%), var(--alt-grain);
+  -webkit-mask: radial-gradient(circle, #000 .7px, transparent 1px) 0 0 / 4px 4px;
+          mask: radial-gradient(circle, #000 .7px, transparent 1px) 0 0 / 4px 4px; }
+.book-rings { position: absolute; inset: 0; container-type: size; pointer-events: none;   /* 上下緣淡出，光環不會在區塊邊界被硬切 */
+  -webkit-mask: linear-gradient(transparent, #000 22%, #000 82%, transparent); mask: linear-gradient(transparent, #000 22%, #000 82%, transparent); }
+.book-defs { position: absolute; }
+.book-ring { position: absolute; left: 50%; top: 0; width: min(1400px, 96vw); aspect-ratio: 1400 / 320; opacity: 0;
+  animation: book-ring 18s linear var(--d, 0s) infinite; will-change: transform, opacity; }
+.book-ring svg { display: block; width: 100%; height: 100%; overflow: visible; animation: book-morph 7s ease-in-out infinite alternate; }
+.book-ring ellipse { fill: none; stroke-width: 52; animation: book-stroke 18s linear var(--d, 0s) infinite; }   /* 線條粗細跟著縮放反向調整，下方小環看起來也一樣粗 */
+.book-ring .pale { stroke: var(--ring-pale); }
+.book-ring .vivid { animation: book-stroke 18s linear var(--d, 0s) infinite, book-vivid 18s linear var(--d, 0s) infinite; }
+.book-ring:nth-child(2) { --d: -4s; }    /* 三個環平均錯開 6 秒 */
+.book-ring:nth-child(3) { --d: -10s; }
+.book-ring:nth-child(4) { --d: -16s; }
+.book-ring:nth-child(3) svg { animation-duration: 8.6s; animation-delay: -3s; }   /* 變形週期各不相同，避免整齊劃一 */
+.book-ring:nth-child(4) svg { animation-duration: 6.2s; animation-delay: -5s; animation-direction: alternate-reverse; }
+@keyframes book-ring {
+  0%   { transform: translate(-50%, calc(112cqh - 50%)) scale(.14); opacity: 0; }   /* 最下方出現時縮小為原本的 25%（2026-11-13 使用者要求），上方大小不變 */
+  12%  { opacity: 1; }
+  30%  { transform: translate(-50%, calc(78cqh - 50%))  scale(.175); }
+  70%  { transform: translate(-50%, calc(20cqh - 50%))  scale(1);  opacity: .8; }
+  100% { transform: translate(-50%, calc(-18cqh - 50%)) scale(1.12); opacity: 0; }
+}
+@keyframes book-stroke {   /* 線寬 × 縮放 ≈ 畫面上的粗細：最下方約 25px，往上漸粗到約 50px */
+  0% { stroke-width: 181; } 30% { stroke-width: 145; } 40% { stroke-width: 85; } 50% { stroke-width: 69; } 60% { stroke-width: 59; } 70% { stroke-width: 52; } 100% { stroke-width: 46; }
+}
+@keyframes book-vivid { 0%, 34% { opacity: 1; } 66%, 100% { opacity: 0; } }
+@keyframes book-morph {
+  0%   { transform: scale(1, 1) rotate(0deg); }
+  35%  { transform: scale(1.04, .86) rotate(-1.6deg); }
+  70%  { transform: scale(.95, 1.14) rotate(1.2deg); }
+  100% { transform: scale(1.02, .94) rotate(-.6deg); }
+}
+.book-inner { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 20px; max-width: 720px; }
+.book-title { margin: 0; font-size: clamp(30px, 3.6vw, 48px); line-height: 1.3; font-weight: 700; letter-spacing: var(--tracking-wider); text-wrap: balance; word-break: keep-all; }   /* 手機只在逗號後換行 */
+.book-flow {   /* 一段亮藍從左往右掃過文字，掃完停一下（大標與卡片頁籤共用） */
+  background: linear-gradient(100deg, var(--alt-ink) 0 38%, var(--book-sweep) 50%, var(--alt-ink) 62% 100%) 0 0 / 260% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent; animation: book-sweep 6s ease-in-out infinite; }
+@keyframes book-sweep { 0% { background-position: 100% 0; } 55%, 100% { background-position: 0 0; } }
+.alt-book.is-paused .book-ring, .alt-book.is-paused .book-ring svg, .alt-book.is-paused .book-ring ellipse, .alt-book.is-paused .book-flow { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .book-ring, .book-ring svg, .book-ring ellipse { animation-play-state: paused; }
+  .book-flow { animation: none; background-position: 100% 0; }
+}
+@media (max-width: 767px) {
+  .alt-book { min-height: 560px; padding: 96px 20px calc(96px + 32px); }
+}
+
+/* 留資表單卡片（2026-11-13）：外框參考使用者提供的頁籤卡片（左上頁籤、右側用內凹圓角接進卡片本體）；
+   欄位參考使用者提供的表單（淺灰底大圓角、粗體標籤在上、輸入文字在下、下拉選單右側小三角）。模組專屬，先留在本頁。 */
+.book-inner { max-width: 1040px; width: 100%; }
+/* 半透明毛玻璃（2026-11-13）：光環經過卡片後方時透出模糊的彩色。
+   玻璃底分成三塊（卡片本體 ::before、頁籤 ::before、內凹圓角 ::after），各自加 backdrop-filter；
+   卡片與頁籤本身不能加 filter／backdrop-filter，否則子層的模糊只看得到卡片內部、看不到後面的光環（因此淺色的 1px 外框拿掉）。 */
+.book-card { --tab-h: 56px; --tab-r: 24px; --card-r: var(--r-30); position: relative; z-index: 0; width: 100%; margin-top: calc(40px + var(--tab-h)); padding: 36px 32px 32px; text-align: left; }
+.book-card::before, .book-tab::before, .book-tab::after { content: ''; position: absolute; z-index: -1; pointer-events: none;
+  background: var(--book-glass); -webkit-backdrop-filter: blur(18px) saturate(1.3); backdrop-filter: blur(18px) saturate(1.3); }
+.book-card::before { inset: 0; border-radius: 0 var(--card-r) var(--card-r) var(--card-r); }
+.book-tab { position: absolute; z-index: 0; left: 0; bottom: 100%; margin: 0; height: var(--tab-h); padding: 0 40px; display: flex; align-items: center;
+  font-size: 16px; font-weight: 700; letter-spacing: var(--tracking-wider); color: var(--alt-ink); }
+.book-tab::before { inset: 0; border-radius: var(--tab-r) var(--tab-r) 0 0; }
+.book-tab::after {   /* 頁籤右下角的內凹圓角：用遮罩挖出四分之一圓，模糊也一起被挖掉 */
+  left: 100%; bottom: 0; width: var(--tab-r); height: var(--tab-r);
+  -webkit-mask: radial-gradient(circle at 100% 0, transparent calc(var(--tab-r) - .5px), #000 var(--tab-r));
+          mask: radial-gradient(circle at 100% 0, transparent calc(var(--tab-r) - .5px), #000 var(--tab-r)); }
+.book-head { display: flex; justify-content: space-between; gap: 16px; padding: 0 8px 20px; font-size: 14px; line-height: 22px; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); }
+.book-head span:first-child { font-size: 16px; }
+.book-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.book-field { position: relative; display: flex; flex-direction: column; gap: 4px; padding: 16px 28px; border-radius: var(--r-20); background: var(--book-field); cursor: text; transition: box-shadow .2s; }
+.book-field.is-wide { grid-column: 1 / -1; }
+.book-field:focus-within { box-shadow: inset 0 0 0 1.5px var(--book-focus); }
+.book-field.has-error { box-shadow: inset 0 0 0 1.5px var(--cta-orange); }
+.book-label { font-size: 15px; line-height: 22px; font-weight: 600; letter-spacing: var(--tracking-wider); color: var(--alt-ink); }
+.book-label b { margin-left: 4px; font-weight: 600; }
+.book-field input, .book-field select, .book-field textarea { width: 100%; margin: 0; padding: 0; border: 0; background: none; outline: none;
+  font: inherit; font-size: 14px; line-height: 22px; letter-spacing: var(--tracking-wider); color: var(--alt-ink); }
+.book-field textarea { resize: vertical; min-height: 44px; }
+.book-field ::placeholder { color: var(--alt-ink-soft); opacity: .75; }
+.book-field.is-select { cursor: pointer; }
+.book-field.is-select .book-label { font-size: 12px; line-height: 18px; font-weight: 500; color: var(--alt-ink-soft); }   /* 下拉：小標籤在上、選到的值較大 */
+.book-field select { appearance: none; -webkit-appearance: none; padding-right: 32px; font-size: 16px; font-weight: 600; cursor: pointer; }
+.book-field select option { color: #1F2A6B; }
+.book-caret { position: absolute; right: 28px; top: 50%; width: 12px; height: 8px; margin-top: -4px; fill: var(--alt-ink); pointer-events: none; }
+.book-foot { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-top: 28px; }   /* 同意在上、送出在下，都置中 */
+.book-agree { display: flex; align-items: center; gap: 10px; font-size: 14px; line-height: 22px; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); cursor: pointer; }
+.book-agree input { width: 18px; height: 18px; margin: 0; accent-color: var(--cta-orange); }
+.book-agree a { color: var(--alt-ink); text-underline-offset: 3px; }
+.book-agree.has-error { color: var(--cta-orange); }
+.book-submit { margin-top: 0; border: 0; font-family: inherit; cursor: pointer; }
+.book-msg { margin: 16px 8px 0; text-align: center; min-height: 22px; font-size: 14px; line-height: 22px; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); }
+.book-msg:empty { display: none; }
+.book-msg.is-error { color: var(--cta-orange); }
+@media (max-width: 767px) {
+  .book-card { --tab-h: 48px; --tab-r: 20px; --card-r: var(--r-20); padding: 24px 16px 20px; }
+  .book-tab { padding: 0 28px; font-size: 15px; }
+  .book-head { padding: 0 4px 16px; }
+  .book-grid { grid-template-columns: 1fr; gap: 10px; }
+  .book-field { padding: 14px 20px; }
+  .book-caret { right: 20px; }
+  .book-foot { align-items: stretch; gap: 16px; }
+  .book-agree { justify-content: center; }
+  .book-submit { width: 100%; }
+}
+
+
+/* ── 共用：footer ── */
+/* Footer（2026-11-13）：版面參考使用者提供的風格（左 logo 與主選單、右圓角卡片列表），內容依 PM 的連結表。
+   左：logo、已上線的三個模組、公司資訊；中：股感集團（開新分頁）；右：關於我們／業務合作（寄信）；底：版權 */
+.alt-foot { --foot-r: 64px; position: relative; margin-top: calc(-1 * var(--foot-r)); border-radius: var(--foot-r) var(--foot-r) 0 0;   /* 往上疊進網點區塊，左右上角用大圓角銜接 */
+  padding: 120px 40px 40px; background: var(--alt-page); color: var(--alt-ink); }
+.foot-inner { width: min(1200px, 100%); margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 360px) minmax(0, 360px); gap: 40px; align-items: start; }
+.foot-brand-col { display: flex; flex-direction: column; gap: 30px; min-width: 0; }
+.foot-brand { --logo-h: 40px; width: fit-content; }
+.foot-info { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; font-size: 14px; line-height: 24px; color: var(--alt-ink-soft); }
+.foot-info li { display: flex; align-items: flex-start; gap: 10px; }
+.foot-info .foot-co { letter-spacing: var(--tracking-wider); }
+.foot-info svg, .foot-bottom svg { flex: none; width: 16px; height: 16px; margin-top: 4px; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+.foot-info a { color: inherit; text-decoration: none; }
+.foot-info a:hover { color: var(--alt-ink); text-decoration: underline; text-underline-offset: 3px; }
+.foot-nav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 18px; }
+.foot-nav a { display: inline-flex; align-items: center; gap: 10px; font-size: 20px; line-height: 28px; font-weight: 700; letter-spacing: var(--tracking-wider); color: var(--alt-ink); text-decoration: none; white-space: nowrap; }
+.foot-nav a { transition: color .2s ease; }
+.foot-nav a:hover { color: var(--cta-orange); }
+.foot-col { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿用 .foot-label 的 8px */
+.foot-label { margin: 0 0 8px 4px; font-size: 12px; line-height: 20px; font-weight: 600; letter-spacing: .1em; color: var(--alt-ink-soft); }
+.foot-card { list-style: none; margin: 0; padding: 6px; border-radius: var(--r-20); background: var(--foot-card); }
+.foot-card li + li { border-top: 1px solid var(--foot-divider); }   /* 分隔線用頁面底色，像卡片被切開 */
+.foot-row { display: flex; align-items: center; gap: 16px; padding: 12px 14px; border-radius: 14px; font-size: 15px; line-height: 22px; letter-spacing: var(--tracking-wider); color: var(--alt-ink); text-decoration: none; }
+.foot-row:focus-visible, .foot-nav a:focus-visible, .foot-info a:focus-visible { outline: 2px solid var(--cta-orange); outline-offset: 2px; }
+.foot-ic { flex: none; width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--foot-ic-bg); }
+.foot-ic svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .25s ease; }
+/* hover：箭頭往前微移、信封往上微移（不變色、不變底色） */
+.foot-row:hover .foot-ic svg { transform: translateX(2px); }
+.foot-row[target="_blank"]:hover .foot-ic svg { transform: translate(1.5px, -1.5px); }
+.foot-row:hover .foot-ic .ic-mail { transform: translateY(-2px); }
+@media (prefers-reduced-motion: reduce) { .foot-ic svg { transition: none; } }
+.foot-bottom { width: min(1200px, 100%); margin: 80px auto 0; padding-top: 24px; border-top: 1px solid var(--alt-line); }
+.foot-bottom p { margin: 0; display: flex; align-items: flex-start; gap: 8px; font-size: 13px; line-height: 24px; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); }
+@media (max-width: 1079px) {
+  .foot-inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px 32px; }
+  .foot-brand-col { grid-column: 1 / -1; }
+}
+@media (max-width: 767px) {
+  .alt-foot { --foot-r: 32px; padding: 80px 20px 32px; }
+  .foot-inner { grid-template-columns: 1fr; gap: 40px; }
+  .foot-brand { --logo-h: 32px; }
+  .foot-nav ul { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; }
+  .foot-nav a { font-size: 16px; line-height: 24px; flex-wrap: wrap; gap: 4px 8px; white-space: normal; }
+  .foot-bottom { margin-top: 48px; }
+}
+
+
+/* ── 共用：深淺色切換 ── */
+/* 深淺色切換（比較用，非頁面設計） */
+.alt-theme {
+  position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 3px;
+  border-radius: var(--r-30); background: rgba(128,128,128,.25); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  box-shadow: 0 4px 16px rgba(0,0,0,.12); font-size: 13px; font-weight: 700; letter-spacing: var(--tracking-wider);
+}
+.alt-theme button {
+  border: 0; border-radius: var(--r-30); padding: 7px 14px; font: inherit; cursor: pointer; color: var(--alt-ink); background: none;
+}
+.alt-theme button[aria-pressed="true"] { background: var(--alt-page); box-shadow: 0 1px 4px rgba(0,0,0,.15); }
+
+
+/* ── 模組說明頁（2026-11-16 試做，商品 SENSE 先做）──
+   共用框架八段：首屏 → 適合誰（角色切換）→ 怎麼運作 → 主力互動 → 計價與保障 → 常見問題 → 其他模組 → 留資。
+   內容參考工程師提供的說明頁草稿；金額、比例一律為示意數字並標註「依平台設定」。class 以 mp- 開頭，先留在本頁。 */
+.mp-wrap { width: min(1200px, 100%); margin: 0 auto; }
+.mp-sec { padding: 120px 40px; }
+.mp-eyebrow { margin: 0 0 12px; font-family: "Roboto Condensed", sans-serif; font-size: 14px; line-height: 20px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--mp-accent); }
+.mp-h2 { margin: 0; font-size: clamp(28px, 3vw, 40px); line-height: 1.3; font-weight: 700; letter-spacing: var(--tracking-wider); color: var(--alt-ink); text-wrap: balance; word-break: keep-all; }
+.mp-lead { margin: 16px 0 0; max-width: 640px; font-size: 16px; line-height: 28px; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); }
+.mp-head { margin-bottom: 48px; }
+.mp-note { margin: 16px 0 0; font-size: 13px; line-height: 22px; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); }
+.mp-card { background: var(--alt-card); border-radius: var(--r-30); }
+[data-theme="light"] .mp-card { box-shadow: 0 0 0 1px var(--alt-card-line); }
+.mp-ic { display: block; color: var(--alt-ink); }
+.mp-ic .lt { color: var(--alt-ink-soft); opacity: .6; }
+.mp-ic .gc { color: var(--c); opacity: 1; }
+
+/* 1. 首屏：網點底＋左側主標、右側「三個重點」摘要（沒時間的人看這張就懂） */
+.mp-hero { position: relative; padding: 200px 40px 120px; overflow: hidden;
+  background: radial-gradient(48% 60% at 85% 30%, var(--mp-tint), transparent 70%), var(--alt-page); }
+.mp-hero::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(circle, var(--alt-grain) .7px, transparent 1px) 0 0 / 4px 4px; }
+.mp-hero .mp-wrap { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 80px; align-items: center; }
+.mp-badge { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 28px; font-size: 18px; font-weight: 700; letter-spacing: var(--tracking-wider); color: var(--alt-ink); }
+.mp-badge .mp-ic { width: 44px; height: 44px; }
+.mp-h1 { margin: 0; font-size: clamp(40px, 5vw, 64px); line-height: 1.25; font-weight: 700; letter-spacing: var(--tracking-wider); color: var(--alt-ink); word-break: keep-all; }
+.mp-hero .mp-lead { font-size: 18px; line-height: 32px; margin-top: 24px; }
+.mp-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 40px; }
+.mp-cta .alt-hbtn.lg { margin-top: 0; }
+.mp-cta .alt-hbtn.ghost { padding: 0 28px; }
+.mp-sum { padding: 32px; }
+.mp-sum h2 { margin: 0 0 20px; font-size: 14px; line-height: 20px; font-weight: 600; letter-spacing: .1em; color: var(--alt-ink-soft); }
+.mp-sum ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 20px; counter-reset: sum; }
+.mp-sum li { display: grid; grid-template-columns: 32px 1fr; gap: 4px 14px; counter-increment: sum; }
+.mp-sum li::before { content: counter(sum); grid-row: span 2; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center;
+  font-family: "Roboto Condensed", sans-serif; font-size: 15px; font-weight: 700; background: var(--mp-tint-strong); color: var(--mp-accent); }
+.mp-sum strong { font-size: 17px; line-height: 26px; color: var(--alt-ink); letter-spacing: var(--tracking-wider); }
+.mp-sum span { font-size: 14px; line-height: 22px; color: var(--alt-ink-soft); letter-spacing: var(--tracking-wider); }
+
+/* 2. 適合誰：只有這段可以切換「商品方／行銷方」 */
+.mp-roles { display: inline-flex; gap: 4px; padding: 4px; margin-top: 28px; border-radius: var(--r-30); background: var(--mp-seg); }
+.mp-roles button { border: 0; border-radius: var(--r-30); padding: 10px 24px; font: inherit; font-size: 15px; font-weight: 700; letter-spacing: var(--tracking-wider);
+  color: var(--alt-ink-soft); background: none; cursor: pointer; transition: background .2s, color .2s; }
+.mp-roles button[aria-selected="true"] { background: var(--alt-card); color: var(--alt-ink); box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+.mp-roles button:focus-visible, .mp-chips button:focus-visible { outline: 2px solid var(--cta-orange); outline-offset: 2px; }
+.mp-panel-sum { margin: 0 0 24px; font-size: 18px; line-height: 30px; font-weight: 600; letter-spacing: var(--tracking-wider); color: var(--alt-ink); }
+.mp-grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.mp-item { padding: 28px; }
+.mp-item h3 { margin: 0 0 8px; font-size: 18px; line-height: 28px; font-weight: 700; letter-spacing: var(--tracking-wider); color: var(--alt-ink); }
+.mp-item p { margin: 0; font-size: 15px; line-height: 26px; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); }
+.mp-panel[hidden] { display: none; }
+.mp-panel { animation: mp-in .35s ease; }
+@keyframes mp-in { from { opacity: 0; transform: translateY(8px); } }
+
+/* 3. 怎麼運作（2026-11-16 改成限時動態式的自動故事）：區塊有一半進到畫面才從第 1 步開始播，每步 6 秒、進度條跑滿自動換下一步，
+   播完停在第 5 步並顯示「重播」（不無限循環）。點區塊任一處可暫停／播放（2026-11-16 改，原本是滑鼠移入就暫停），離開畫面或切換分頁時也會暫停；
+   點進度條或插圖左右箭頭可切換步驟（鍵盤左右鍵亦可），第 5 步按下一步＝重播；右下角小按鈕顯示目前狀態。不攔截捲動，隨時可以往下捲離開。減少動態效果時不自動播放，進度條當分頁用。
+   右側插圖是同一個場景，依 data-step 切換：1 商品上架（購物袋＋推廣費標籤）→ 2 三個渠道出現 → 3 連線＋提案確認 → 4 會員下單、成交 +1 → 5 拆成三份。 */
+.st { --dur: 6s; display: grid; grid-template-columns: minmax(0, 480px) minmax(0, 1fr); gap: 64px; align-items: center; }
+.st-bars { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.st-bar { display: flex; flex-direction: column; gap: 12px; padding: 0; border: 0; background: none; cursor: pointer; text-align: left; font: inherit; }
+.st-track { display: block; height: 3px; border-radius: 2px; background: var(--alt-line); overflow: hidden; }
+.st-fill { display: block; height: 100%; width: calc(var(--f, 0) * 100%); background: var(--mp-accent); }
+.st-lbl { font-size: 14px; line-height: 20px; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); transition: color .3s; }
+.st-lbl b { margin-right: 6px; font-family: "Roboto Condensed", sans-serif; }
+.st-bar[aria-current="step"] .st-lbl { color: var(--mp-accent); font-weight: 700; }
+.st-bar:focus-visible { outline: 2px solid var(--cta-orange); outline-offset: 4px; border-radius: 4px; }
+.st-copy { display: grid; margin-top: 40px; min-height: 220px; }
+.st-panel { grid-area: 1 / 1; opacity: 0; visibility: hidden; transform: translateY(12px); transition: opacity .45s ease, transform .45s ease, visibility 0s .45s; }
+.st-panel.is-on { opacity: 1; visibility: visible; transform: none; transition: opacity .5s ease .1s, transform .5s ease .1s; }
+.st-panel h3 { margin: 0 0 18px; font-size: clamp(30px, 3.4vw, 44px); line-height: 1.3; font-weight: 700; letter-spacing: var(--tracking-wider); color: var(--alt-ink); word-break: keep-all; }
+.st-panel p { margin: 0; font-size: 17px; line-height: 30px; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); }
+.st-foot { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--alt-line); }
+.st-stats { display: flex; align-items: flex-end; gap: 32px; }
+.st-stats span { display: block; font-size: 14px; line-height: 20px; color: var(--alt-ink-soft); letter-spacing: var(--tracking-wider); }
+.st-stats b { display: block; font-family: "Roboto Condensed", sans-serif; font-size: 40px; line-height: 48px; font-weight: 700; color: var(--alt-ink); font-variant-numeric: tabular-nums; }
+.st-stats b.is-deal { color: var(--cta-orange); }
+.st-stats em { font-style: normal; font-size: 13px; line-height: 26px; color: var(--alt-ink-soft); }
+.st { cursor: pointer; }   /* 點區塊任一處（箭頭、進度條、按鈕除外）可暫停／播放 */
+.st-play { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 36px; height: 36px; padding: 0 10px; border: 1px solid var(--alt-line); border-radius: var(--r-30); background: var(--alt-card);
+  font: inherit; font-size: 13px; font-weight: 600; letter-spacing: var(--tracking-wider); color: var(--alt-ink); cursor: pointer; }
+.st-play svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; display: none; }
+.st-play .i-play { fill: currentColor; stroke: none; }
+.st:not(.is-paused):not(.is-ended) .st-play .i-pause, .st.is-paused:not(.is-ended) .st-play .i-play, .st.is-ended .st-play .i-replay { display: block; }   /* 只限右下按鈕；原本沒限定，中央提示會同時出現兩個圖示 */
+.st-play-txt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }   /* 平常只顯示圖示；播完才顯示「重播」 */
+.st.is-ended .st-play { padding: 0 14px 0 10px; }
+.st.is-ended .st-play-txt { position: static; width: auto; height: auto; clip-path: none; }
+.st-play:focus-visible { outline: 2px solid var(--cta-orange); outline-offset: 2px; }
+
+/* 右側場景：位置一律用百分比，手機等比縮小 */
+.st-scene { position: relative; aspect-ratio: 5 / 4; }
+.st-art { position: absolute; inset: 0; }
+/* 左右切換：桌機滑鼠移到插圖上才出現；手機一直顯示。可點範圍 44px */
+.st-nav { position: absolute; top: 50%; z-index: 5; width: 44px; height: 44px; margin-top: -22px; padding: 0; border: 0; background: none; display: grid; place-items: center; cursor: pointer;
+  opacity: 0; transition: opacity .25s; }
+.st-nav.prev { left: -8px; } .st-nav.next { right: -8px; }
+.st-nav svg { width: 40px; height: 40px; padding: 11px; border-radius: 50%; background: var(--alt-card); fill: none; stroke: var(--alt-ink); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  box-shadow: 0 6px 18px -8px rgba(16,30,80,.45), 0 0 0 1px var(--alt-card-line); transition: transform .2s; }
+.st-nav:hover svg { transform: scale(1.08); }
+.st-scene:hover .st-nav, .st-nav:focus-visible { opacity: 1; }
+.st-nav:disabled { opacity: 0 !important; pointer-events: none; }
+.st-nav:focus-visible { outline: none; } .st-nav:focus-visible svg { outline: 2px solid var(--cta-orange); outline-offset: 2px; }
+/* 點擊暫停／播放時，插圖中央短暫出現提示圖示 */
+.st-flash { position: absolute; left: 50%; top: 50%; z-index: 4; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%; display: grid; place-items: center;
+  background: rgba(15,25,60,.55); color: #fff; opacity: 0; pointer-events: none; }
+.st-flash svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; display: none; }
+.st-flash .i-play { fill: currentColor; stroke: none; }
+.st-flash.is-pause .i-pause, .st-flash.is-play .i-play { display: block; }
+.st-flash.is-show { animation: st-flash .7s ease-out; }
+@keyframes st-flash { 0% { opacity: 0; transform: scale(.8); } 20% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.15); } }
+.st-cloud { position: absolute; inset: -6% -4%; pointer-events: none;
+  background: radial-gradient(circle, var(--st-dot) 1.3px, transparent 1.8px) 0 0 / 9px 9px;
+  -webkit-mask: radial-gradient(52% 50% at 60% 50%, #000 20%, transparent 75%); mask: radial-gradient(52% 50% at 60% 50%, #000 20%, transparent 75%); }
+.st-links { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; opacity: 0; transition: opacity .5s; }
+.st-links path { fill: none; stroke: var(--mp-accent); stroke-width: 1.6; stroke-dasharray: 5 6; animation: st-march 1.2s linear infinite; }
+@keyframes st-march { to { stroke-dashoffset: -22; } }
+.st[data-step="3"] .st-links, .st[data-step="4"] .st-links { opacity: .8; }
+.st-ch { position: absolute; display: flex; flex-direction: column; border-radius: 14px; padding: 2.2% 2.4% 2.4%; color: #fff; box-shadow: 0 18px 40px -24px rgba(16,30,80,.6);
+  opacity: 0; transform: translateY(18px) scale(.94); transition: opacity .5s ease, transform .6s cubic-bezier(.3, 1.3, .5, 1); }
+.st-edm { left: 50%; top: 4%; width: 42%; height: 33%; background: #1A81F6; }
+.st-app { left: 76%; top: 40%; width: 23%; height: 54%; background: #4C46C2; transition-delay: .12s; }
+.st-sms { left: 42%; top: 56%; width: 31%; height: 36%; background: #1F8C88; transition-delay: .24s; }
+.st:not([data-step="1"]) .st-ch { opacity: 1; transform: none; }
+.st[data-step="5"] .st-ch { opacity: .22; transition-delay: 0s; }
+.st-ch-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; margin-bottom: 4%; }
+.st-ch-head b { font-family: "Roboto Condensed", sans-serif; font-size: clamp(12px, 1.3vw, 17px); }
+.st-ch-head span { font-size: clamp(9px, .8vw, 11px); opacity: .85; white-space: nowrap; }
+.st-screen { flex: 1; display: flex; flex-direction: column; gap: 8%; padding: 7%; border-radius: 8px; background: #fff; }
+.st-screen i { display: block; position: relative; border-radius: 4px; background: #E7ECF4; }
+.st-ln { height: 7%; } .w40 { width: 40%; } .w50 { width: 50%; } .w60 { width: 60%; } .w70 { width: 70%; } .w80 { width: 80%; }
+.st-card, .st-bubble { flex: 1; }
+.st-bubble { border-radius: 10px !important; max-width: 80%; }
+.st-buy { position: absolute; right: 10%; bottom: 18%; width: 9px; height: 9px; border-radius: 50%; background: var(--cta-orange); opacity: 0; }
+.st[data-step="4"] .st-buy { opacity: 1; animation: st-ping 1.6s ease-out infinite; }
+.st-app .st-buy { animation-delay: .5s !important; } .st-sms .st-buy { animation-delay: 1s !important; }
+@keyframes st-ping { 0% { box-shadow: 0 0 0 0 rgba(255,97,0,.55); } 70%, 100% { box-shadow: 0 0 0 12px rgba(255,97,0,0); } }
+.st-bag { position: absolute; left: 6%; top: 46%; width: 18%; transition: left .7s cubic-bezier(.4, 0, .2, 1), top .7s cubic-bezier(.4, 0, .2, 1), width .7s cubic-bezier(.4, 0, .2, 1); }
+.st[data-step="1"] .st-bag { left: 30%; top: 18%; width: 30%; }
+.st-bag svg { display: block; width: 100%; overflow: visible; filter: drop-shadow(0 16px 18px rgba(16,40,120,.25)); }
+.st-bag-handle { fill: none; stroke: #1F2A6B; stroke-width: 5; stroke-linecap: round; }
+.st-bag-body { fill: #1A81F6; } .st-bag-side { fill: #1565C9; } .st-bag-mark { fill: #fff; opacity: .9; }
+.st-tag { position: absolute; left: 82%; top: -6%; padding: 6px 12px 7px; border: 1.5px solid #1F2A6B; border-radius: 8px; background: #fff; white-space: nowrap; transform: rotate(-8deg); transform-origin: left center;
+  box-shadow: 0 6px 14px -8px rgba(16,30,80,.4); transition: opacity .4s, transform .5s; }
+.st-tag span { display: block; font-size: 11px; line-height: 14px; color: #56698F; }
+.st-tag b { font-family: "Roboto Condensed", sans-serif; font-size: 22px; line-height: 24px; color: #1565C9; }
+.st:not([data-step="1"]) .st-tag { transform: rotate(-8deg) scale(.78); }
+.st[data-step="5"] .st-tag, .st[data-step="5"] .st-bag { opacity: .25; }
+.st-ok, .st-deal { position: absolute; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; white-space: nowrap;
+  opacity: 0; transform: translateY(10px) scale(.9); transition: opacity .35s ease, transform .45s cubic-bezier(.3, 1.4, .5, 1); }
+.st-ok { left: 24%; top: 30%; background: var(--alt-card); color: var(--alt-ink); box-shadow: 0 8px 20px -10px rgba(16,30,80,.45); }
+.st-ok svg { width: 14px; height: 14px; fill: none; stroke: #1F8C88; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.st[data-step="3"] .st-ok { opacity: 1; transform: none; transition-delay: .6s; }
+.st-deal { background: var(--cta-orange); color: #fff; }
+.d1 { left: 74%; top: 0; } .d2 { left: 86%; top: 34%; } .d3 { left: 52%; top: 50%; }
+.st[data-step="4"] .st-deal { opacity: 1; transform: none; }
+.st[data-step="4"] .d1 { transition-delay: .6s; } .st[data-step="4"] .d2 { transition-delay: 1.6s; } .st[data-step="4"] .d3 { transition-delay: 2.6s; }
+.st-split { position: absolute; left: 22%; top: 12%; width: 62%; padding: 5% 6%; border-radius: 20px; background: var(--alt-card); box-shadow: 0 24px 50px -28px rgba(16,30,80,.55);
+  opacity: 0; transform: translateY(16px); transition: opacity .5s ease, transform .6s cubic-bezier(.3, 1.2, .5, 1); }
+.st[data-step="5"] .st-split { opacity: 1; transform: none; transition-delay: .2s; }
+.st-split p { margin: 0 0 6%; font-size: 14px; color: var(--alt-ink-soft); letter-spacing: var(--tracking-wider); }
+.st-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8%; height: 9em; align-items: end; }
+.st-cols span { position: relative; height: 0; border-radius: 8px 8px 2px 2px; transition: height .9s cubic-bezier(.3, .8, .3, 1) .5s; }
+.st[data-step="5"] .st-cols span { height: max(var(--h), 10px); }
+.st-cols .c1 { background: var(--mp-c-net); } .st-cols .c2 { background: var(--mp-c-promo); } .st-cols .c3 { background: var(--mp-c-fee); }
+.st-cols b { position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); font-family: "Roboto Condensed", sans-serif; font-size: clamp(13px, 1.4vw, 18px); white-space: nowrap; color: var(--alt-ink); }
+.st-split ul { list-style: none; margin: 10px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8%; text-align: center; font-size: 12px; color: var(--alt-ink-soft); }
+
+/* 4. 主力互動：一筆訂單拆成三疊（2026-11-16 依使用者要求改回工程師版本的互動）
+   每顆點代表固定金額（訂單 3,000 以下每顆 NT$20，以上每顆 NT$50）；每疊一列 7 顆、由下往上疊。
+   調整推廣費時，商品方那疊最上面的點會飛到推廣費那疊的最上面（其餘點不動）；調整金額時，點會增減並重新排列。 */
+.mp-head-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; }
+.mp-viz-note { margin: 20px 0 0; font-size: 13px; line-height: 22px; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); opacity: .7; text-align: right; }   /* 圖表說明：圖表下方、靠右的淡灰小字 */
+.mp-split { display: grid; grid-template-columns: 440px minmax(0, 1fr); gap: 64px; align-items: end; }
+.mp-ctrl-card { padding: 36px; }
+.mp-ctrl + .mp-ctrl { margin-top: 28px; padding-top: 28px; border-top: 1px solid var(--alt-line); }
+.mp-ctrl-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.mp-ctrl-head label { font-size: 15px; font-weight: 700; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); }
+.mp-ctrl-head output { font-family: "Roboto Condensed", sans-serif; font-size: 52px; line-height: 60px; font-weight: 700; color: var(--alt-ink); font-variant-numeric: tabular-nums; }
+.mp-ctrl-head output.is-promo { color: var(--mp-c-promo); }
+.mp-range { --c: var(--mp-c-net); --p: 50%; -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 30px; margin: 14px 0 18px; background: none; cursor: pointer; }
+.mp-range.is-promo { --c: var(--mp-c-promo); }
+.mp-range::-webkit-slider-runnable-track { height: 12px; border-radius: 12px;
+  background: linear-gradient(to right, var(--c) var(--p), transparent var(--p)), radial-gradient(circle, var(--mp-track-dot) 1.3px, transparent 1.8px) 0 50% / 8px 12px repeat-x, var(--mp-seg); }
+.mp-range::-moz-range-track { height: 12px; border-radius: 12px; background: radial-gradient(circle, var(--mp-track-dot) 1.3px, transparent 1.8px) 0 50% / 8px 12px repeat-x, var(--mp-seg); }
+.mp-range::-moz-range-progress { height: 12px; border-radius: 12px; background: var(--c); }
+.mp-range::-webkit-slider-thumb { -webkit-appearance: none; width: 32px; height: 32px; margin-top: -10px; border-radius: 50%; background: var(--alt-card); border: 7px solid var(--c); box-shadow: 0 2px 8px rgba(0,0,0,.18); }
+.mp-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--alt-card); border: 7px solid var(--c); box-shadow: 0 2px 8px rgba(0,0,0,.18); }
+.mp-range:focus-visible { outline: 2px solid var(--cta-orange); outline-offset: 4px; border-radius: 16px; }
+.mp-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.mp-chips button { min-width: 64px; height: 40px; padding: 0 16px; border: 1px solid var(--alt-line); border-radius: var(--r-30); background: var(--alt-card);
+  font-family: "Roboto Condensed", sans-serif; font-size: 15px; font-weight: 600; color: var(--alt-ink); cursor: pointer; transition: background .2s, color .2s, border-color .2s; }
+.mp-chips button:hover { border-color: var(--alt-ink-soft); }
+.mp-chips button[aria-pressed="true"] { background: var(--alt-ink); border-color: var(--alt-ink); color: var(--alt-page); }
+.mp-viz { min-width: 0; }
+.mp-stage { position: relative; height: 400px;   /* 固定高度（2026-11-16）：點變多時改成縮小，區塊高度不變 */
+  background: radial-gradient(circle, var(--mp-grid-dot) 1.6px, transparent 2.2px) 0 100% / var(--pitch, 30px) var(--pitch, 30px); }
+.mp-stage i { position: absolute; left: 0; top: 0; width: var(--d, 22px); height: var(--d, 22px); border-radius: 50%; background: var(--mp-c-net);
+  transition: transform .55s cubic-bezier(.3, .8, .3, 1), background-color .35s ease, opacity .3s ease; }
+.mp-stage i.is-promo { background: var(--mp-c-promo); }
+.mp-stage i.is-fee { background: var(--mp-c-fee); }
+.mp-stage i.is-out { opacity: 0; }
+.mp-stage.no-anim i, .mp-stage.no-anim .mp-col-amt, .mp-stage.no-anim { transition: none; }
+.mp-col-amt { position: absolute; left: 0; top: 0; text-align: center; white-space: nowrap; font-family: "Roboto Condensed", sans-serif; font-size: 34px; line-height: 40px; font-weight: 700;
+  transition: transform .55s cubic-bezier(.3, .8, .3, 1); }
+.mp-col-base { position: absolute; bottom: 0; height: 3px; border-radius: 2px; }
+.c-net { color: var(--mp-c-net); } .c-promo { color: var(--mp-c-promo); } .c-fee { color: var(--mp-c-fee); }
+.mp-col-base.c-net { background: var(--mp-c-net); } .mp-col-base.c-promo { background: var(--mp-c-promo); } .mp-col-base.c-fee { background: var(--mp-c-fee); }
+.mp-col-names { list-style: none; margin: 18px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--gap, 24px); text-align: center; }
+.mp-col-names strong { display: inline-flex; align-items: center; gap: 6px; font-size: 16px; line-height: 26px; color: var(--alt-ink); letter-spacing: var(--tracking-wider); }
+.mp-col-names span { display: block; font-family: "Roboto Condensed", sans-serif; font-size: 14px; color: var(--alt-ink-soft); }
+.mp-you { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; font-style: normal; font-size: 12px; font-weight: 700; background: var(--cta-orange); color: var(--white); }
+.mp-eq { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px 28px; margin-top: 64px; }
+.mp-eq b { display: block; font-family: "Roboto Condensed", sans-serif; font-size: 46px; line-height: 52px; font-weight: 700; color: var(--alt-ink); font-variant-numeric: tabular-nums; }
+.mp-eq .c-net b { color: var(--mp-c-net); } .mp-eq .c-promo b { color: var(--mp-c-promo); } .mp-eq .c-fee b { color: var(--mp-c-fee); }
+.mp-eq span { font-size: 14px; line-height: 22px; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); }
+.mp-eq > i { font-style: normal; font-size: 40px; line-height: 52px; color: var(--alt-ink-soft); }
+
+/* 5. 計價與保障：四張說明卡＋結算流程（天數依平台設定） */
+.mp-grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.mp-flow { list-style: none; margin: 40px 0 0; padding: 28px 32px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; counter-reset: flow; }
+.mp-flow li { position: relative; counter-increment: flow; padding-right: 12px; }
+.mp-flow li:not(:last-child)::after { content: ''; position: absolute; right: 0; top: 10px; width: 8px; height: 8px; border-top: 1.5px solid var(--alt-ink-soft); border-right: 1.5px solid var(--alt-ink-soft); transform: rotate(45deg); opacity: .5; }
+.mp-flow strong { display: block; font-size: 16px; line-height: 26px; color: var(--alt-ink); letter-spacing: var(--tracking-wider); }
+.mp-flow strong::before { content: counter(flow) '. '; font-family: "Roboto Condensed", sans-serif; color: var(--mp-accent); }
+.mp-flow span { font-size: 14px; line-height: 22px; color: var(--alt-ink-soft); letter-spacing: var(--tracking-wider); }
+
+/* 6. 常見問題：用 details，內容一開始就在頁面裡（搜尋引擎讀得到） */
+.mp-faq { display: flex; flex-direction: column; gap: 12px; max-width: 880px; }
+.mp-faq details { padding: 0 28px; }
+.mp-faq summary { list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 22px 0; cursor: pointer;
+  font-size: 17px; line-height: 26px; font-weight: 600; letter-spacing: var(--tracking-wider); color: var(--alt-ink); }
+.mp-faq summary::-webkit-details-marker { display: none; }
+.mp-faq summary::after { content: ''; flex: none; width: 10px; height: 10px; border-right: 2px solid var(--alt-ink-soft); border-bottom: 2px solid var(--alt-ink-soft); transform: rotate(45deg) translateY(-3px); transition: transform .25s; }
+.mp-faq details[open] summary::after { transform: rotate(-135deg) translateY(-3px); }
+.mp-faq summary:focus-visible { outline: 2px solid var(--cta-orange); outline-offset: 4px; border-radius: 6px; }
+.mp-faq details p { margin: 0 0 22px; font-size: 15px; line-height: 26px; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); }
+
+/* 身份切換（2026-11-16）：整頁依 html[data-role] 顯示商品方或行銷方的內容（.for-seller／.for-promoter）。
+   入口：首屏的「我是 商品方｜行銷方」與底部浮動身份列，兩者同步；選擇記在 localStorage（sense.mpRole），網址可帶 ?role=seller|promoter。 */
+[data-role="seller"] .for-promoter, [data-role="promoter"] .for-seller { display: none !important; }
+.mp-roleseg-wrap { display: flex; align-items: center; gap: 12px; margin: 0 0 28px; }   /* 「我是」放在切換鈕外面 */
+.mp-roleseg-lbl { font-size: 15px; font-weight: 600; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); }
+.mp-roleseg { display: flex; align-items: center; gap: 4px; padding: 4px; border-radius: var(--r-30); background: var(--mp-seg); }
+.mp-roleseg button { border: 0; border-radius: var(--r-30); padding: 9px 20px; font: inherit; font-size: 15px; font-weight: 700; letter-spacing: var(--tracking-wider);
+  color: var(--alt-ink-soft); background: none; cursor: pointer; transition: background .2s, color .2s; }
+.mp-roleseg button[aria-pressed="true"] { background: var(--alt-card); color: var(--mp-role-on); box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+/* 身份切換鈕的選中色：三個模組頁統一用藍色（2026-11-16 使用者指定），不跟著各模組的強調色 */
+[data-theme="light"] { --mp-role-on: var(--mod-product-strong); }
+[data-theme="dark"] { --mp-role-on: #6FB2FF; }
+.mp-roleseg button:focus-visible { outline: 2px solid var(--cta-orange); outline-offset: 2px; }
+main.is-swapping { animation: mp-swap .35s ease; }
+@keyframes mp-swap { from { opacity: .25; } }
+/* 底部浮動身份列：捲過首屏的切換後出現；捲到留資或 footer 時收起，避免擋住送出按鈕 */
+.mp-rolebar { position: fixed; left: 50%; bottom: 20px; z-index: 45; display: flex; align-items: center; gap: 14px; padding: 5px 5px 5px 16px; border-radius: 40px;
+  background: var(--alt-head-bg); border: 1px solid var(--alt-line); box-shadow: 0 12px 30px -14px rgba(16,30,80,.45); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  transform: translate(-50%, 0); transition: transform .4s cubic-bezier(.3, 1.2, .5, 1), opacity .3s; }
+.mp-rolebar.is-hidden { transform: translate(-50%, calc(100% + 30px)); opacity: 0; pointer-events: none; }
+.mp-rolebar p { margin: 0; font-size: 14px; line-height: 22px; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); white-space: nowrap; }
+.mp-rolebar p b { color: var(--mp-accent); margin: 0 2px; }
+.mp-rolebar-msg { display: inline-flex; vertical-align: middle; }
+.mp-eye { width: 20px; height: 20px; fill: none; stroke: var(--alt-ink-soft); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }   /* 「目前觀看的身份」：只放眼睛圖示 */
+.mp-rolebar .mp-roleseg { padding: 3px; flex: none; }
+.mp-roleseg button { white-space: nowrap; }   /* 浮動列裡的切換鈕：與首屏同一個元件，尺寸略小 */
+.mp-rolebar .mp-roleseg button { padding: 7px 16px; font-size: 14px; }
+@media (max-width: 767px) {
+  .mp-roleseg-wrap { margin-bottom: 22px; } .mp-roleseg button { padding: 8px 16px; font-size: 14px; }
+  .mp-rolebar { bottom: 12px; gap: 10px; padding: 5px 5px 5px 14px; max-width: calc(100% - 24px); }
+  .mp-rolebar p { font-size: 13px; }
+  .mp-rolebar .mp-roleseg button { padding: 6px 12px; font-size: 13px; }
+  .alt-theme { bottom: 72px; }   /* 深淺色切換（比較用）移到浮動列上方 */
+}
+@media (prefers-reduced-motion: reduce) { main.is-swapping { animation: none; } .mp-rolebar { transition: none; } }
+
+/* 7. 其他模組 */
+.mp-others { padding-bottom: calc(40px + 64px); }   /* 移到頁面最底部（留資下方、footer 上方）：底部多留 footer 往上疊的 64px */
+.alt-book { padding-bottom: 120px; }   /* footer 不再疊在留資上 */
+.mp-mod { display: flex; align-items: center; gap: 24px; padding: 28px 32px; text-decoration: none; transition: transform .25s; }
+.mp-mod:hover { transform: translateY(-3px); }
+.mp-mod .mp-ic { width: 56px; height: 56px; flex: none; }
+.mp-mod h3 { margin: 0 0 4px; font-size: 20px; line-height: 28px; font-weight: 700; letter-spacing: var(--tracking-wider); color: var(--alt-ink); }
+.mp-mod p { margin: 0; font-size: 15px; line-height: 24px; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); }
+.mp-mod .mp-arrow { margin-left: auto; width: 20px; height: 20px; flex: none; fill: none; stroke: var(--alt-ink-soft); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s; }
+.mp-mod:hover .mp-arrow { transform: translateX(3px); }
+.mp-mod:focus-visible { outline: 2px solid var(--cta-orange); outline-offset: 3px; }
+
+/* 留資區塊的網點從純白段落接過來：上緣 160px 漸層淡入，避免一條硬邊（首頁上方本來就有網點，不需要） */
+.alt-book::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(var(--alt-page), transparent 160px, transparent calc(100% - 160px), var(--alt-page)); }   /* 網點上下緣都淡入／淡出，和前後的白色段落接起來 */
+@media (max-width: 1079px) {
+  .mp-hero .mp-wrap { grid-template-columns: minmax(0, 1fr); gap: 48px; }
+  .mp-sum { max-width: 560px; }
+  .mp-split { grid-template-columns: minmax(0, 1fr); gap: 48px; }
+  .mp-head-row { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .st { grid-template-columns: minmax(0, 1fr); gap: 40px; }
+  .st-scene { max-width: 640px; }
+  .mp-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 20px; }
+  .mp-flow li::after { display: none; }
+}
+@media (max-width: 767px) {
+  .mp-sec { padding: 72px 20px; }
+  .mp-hero { padding: 132px 20px 72px; }
+  .mp-h1 { font-size: 32px; }   /* keep-all 下「缺的是被看見的場景。」整句不斷行，字級要放得進 335px */
+  .mp-head { margin-bottom: 32px; }
+  .mp-hero .mp-lead { font-size: 16px; line-height: 28px; }
+  .mp-cta .alt-hbtn { flex: 1 1 auto; }
+  .mp-sum { padding: 24px; }
+  .mp-roles { display: flex; }
+  .mp-roles button { flex: 1; padding: 10px 12px; }
+  .mp-grid3, .mp-grid2 { grid-template-columns: 1fr; gap: 12px; }
+  .mp-item { padding: 22px; }
+  .st { display: flex; flex-direction: column; gap: 0; }   /* 手機：進度條 → 插圖 → 文字 → 數字，像限時動態一樣插圖在上 */
+  .st-text { display: contents; }
+  .st-bars { order: 1; gap: 6px; }
+  .st-scene { order: 2; width: 100%; margin-top: 24px; }
+  .st-nav { opacity: 1; } .st-nav.prev { left: -12px; } .st-nav.next { right: -12px; }
+  .st-nav svg { width: 34px; height: 34px; padding: 9px; }
+  .st-copy { order: 3; }
+  .st-foot { order: 4; }
+  .st-lbl { font-size: 12px; }
+  .st-lbl b { margin-right: 3px; }
+  .st-copy { margin-top: 20px; min-height: 172px; }
+  .st-panel p { font-size: 15px; line-height: 27px; }
+  .st-stats { gap: 20px; }
+  .st-stats b { font-size: 30px; line-height: 36px; }
+  .st-tag { padding: 4px 8px; } .st-tag span { font-size: 9px; } .st-tag b { font-size: 16px; }
+  .st-ok, .st-deal { font-size: 11px; padding: 4px 9px; }
+  .st-split p { font-size: 11px; }
+  .st-cols { height: 6.5em; }
+  .mp-ctrl-card { padding: 24px 20px; }
+  .mp-ctrl-head output { font-size: 40px; line-height: 48px; }
+  .mp-col-amt { font-size: 20px; line-height: 26px; }
+  .mp-stage { height: 260px; }
+  .mp-col-names strong { font-size: 13px; line-height: 20px; }
+  .mp-eq { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 16px; margin-top: 40px; }   /* 手機改 2×2，不顯示運算符號 */
+  .mp-eq > i { display: none; }
+  .mp-eq b { font-size: 28px; line-height: 34px; }
+  .mp-eq > i { font-size: 24px; line-height: 34px; }
+  .mp-flow { grid-template-columns: 1fr; padding: 24px; }
+  .mp-faq details { padding: 0 20px; }
+  .mp-mod { padding: 22px; gap: 16px; }
+  .mp-mod .mp-ic { width: 44px; height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) { .mp-panel { animation: none; } .st-panel, .st-ch, .st-bag, .st-ok, .st-deal, .st-split, .st-cols span { transition: none !important; } .st-links path, .st-buy { animation: none !important; } .mp-stage, .mp-stage i, .mp-col-amt { transition: none; } .mp-mod, .mp-mod .mp-arrow { transition: none; } }
+
+</style>
+</head>
+<body>
+<header class="alt-header">
+  <a class="alt-brand" href="landing-alt.html" aria-label="SENSE 首頁"><svg class="alt-logo" viewBox="0 0 112 185" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10.81 44.57C10.33 42.93 7.2 34.58 21.84 24.05C24.37 22.23 28.72 20.58 32.22 19.28C47.74 12.65 54.39 9.6 74.57 .98C80.29-1.46 86.7.7 89.36 7.18C96.3 24.02 101.8 36.97 108.85 53.68L108.92 53.65C111.9 60 109.16 66.18 103.5 68.75C101.62 69.6 77.22 80.87 69.7 84.06C63.98 86.48 57.57 84.29 54.93 77.81H54.95C49.58 65.05 37.1 35.53 35.89 33.74C33.09 29.55 24.75 28.45 18.98 31.16C14.43 33.29 9.09 38.56 10.81 44.58Z" fill="url(#p0)"/><path d="M105.83 157.14C81.67 168.1 76.86 169.98 52.75 181.03C52.04 181.35 51.18 181.73 50.22 182.11C36.01 182.86 31.54 175.97 31.54 175.97L31.51 175.93C35.1 179.98 41.76 179.52 46.03 177.76C51.93 175.33 56.74 168.43 55.55 163.54C55.04 161.44 54.15 159.42 53.25 157.44L26.63 97.53L31.25 94.33C35.16 101.74 40.29 103.63 46.5 102.3C51.89 101.18 73.5 90.84 75.39 90.03C81.11 87.59 87.51 89.75 90.19 96.23L90.13 96.26C97.69 112.74 103.52 125.55 111.25 142.03C114.23 148.37 111.49 154.56 105.84 157.13Z" fill="url(#p1)"/><path d="M18.98 31.15C21.36 30.13 25.58 29.43 29.47 30.02C32.24 30.79 34.01 31.35 35.9 33.73C40.25 42.51 54.96 77.8 54.96 77.8C54.96 77.8 58.35 86.75 66.83 84.86L45.49 31.31C41.97 22.88 28.16 18.77 15.25 26.41C10.22 29.38 6.4 32.06 4.86 39.61C3.65 45.8 5.99 50.77 5.99 50.77C5.99 50.77 22.85 88.99 26.35 96.9C26.37 96.94 26.38 96.98 26.4 97.02C28.38 101.48 31.1 107.6 31.2 107.82L53.26 157.45C53.26 157.45 55.57 162.19 55.74 164.85C55.74 164.85 56.21 168.18 52.97 172.27C52.97 172.27 49.76 176.25 47.05 177.31C44.34 178.37 42.8 178.74 42.8 178.74C42.8 178.74 39.33 180.11 34.25 177.98C34.25 177.98 32.88 177.42 31.66 176.12C31.59 176.03 31.56 175.98 31.56 175.98L30.64 174.74L26.85 168C26.85 168 6.88 124.34 5.89 122.22C4.87 121.02 4.14 119.81 1.65 121C-.84 122.19.22 124.56.22 124.56L7.54 140.82L16.73 160.94L22.78 174.13C22.78 174.13 23.69 176.28 25.68 178.65C29.35 183.04 33.67 184.45 37.91 184.9C42.14 185.35 50.22 182.13 50.22 182.13L52.45 181.12C61.74 176.93 65.75 165.9 61.32 156.72L31.24 94.35L30.17 91.79C28.64 88.26 23.33 75.82 23.33 75.82L11.93 48.48C11.93 48.48 11.36 46.49 10.8 44.57C10.67 44.14 10.45 43.31 10.45 42.12V42.34C10.45 42.34 10.54 35.22 18.96 31.15Z" fill="url(#p2)"/><path d="M45.5 91.5C43.85 92.23 41.92 91.47 41.19 89.82L21.1 44.19C20.37 42.54 21.13 40.61 22.78 39.88C24.44 39.15 26.37 39.9 27.1 41.56L47.18 87.19C47.91 88.84 47.16 90.77 45.5 91.5Z" fill="url(#p3)"/><path d="M17.58 115.81C19.23 115.07 21.16 115.81 21.9 117.46L42.25 162.97C42.98 164.61 42.25 166.56 40.59 167.29C38.94 168.03 37.01 167.29 36.27 165.64L15.92 120.14C15.18 118.49 15.92 116.55 17.57 115.81Z" fill="url(#p4)"/><defs><linearGradient id="p0" x1="76.09" y1="82.74" x2="13.82" y2="-53.48" gradientUnits="userSpaceOnUse"><stop offset=".09" stop-color="#0073F5"/><stop offset=".18" stop-color="#1495E9"/><stop offset=".3" stop-color="#29B8DC"/><stop offset=".39" stop-color="#37CED4"/><stop offset=".45" stop-color="#3CD7D2"/></linearGradient><radialGradient id="p1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(51.61 88.5) scale(110.73)"><stop stop-color="#0073F5"/><stop offset=".08" stop-color="#0D83EB"/><stop offset=".19" stop-color="#1D96E1"/><stop offset=".25" stop-color="#2CB6D9"/><stop offset=".31" stop-color="#37CED3"/><stop offset=".34" stop-color="#3CD7D2"/><stop offset=".55" stop-color="#AAC874"/><stop offset=".71" stop-color="#FFBE2D"/><stop offset=".73" stop-color="#FFAF2B"/><stop offset=".88" stop-color="#FF6025"/><stop offset=".95" stop-color="#FF4123"/></radialGradient><linearGradient id="p2" x1="51.27" y1="33.58" x2="17.61" y2="169.09" gradientUnits="userSpaceOnUse"><stop offset=".12" stop-color="#0073F5"/><stop offset=".15" stop-color="#1677F6"/><stop offset=".22" stop-color="#4F84FA"/><stop offset=".28" stop-color="#8791FF"/><stop offset=".31" stop-color="#8B92F7"/><stop offset=".36" stop-color="#9797E2"/><stop offset=".42" stop-color="#AB9EBF"/><stop offset=".49" stop-color="#C6A88F"/><stop offset=".57" stop-color="#E9B553"/><stop offset=".62" stop-color="#FFBE2D"/><stop offset=".87" stop-color="#FFBE2D"/><stop offset="1" stop-color="#FF6E2D"/></linearGradient><linearGradient id="p3" x1="23.57" y1="41.88" x2="39.94" y2="78.73" gradientUnits="userSpaceOnUse"><stop stop-color="#0073F5"/><stop offset=".2" stop-color="#1677F6"/><stop offset=".63" stop-color="#4F84FA"/><stop offset="1" stop-color="#8791FF"/></linearGradient><radialGradient id="p4" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(25.57 96.03) scale(76.77)"><stop stop-color="#0073F5"/><stop offset=".08" stop-color="#0D83EB"/><stop offset=".19" stop-color="#1D96E1"/><stop offset=".27" stop-color="#2CB6D9"/><stop offset=".34" stop-color="#37CED3"/><stop offset=".38" stop-color="#3CD7D2"/><stop offset=".42" stop-color="#4FD4C1"/><stop offset=".51" stop-color="#83CD95"/><stop offset=".64" stop-color="#D4C350"/><stop offset=".71" stop-color="#FFBE2D"/><stop offset=".73" stop-color="#FFAF2B"/><stop offset=".88" stop-color="#FF6025"/><stop offset=".95" stop-color="#FF4123"/></radialGradient></defs></svg><span class="alt-brand-word"><svg viewBox="171.8 53.7 426.1 77.5" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M203.06 131.15C212.22 131.15 233.52 128.93 233.52 108.32C233.52 96.75 226.23 90.31 209.15 86.79L199.21 84.8C190.94 83.09 189.21 78.74 189.21 75.39C189.21 70.56 192.68 65.4 202.4 65.4C207.44 65.4 211.4 66.73 213.83 69.24C215.45 70.92 216.34 73.04 216.47 75.57H231.41C230.94 61.5 220.8 53.77 202.74 53.77C184.68 53.77 173.94 61.85 173.94 75.39C173.94 86.67 180.84 93.23 195.64 96.03L206.49 98.24C212.2 99.4 218.04 101.52 218.04 108.43C218.04 115.34 212.49 119.52 203.19 119.52C193.89 119.52 187.78 114.91 186.98 106.81H171.87C172.35 122.29 183.67 131.15 203.08 131.15H203.06Z"/><path d="M314.87 97.34V86.48H281.94V67.06H318.18V54.77H267.43V130.05H319.29V117.75H281.94V97.34H314.87Z"/><path d="M400.15 130.05H416.43V54.77H401.93V105.6H399.98L368.82 54.77H353.2V130.05H367.71V80.21H369.65L400.15 130.05Z"/><path d="M481.58 131.15C490.74 131.15 512.04 128.93 512.04 108.32C512.04 96.75 504.75 90.31 487.67 86.79L477.73 84.8C469.46 83.09 467.73 78.74 467.73 75.39C467.73 70.56 471.2 65.4 480.92 65.4C485.96 65.4 489.92 66.73 492.35 69.24C493.98 70.92 494.86 73.04 494.99 75.57H509.93C509.46 61.5 499.32 53.77 481.26 53.77C463.2 53.77 452.46 61.85 452.46 75.39C452.46 86.67 459.36 93.23 474.16 96.03L485 98.24C490.71 99.4 496.55 101.52 496.55 108.43C496.55 115.34 491 119.52 481.7 119.52C472.4 119.52 466.29 114.91 465.49 106.81H450.38C450.86 122.29 462.18 131.15 481.59 131.15H481.58Z"/><path d="M593.38 97.34V86.48H560.46V67.06H596.7V54.77H545.95V130.05H597.81V117.75H560.46V97.34H593.38Z"/></svg></span></a>
+  <nav class="alt-actions" aria-label="會員">
+    <a class="alt-hbtn book" href="#book" aria-label="預約洽談" title="預約洽談"><svg class="ico" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21.4 2.6a.6.6 0 0 0-.65-.13L2.9 9.6a.6.6 0 0 0-.03 1.1l7.2 3.2 3.2 7.2a.6.6 0 0 0 1.1-.03l7.13-17.85a.6.6 0 0 0-.1-.62Z" fill="currentColor"/></svg><span class="divider" aria-hidden="true"></span><span class="label">預約洽談</span></a>
+    <button type="button" class="alt-hbtn ghost alt-browse" aria-expanded="false" aria-controls="browse-panel" aria-label="瀏覽 SENSE" title="瀏覽 SENSE"><svg class="ico i-menu" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><svg class="ico i-close" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span class="label">瀏覽 SENSE</span></button>
+    <a class="alt-hbtn ghost" href="login.html" aria-label="登入" title="登入"><svg class="ico" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M4 20.5c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5" fill="currentColor"/></svg><span class="label">登入</span></a>
+  </nav>
+  <div class="alt-browse-panel" id="browse-panel" role="region" aria-label="瀏覽 SENSE">
+    <ul><li><a class="bp-item" href="module-product.html" aria-current="page"><svg class="bp-ic" data-anim="product" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="ic-bag"><path d="M20 30H60L57 64H23Z"/><path d="M31 30V24a9 9 0 0 1 18 0V30"/></g><g fill="currentColor" stroke="none"><circle class="ic-dot lt gc" style="--i:2;--c:#0073F5" cx="31" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#56BBB9" cx="35.5" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#A9C576" cx="40" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#FAB431" cx="44.5" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="49" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#0073F5" cx="31" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#56BBB9" cx="35.5" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="40" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#FAB431" cx="44.5" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#FF5B26" cx="49" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#0073F5" cx="31" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#56BBB9" cx="35.5" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#A9C576" cx="40" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#FAB431" cx="44.5" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#FF5B26" cx="49" cy="53" r="1.1"/></g></svg><span class="bp-txt"><b>商品 SENSE</b><em>讓商品進入現成的會員場景</em></span></a></li><li><a class="bp-item" href="module-marketing.html"><svg class="bp-ic" data-anim="marketing" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g fill="currentColor" stroke="none"><circle cx="16" cy="16" r="1.1"/><circle cx="24" cy="16" r="1.1"/><circle cx="32" cy="16" r="1.1"/><circle cx="40" cy="16" r="1.1"/><circle cx="48" cy="16" r="1.1"/><circle cx="56" cy="16" r="1.1"/><circle cx="64" cy="16" r="1.1"/><circle cx="16" cy="24" r="1.1"/><circle cx="24" cy="24" r="1.1"/><circle cx="32" cy="24" r="1.1"/><circle cx="64" cy="24" r="1.1"/><circle cx="16" cy="32" r="1.1"/><circle cx="24" cy="32" r="1.1"/><circle cx="32" cy="32" r="1.1"/><circle cx="64" cy="32" r="1.1"/><circle cx="16" cy="40" r="1.1"/><circle cx="24" cy="40" r="1.1"/><circle cx="32" cy="40" r="1.1"/><circle cx="64" cy="40" r="1.1"/><circle cx="16" cy="48" r="1.1"/><circle cx="24" cy="48" r="1.1"/><circle cx="32" cy="48" r="1.1"/><circle cx="40" cy="48" r="1.1"/><circle cx="48" cy="48" r="1.1"/><circle cx="56" cy="48" r="1.1"/><circle cx="64" cy="48" r="1.1"/><circle cx="16" cy="56" r="1.1"/><circle cx="24" cy="56" r="1.1"/><circle cx="32" cy="56" r="1.1"/><circle cx="40" cy="56" r="1.1"/><circle cx="48" cy="56" r="1.1"/><circle cx="56" cy="56" r="1.1"/><circle cx="64" cy="56" r="1.1"/><circle cx="16" cy="64" r="1.1"/><circle cx="24" cy="64" r="1.1"/><circle cx="32" cy="64" r="1.1"/><circle cx="40" cy="64" r="1.1"/><circle cx="48" cy="64" r="1.1"/><circle cx="56" cy="64" r="1.1"/><circle cx="64" cy="64" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="40" cy="24" r="2.2"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="48" cy="24" r="2.2"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="56" cy="24" r="2.2"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="40" cy="32" r="2.2"/><circle class="ic-dot lt gc ic-center" style="--i:0;--c:#0073F5" cx="48" cy="32" r="2.2"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="56" cy="32" r="2.2"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="40" cy="40" r="2.2"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="48" cy="40" r="2.2"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="56" cy="40" r="2.2"/></g><circle class="ic-ring" cx="48" cy="32" r="14"/></svg><span class="bp-txt"><b>行銷 SENSE</b><em>選受眾、選渠道，由夥伴具名觸及會員</em></span></a></li><li><a class="bp-item" href="module-strategy.html"><svg class="bp-ic" data-anim="strategy" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle class="ic-l" cx="31" cy="40" r="17"/><circle class="ic-r" cx="49" cy="40" r="17"/><g fill="currentColor" stroke="none"><circle class="ic-dot gc" style="--i:0;--c:#0073F5" cx="40" cy="38" r="1.25"/><circle class="ic-dot gc" style="--i:0;--c:#0073F5" cx="40" cy="42" r="1.25"/><circle class="ic-dot gc" style="--i:1;--c:#56BBB9" cx="36" cy="38" r="1.25"/><circle class="ic-dot gc" style="--i:1;--c:#56BBB9" cx="44" cy="38" r="1.25"/><circle class="ic-dot gc" style="--i:1;--c:#56BBB9" cx="36" cy="42" r="1.25"/><circle class="ic-dot gc" style="--i:1;--c:#56BBB9" cx="44" cy="42" r="1.25"/><circle class="ic-dot gc" style="--i:2;--c:#A9C576" cx="40" cy="34" r="1.25"/><circle class="ic-dot gc" style="--i:2;--c:#A9C576" cx="40" cy="46" r="1.25"/><circle class="ic-dot gc" style="--i:3;--c:#FAB431" cx="36" cy="34" r="1.25"/><circle class="ic-dot gc" style="--i:3;--c:#FAB431" cx="44" cy="34" r="1.25"/><circle class="ic-dot gc" style="--i:3;--c:#FAB431" cx="36" cy="46" r="1.25"/><circle class="ic-dot gc" style="--i:3;--c:#FAB431" cx="44" cy="46" r="1.25"/><circle class="ic-dot gc" style="--i:4;--c:#FF5B26" cx="40" cy="30" r="1.25"/><circle class="ic-dot gc" style="--i:4;--c:#FF5B26" cx="40" cy="50" r="1.25"/></g><circle class="ic-one lt" fill="currentColor" stroke="none" cx="40" cy="40" r="2.4"/></svg><span class="bp-txt"><b>策略 SENSE</b><em>讓會員資料變成可合作的資產</em></span></a></li></ul>
+  </div>
+</header>
+
+<main>
+<section class="mp-hero" aria-labelledby="mp-title">
+  <div class="mp-wrap">
+    <div>
+      <p class="mp-badge"><svg class="mp-ic" data-anim="product" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="ic-bag"><path d="M20 30H60L57 64H23Z"/><path d="M31 30V24a9 9 0 0 1 18 0V30"/></g><g fill="currentColor" stroke="none"><circle class="ic-dot lt gc" style="--i:2;--c:#0073F5" cx="31" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#56BBB9" cx="35.5" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#A9C576" cx="40" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#FAB431" cx="44.5" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="49" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#0073F5" cx="31" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#56BBB9" cx="35.5" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="40" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#FAB431" cx="44.5" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#FF5B26" cx="49" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#0073F5" cx="31" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#56BBB9" cx="35.5" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#A9C576" cx="40" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#FAB431" cx="44.5" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#FF5B26" cx="49" cy="53" r="1.1"/></g></svg>商品 SENSE</p>
+      <div class="mp-roleseg-wrap"><span class="mp-roleseg-lbl" id="mp-role-lbl">我是</span><div class="mp-roleseg" role="group" aria-labelledby="mp-role-lbl"><button type="button" data-set="seller" aria-pressed="true">商品方</button><button type="button" data-set="promoter" aria-pressed="false">行銷方</button></div></div>
+      <h1 class="mp-h1" id="mp-title"><span class="for-seller">好商品，<br>缺的是被看見的場景。</span><span class="for-promoter">你的會員，<br>值得更好的推薦。</span></h1>
+      <p class="mp-lead"><span class="for-seller">在商品 SENSE 上架商品，生態圈夥伴會把它帶進自家會員每天打開的電子報、APP 和簡訊。有人買，才付推廣費。</span><span class="for-promoter">在商品 SENSE 的商品市集挑選會員會喜歡的商品，用你自己的電子報、APP 和簡訊推廣。每成交一筆，就有推廣費。</span></p>
+      <div class="mp-cta">
+        <a class="alt-hbtn lg book" href="#book"><svg class="ico" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21.4 2.6a.6.6 0 0 0-.65-.13L2.9 9.6a.6.6 0 0 0-.03 1.1l7.2 3.2 3.2 7.2a.6.6 0 0 0 1.1-.03l7.13-17.85a.6.6 0 0 0-.1-.62Z" fill="currentColor"/></svg><span class="divider" aria-hidden="true"></span><span class="label">預約洽談</span></a>
+        <a class="alt-hbtn lg ghost" href="#how">看看怎麼運作</a>
+      </div>
+    </div>
+    <aside class="mp-sum mp-card" aria-labelledby="mp-sum-title">
+      <h2 class="sr-only" id="mp-sum-title">三個重點</h2>
+      <ol class="for-seller">
+        <li><strong>不用先付廣告費</strong><span>推廣費按成交計算，沒有成交就不用付。</span></li>
+        <li><strong>會員場景是現成的</strong><span>直接進入夥伴的電子報、APP 與簡訊。</span></li>
+        <li><strong>結算交給平台</strong><span>成交追蹤、金流與發票都由平台處理。</span></li>
+      </ol>
+      <ol class="for-promoter">
+        <li><strong>不用備貨、不用自己談</strong><span>商品市集直接挑，每件都標好成交一筆的推廣費。</span></li>
+        <li><strong>用你現有的渠道</strong><span>電子報、APP、簡訊，用你自己的名義推薦。</span></li>
+        <li><strong>成交就有推廣費</strong><span>平台追蹤成交，鑑賞期後入帳、可申請提領。</span></li>
+      </ol>
+    </aside>
+  </div>
+</section>
+
+<section class="mp-sec" id="who" aria-labelledby="who-title">
+  <div class="mp-wrap">
+    <div class="mp-head">
+      <p class="mp-eyebrow">Who it's for</p>
+      <h2 class="mp-h2" id="who-title">誰適合用商品 SENSE？</h2>
+    </div>
+    <div class="mp-panel for-seller">
+      <p class="mp-panel-sum">你有商品，想找到願意推薦它的會員場景。</p>
+      <div class="mp-grid3">
+        <article class="mp-item mp-card"><h3>有好商品，缺穩定曝光</h3><p>不用自己經營新渠道，直接進入夥伴每天打開的電子報、APP 與簡訊。</p></article>
+        <article class="mp-item mp-card"><h3>不想先砸廣告預算</h3><p>只有真正成交的訂單才付推廣費，每一筆都看得到成效。</p></article>
+        <article class="mp-item mp-card"><h3>想觸及其他品牌的會員</h3><p>讓商品出現在夥伴的會員面前，接觸原本觸及不到的客群。</p></article>
+      </div>
+    </div>
+    <div class="mp-panel for-promoter">
+      <p class="mp-panel-sum">你有會員和渠道，想找到值得推薦的商品。</p>
+      <div class="mp-grid3">
+        <article class="mp-item mp-card"><h3>手上有會員與渠道</h3><p>電子報、APP、簡訊已經在運作，缺的是值得推薦給會員的內容。</p></article>
+        <article class="mp-item mp-card"><h3>想把渠道變成收入</h3><p>每一筆從你渠道來的成交，都會計入你的推廣費。</p></article>
+        <article class="mp-item mp-card"><h3>不想自己談合作、對帳</h3><p>在商品市集挑商品、送出提案，成交追蹤與結算由平台處理。</p></article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="mp-sec mp-how" id="how" aria-labelledby="how-title">
+  <div class="mp-wrap">
+    <div class="mp-head">
+      <p class="mp-eyebrow">How it works</p>
+      <h2 class="mp-h2" id="how-title"><span class="for-seller">一件商品，怎麼被賣出去</span><span class="for-promoter">一筆推廣費，怎麼賺進來</span></h2>
+    </div>
+    <div class="st" data-step="1">
+      <div class="st-text">
+        <div class="st-bars" role="group" aria-label="選擇步驟"><button type="button" class="st-bar" data-i="0" aria-label="第 1 步"><span class="st-track"><span class="st-fill"></span></span><span class="st-lbl"><b>1</b><span class="for-seller">上架</span><span class="for-promoter">挑商品</span></span></button><button type="button" class="st-bar" data-i="1" aria-label="第 2 步"><span class="st-track"><span class="st-fill"></span></span><span class="st-lbl"><b>2</b><span class="for-seller">場景</span><span class="for-promoter">備渠道</span></span></button><button type="button" class="st-bar" data-i="2" aria-label="第 3 步"><span class="st-track"><span class="st-fill"></span></span><span class="st-lbl"><b>3</b><span class="for-seller">媒合</span><span class="for-promoter">送提案</span></span></button><button type="button" class="st-bar" data-i="3" aria-label="第 4 步"><span class="st-track"><span class="st-fill"></span></span><span class="st-lbl"><b>4</b><span class="for-seller">成交</span><span class="for-promoter">成交</span></span></button><button type="button" class="st-bar" data-i="4" aria-label="第 5 步"><span class="st-track"><span class="st-fill"></span></span><span class="st-lbl"><b>5</b><span class="for-seller">分帳</span><span class="for-promoter">領推廣費</span></span></button></div>
+        <div class="st-copy"><article class="st-panel for-seller" data-i="0"><h3>先把商品放上架</h3><p>寫好商品資訊和價格條件，再決定每成交一筆，願意付多少行銷推廣費給幫你賣的夥伴。</p></article><article class="st-panel for-promoter" data-i="0"><h3>先挑一件會員會想買的商品</h3><p>商品市集裡的每件商品，都標好了成交一筆你能拿到多少推廣費。挑你的會員會想買的。</p></article><article class="st-panel for-seller" data-i="1"><h3>會員已經在那裡了</h3><p>生態圈夥伴手上有現成的會員，以及他們每天會打開的電子報、APP 和簡訊。你不用從零經營。</p></article><article class="st-panel for-promoter" data-i="1"><h3>你的會員已經在那裡了</h3><p>你的會員每天都會打開你的電子報、APP 和簡訊，缺的是值得推薦給他們的東西。</p></article><article class="st-panel for-seller" data-i="2"><h3>一個提案，商品就上場</h3><p>行銷方挑中你的商品、送出合作提案。你按下確認，商品就出現在他們的會員面前。</p></article><article class="st-panel for-promoter" data-i="2"><h3>送出提案，商品就上場</h3><p>對想推的商品發起合作提案。商品方確認後，就能在你自己的渠道推廣它。</p></article><article class="st-panel for-seller" data-i="3"><h3>有人買，才算數</h3><p>沒有前期廣告預算，也不用猜哪個渠道有效。只有真正成交的訂單才付推廣費，由平台負責追蹤。</p></article><article class="st-panel for-promoter" data-i="3"><h3>有人買，就算你的</h3><p>從你渠道來的每一筆成交都記在你名下，由平台負責追蹤，不用自己對帳。</p></article><article class="st-panel for-seller" data-i="4"><h3>錢怎麼分，一目了然</h3><p>過了鑑賞期，推廣費付給行銷方，平台收商品處理費（含金流、發票），其餘就是你的實收。</p></article><article class="st-panel for-promoter" data-i="4"><h3>推廣費，一目了然</h3><p>過了鑑賞期，推廣費計入你的應收帳款，入帳滿一段時間就能申請提領。</p></article></div>
+        <div class="st-foot">
+          <div class="st-stats"><div><span>曝光</span><b id="st-exp">0</b></div><div><span>成交</span><b class="is-deal" id="st-deal">0</b></div><em>示意數字</em></div>
+          <button type="button" class="st-play" aria-label="暫停自動播放"><svg class="i-pause" viewBox="0 0 16 16"><path d="M5 3.5v9M11 3.5v9"/></svg><svg class="i-play" viewBox="0 0 16 16"><path d="M5 3.2v9.6L12.8 8Z"/></svg><svg class="i-replay" viewBox="0 0 16 16"><path d="M3.2 8a4.8 4.8 0 1 0 1.5-3.5M3.5 2.5v2.6h2.6"/></svg><span class="st-play-txt">暫停</span></button>
+        </div>
+      </div>
+      <div class="st-scene">
+        <button type="button" class="st-nav prev" aria-label="上一步"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5"/></svg></button>
+        <button type="button" class="st-nav next" aria-label="下一步"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5"/></svg></button>
+        <div class="st-flash" aria-hidden="true"><svg class="i-pause" viewBox="0 0 16 16"><path d="M5 3.5v9M11 3.5v9"/></svg><svg class="i-play" viewBox="0 0 16 16"><path d="M5 3.2v9.6L12.8 8Z"/></svg></div>
+        <div class="st-art" aria-hidden="true">
+        <div class="st-cloud"></div>
+        <svg class="st-links" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M24 64C36 52 44 30 54 22" vector-effect="non-scaling-stroke"/><path d="M24 64C42 62 58 60 72 58" vector-effect="non-scaling-stroke"/><path d="M24 64C34 70 42 74 50 76" vector-effect="non-scaling-stroke"/></svg>
+        <div class="st-ch st-edm"><div class="st-ch-head"><b>EDM</b><span>夥伴電子報</span></div><div class="st-screen"><i class="st-ln w60"></i><i class="st-ln w80"></i><i class="st-card"><em class="st-buy"></em></i></div></div>
+        <div class="st-ch st-app"><div class="st-ch-head"><b>APP</b><span>夥伴 APP 推播</span></div><div class="st-screen"><i class="st-ln w40"></i><i class="st-card"><em class="st-buy"></em></i><i class="st-ln w70"></i></div></div>
+        <div class="st-ch st-sms"><div class="st-ch-head"><b>SMS</b><span>夥伴會員簡訊</span></div><div class="st-screen"><i class="st-bubble"><em class="st-buy"></em></i><i class="st-ln w50"></i></div></div>
+        <div class="st-bag"><svg viewBox="0 0 100 110" aria-hidden="true"><path class="st-bag-handle" d="M34 34V24a16 16 0 0 1 32 0v10"/><path class="st-bag-body" d="M14 34h72l-5 70H19Z"/><path class="st-bag-side" d="M86 34l-5 70h-6l4-70Z"/><g class="st-bag-mark"><circle cx="50" cy="66" r="4"/><circle cx="50" cy="55" r="1.6"/><circle cx="50" cy="77" r="1.6"/><circle cx="39" cy="66" r="1.6"/><circle cx="61" cy="66" r="1.6"/></g></svg><div class="st-tag"><span>行銷推廣費（示意）</span><b>12%</b></div></div>
+        <div class="st-ok"><svg viewBox="0 0 16 16"><path d="m3.5 8.5 3 3 6-7"/></svg>合作提案已確認</div>
+        <div class="st-deal d1">成交 +1</div><div class="st-deal d2">成交 +1</div><div class="st-deal d3">成交 +1</div>
+        <div class="st-split">
+          <p>一筆 NT$ 1,200 的訂單（示意）</p>
+          <div class="st-cols"><span class="c1" style="--h:80%"><b>NT$ 960</b></span><span class="c2" style="--h:12%"><b>NT$ 144</b></span><span class="c3" style="--h:8%"><b>NT$ 96</b></span></div>
+          <ul><li>商品方實收</li><li>行銷推廣費</li><li>商品處理費</li></ul>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="mp-sec" id="split" aria-labelledby="split-title">
+  <div class="mp-wrap">
+    <div class="mp-head mp-head-row">
+      <div><p class="mp-eyebrow">Revenue split</p><h2 class="mp-h2" id="split-title">一筆訂單，拆成三疊</h2></div>
+    </div>
+    <div class="mp-split">
+      <div class="mp-ctrl-card mp-card">
+        <div class="mp-ctrl">
+          <div class="mp-ctrl-head"><label for="amt">訂單金額</label><output id="amt-out" for="amt">NT$ 1,200</output></div>
+          <input class="mp-range" id="amt" type="range" min="600" max="6000" step="100" value="1200">
+          <div class="mp-chips" data-for="amt"><button type="button" data-v="600">600</button><button type="button" data-v="1200">1,200</button><button type="button" data-v="3000">3,000</button><button type="button" data-v="6000">6,000</button></div>
+        </div>
+        <div class="mp-ctrl">
+          <div class="mp-ctrl-head"><label for="pct">行銷推廣費</label><output class="is-promo" id="pct-out" for="pct">12%</output></div>
+          <input class="mp-range is-promo" id="pct" type="range" min="5" max="40" step="1" value="12">
+          <div class="mp-chips" data-for="pct"><button type="button" data-v="5">5%</button><button type="button" data-v="10">10%</button><button type="button" data-v="15">15%</button><button type="button" data-v="20">20%</button></div>
+        </div>
+      </div>
+      <div class="mp-viz">
+        <div class="mp-stage" aria-hidden="true">
+          <b class="mp-col-amt c-net"></b><b class="mp-col-amt c-promo"></b><b class="mp-col-amt c-fee"></b>
+          <span class="mp-col-base c-net"></span><span class="mp-col-base c-promo"></span><span class="mp-col-base c-fee"></span>
+        </div>
+        <ul class="mp-col-names">
+          <li><strong>商品方實收 <em class="mp-you for-seller">你</em></strong><span id="p-net">80%</span></li>
+          <li><strong>行銷推廣費 <em class="mp-you for-promoter">你</em></strong><span id="p-promo">12%</span></li>
+          <li><strong>商品處理費</strong><span>8%</span></li>
+        </ul>
+        <p class="mp-viz-note">每一顆點是 <span id="dot-v">NT$ 20</span>。調整金額和推廣費，點會在三疊之間移動，<span class="for-seller">藍色那疊就是你最後拿到的錢。</span><span class="for-promoter">橘色那疊就是你拿到的推廣費。</span></p>
+      </div>
+    </div>
+    <div class="mp-eq" aria-live="polite">
+      <div><b id="e-amt">NT$ 1,200</b><span>訂單金額</span></div><i aria-hidden="true">−</i>
+      <div class="c-promo"><b id="e-promo">NT$ 144</b><span>行銷推廣費，給行銷方</span></div><i aria-hidden="true">−</i>
+      <div class="c-fee"><b id="e-fee">NT$ 96</b><span>商品處理費 8%，給平台</span></div><i aria-hidden="true">＝</i>
+      <div class="c-net"><b id="e-net">NT$ 960</b><span>商品方實收</span></div>
+    </div>
+    <p class="mp-note">※ 數字為示意，商品處理費以 8% 計算；實際比例以合作條件和平台設定為準。</p>
+  </div>
+</section>
+
+<section class="mp-sec mp-how" id="pricing" aria-labelledby="pricing-title">
+  <div class="mp-wrap">
+    <div class="mp-head">
+      <p class="mp-eyebrow">Pricing &amp; settlement</p>
+      <h2 class="mp-h2" id="pricing-title"><span class="for-seller">成交才付費，結算看得見</span><span class="for-promoter">成交就有推廣費，入帳看得見</span></h2>
+    </div>
+    <div class="mp-grid2 for-promoter">
+      <article class="mp-item mp-card"><h3>不用先墊任何費用</h3><p>挑商品、送提案都不用付費，成交才計推廣費。</p></article>
+      <article class="mp-item mp-card"><h3>平台追蹤每一筆成交</h3><p>從你渠道來的訂單由平台記錄，不用自己對帳。</p></article>
+      <article class="mp-item mp-card"><h3>鑑賞期過後才入帳</h3><p>退貨的訂單不計推廣費。</p></article>
+      <article class="mp-item mp-card"><h3>在「帳戶與結算」提領</h3><p>入帳滿一段時間就能申請提領，上傳發票後由平台撥款。</p></article>
+    </div>
+    <div class="mp-grid2 for-seller">
+      <article class="mp-item mp-card"><h3>沒有前期廣告費</h3><p>推廣費按成交計算，沒有成交就沒有推廣費。</p></article>
+      <article class="mp-item mp-card"><h3>平台追蹤每一筆成交</h3><p>從夥伴渠道來的訂單由平台記錄，雙方不用自己對帳。</p></article>
+      <article class="mp-item mp-card"><h3>鑑賞期過後才結算</h3><p>退貨的訂單不計推廣費。</p></article>
+      <article class="mp-item mp-card"><h3>金流與發票由平台處理</h3><p>商品處理費包含金流與發票服務，比例依平台設定。</p></article>
+    </div>
+    <ol class="mp-flow mp-card" aria-label="結算流程">
+      <li><strong>成交</strong><span>會員在夥伴渠道下單</span></li>
+      <li><strong>鑑賞期</strong><span>確認沒有退貨</span></li>
+      <li><strong>合作完成</strong><span>推廣費入帳</span></li>
+      <li><strong>可提領</strong><span>入帳滿一段時間後申請</span></li>
+      <li><strong>撥款</strong><span>收到發票後撥款</span></li>
+    </ol>
+    <p class="mp-note">※ 各階段天數依平台設定。</p>
+  </div>
+</section>
+
+<section class="mp-sec" id="faq" aria-labelledby="faq-title">
+  <div class="mp-wrap">
+    <div class="mp-head">
+      <p class="mp-eyebrow">FAQ</p>
+      <h2 class="mp-h2" id="faq-title"><span class="for-seller">上架前，大家常問</span><span class="for-promoter">推廣前，大家常問</span></h2>
+    </div>
+    <div class="mp-faq">
+      <details class="mp-card for-promoter"><summary>推廣商品要先付費嗎？</summary><p>不用。挑商品、送提案都不需要付費，成交才計推廣費。</p></details>
+      <details class="mp-card for-seller"><summary>上架要先付廣告費嗎？</summary><p>不用。行銷推廣費按成交計算，沒有成交就沒有推廣費。</p></details>
+      <details class="mp-card"><summary>退貨的訂單怎麼算？</summary><p>訂單要過了鑑賞期才進入結算，退貨的訂單不計推廣費。</p></details>
+      <details class="mp-card"><summary>推廣費多久可以領到？</summary><p>合作完成後入帳，入帳滿一段時間即可申請提領；上傳發票後由平台撥款。各階段天數依平台設定。</p></details>
+    </div>
+    <p class="mp-note">沒看到你的問題？在下方留下聯絡資訊，我們直接聊。</p>
+  </div>
+</section>
+
+<section class="alt-book" id="book" aria-labelledby="book-title">
+  <div class="book-rings" aria-hidden="true">
+    <svg class="book-defs" width="0" height="0"><defs>
+      <linearGradient id="book-grad" gradientUnits="userSpaceOnUse" x1="40" y1="0" x2="1360" y2="0">
+        <stop offset="0" stop-color="var(--ring-a)"/><stop offset=".5" stop-color="var(--ring-b)"/><stop offset="1" stop-color="var(--ring-c)"/>
+      </linearGradient>
+    </defs></svg>
+    <div class="book-ring"><svg viewBox="0 0 1400 320"><ellipse class="pale" cx="700" cy="160" rx="660" ry="128"/><ellipse class="vivid" cx="700" cy="160" rx="660" ry="128" stroke="url(#book-grad)"/></svg></div>
+    <div class="book-ring"><svg viewBox="0 0 1400 320"><ellipse class="pale" cx="700" cy="160" rx="660" ry="128"/><ellipse class="vivid" cx="700" cy="160" rx="660" ry="128" stroke="url(#book-grad)"/></svg></div>
+    <div class="book-ring"><svg viewBox="0 0 1400 320"><ellipse class="pale" cx="700" cy="160" rx="660" ry="128"/><ellipse class="vivid" cx="700" cy="160" rx="660" ry="128" stroke="url(#book-grad)"/></svg></div>
+  </div>
+  <div class="book-inner">
+    <h2 class="book-title" id="book-title"><span class="book-flow">讓合作，從一次對話開始</span></h2>
+  <form class="book-card" id="book-form" novalidate>
+    <p class="book-tab"><span class="book-flow">預約洽談</span></p>
+    <div class="book-head"><span>你的聯絡資訊</span></div>
+    <input type="hidden" name="bk-role" id="bk-role" value="商品方">
+    <div class="book-grid">
+      <label class="book-field"><span class="book-label">姓名<b aria-hidden="true">*</b></span><input id="bk-name" name="bk-name" type="text" placeholder="王小明" required autocomplete="name"></label>
+      <label class="book-field"><span class="book-label">公司名稱<b aria-hidden="true">*</b></span><input id="bk-company" name="bk-company" type="text" placeholder="公司全名" required autocomplete="organization"></label>
+      <label class="book-field"><span class="book-label">Email<b aria-hidden="true">*</b></span><input id="bk-email" name="bk-email" type="email" placeholder="name@company.com" required autocomplete="email"></label>
+      <label class="book-field"><span class="book-label">聯絡電話<b aria-hidden="true">*</b></span><input id="bk-phone" name="bk-phone" type="tel" placeholder="02-1234-5678" required autocomplete="tel"></label>
+      <label class="book-field"><span class="book-label">職稱</span><input id="bk-title" name="bk-title" type="text" placeholder="行銷經理" autocomplete="organization-title"></label>
+      <label class="book-field is-select"><span class="book-label">想了解的模組<b aria-hidden="true">*</b></span>
+        <select id="bk-module" name="bk-module" required><option selected>商品 SENSE</option><option>行銷 SENSE</option><option>策略 SENSE</option><option>其他／尚未確定</option></select>
+        <svg class="book-caret" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1h10L6 7Z"/></svg></label>
+      <label class="book-field is-wide"><span class="book-label">需求說明</span>
+        <textarea id="bk-note" name="bk-note" rows="3" placeholder="簡單描述你想合作的內容或目前遇到的問題"></textarea></label>
+    </div>
+    <div class="book-foot">
+      <label class="book-agree"><input type="checkbox" id="bk-agree" required><span>我已閱讀並同意 <a href="https://sensebiz.tw/privacy">隱私權政策</a></span></label>
+      <button class="alt-hbtn lg book book-submit" type="submit"><svg class="ico" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21.4 2.6a.6.6 0 0 0-.65-.13L2.9 9.6a.6.6 0 0 0-.03 1.1l7.2 3.2 3.2 7.2a.6.6 0 0 0 1.1-.03l7.13-17.85a.6.6 0 0 0-.1-.62Z" fill="currentColor"/></svg><span class="divider" aria-hidden="true"></span><span class="label">送出</span></button>
+    </div>
+    <p class="book-msg" role="status" aria-live="polite"></p>
+  </form>
+  </div>
+</section>
+
+<section class="mp-sec mp-others" aria-labelledby="others-title">
+  <div class="mp-wrap">
+    <div class="mp-head">
+      <p class="mp-eyebrow">More SENSE</p>
+      <h2 class="mp-h2" id="others-title">也看看其他 SENSE</h2>
+    </div>
+    <div class="mp-grid2">
+      <a class="mp-mod mp-card" href="module-marketing.html"><svg class="mp-ic" data-anim="marketing" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g fill="currentColor" stroke="none"><circle cx="16" cy="16" r="1.1"/><circle cx="24" cy="16" r="1.1"/><circle cx="32" cy="16" r="1.1"/><circle cx="40" cy="16" r="1.1"/><circle cx="48" cy="16" r="1.1"/><circle cx="56" cy="16" r="1.1"/><circle cx="64" cy="16" r="1.1"/><circle cx="16" cy="24" r="1.1"/><circle cx="24" cy="24" r="1.1"/><circle cx="32" cy="24" r="1.1"/><circle cx="64" cy="24" r="1.1"/><circle cx="16" cy="32" r="1.1"/><circle cx="24" cy="32" r="1.1"/><circle cx="32" cy="32" r="1.1"/><circle cx="64" cy="32" r="1.1"/><circle cx="16" cy="40" r="1.1"/><circle cx="24" cy="40" r="1.1"/><circle cx="32" cy="40" r="1.1"/><circle cx="64" cy="40" r="1.1"/><circle cx="16" cy="48" r="1.1"/><circle cx="24" cy="48" r="1.1"/><circle cx="32" cy="48" r="1.1"/><circle cx="40" cy="48" r="1.1"/><circle cx="48" cy="48" r="1.1"/><circle cx="56" cy="48" r="1.1"/><circle cx="64" cy="48" r="1.1"/><circle cx="16" cy="56" r="1.1"/><circle cx="24" cy="56" r="1.1"/><circle cx="32" cy="56" r="1.1"/><circle cx="40" cy="56" r="1.1"/><circle cx="48" cy="56" r="1.1"/><circle cx="56" cy="56" r="1.1"/><circle cx="64" cy="56" r="1.1"/><circle cx="16" cy="64" r="1.1"/><circle cx="24" cy="64" r="1.1"/><circle cx="32" cy="64" r="1.1"/><circle cx="40" cy="64" r="1.1"/><circle cx="48" cy="64" r="1.1"/><circle cx="56" cy="64" r="1.1"/><circle cx="64" cy="64" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="40" cy="24" r="2.2"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="48" cy="24" r="2.2"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="56" cy="24" r="2.2"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="40" cy="32" r="2.2"/><circle class="ic-dot lt gc ic-center" style="--i:0;--c:#0073F5" cx="48" cy="32" r="2.2"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="56" cy="32" r="2.2"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="40" cy="40" r="2.2"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="48" cy="40" r="2.2"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="56" cy="40" r="2.2"/></g><circle class="ic-ring" cx="48" cy="32" r="14"/></svg><div><h3>行銷 SENSE</h3><p>選受眾、選渠道，由夥伴具名觸及會員</p></div><svg class="mp-arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5.5 15.5 10 11 14.5"/></svg></a>
+      <a class="mp-mod mp-card" href="module-strategy.html"><svg class="mp-ic" data-anim="strategy" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle class="ic-l" cx="31" cy="40" r="17"/><circle class="ic-r" cx="49" cy="40" r="17"/><g fill="currentColor" stroke="none"><circle class="ic-dot gc" style="--i:0;--c:#0073F5" cx="40" cy="38" r="1.25"/><circle class="ic-dot gc" style="--i:0;--c:#0073F5" cx="40" cy="42" r="1.25"/><circle class="ic-dot gc" style="--i:1;--c:#56BBB9" cx="36" cy="38" r="1.25"/><circle class="ic-dot gc" style="--i:1;--c:#56BBB9" cx="44" cy="38" r="1.25"/><circle class="ic-dot gc" style="--i:1;--c:#56BBB9" cx="36" cy="42" r="1.25"/><circle class="ic-dot gc" style="--i:1;--c:#56BBB9" cx="44" cy="42" r="1.25"/><circle class="ic-dot gc" style="--i:2;--c:#A9C576" cx="40" cy="34" r="1.25"/><circle class="ic-dot gc" style="--i:2;--c:#A9C576" cx="40" cy="46" r="1.25"/><circle class="ic-dot gc" style="--i:3;--c:#FAB431" cx="36" cy="34" r="1.25"/><circle class="ic-dot gc" style="--i:3;--c:#FAB431" cx="44" cy="34" r="1.25"/><circle class="ic-dot gc" style="--i:3;--c:#FAB431" cx="36" cy="46" r="1.25"/><circle class="ic-dot gc" style="--i:3;--c:#FAB431" cx="44" cy="46" r="1.25"/><circle class="ic-dot gc" style="--i:4;--c:#FF5B26" cx="40" cy="30" r="1.25"/><circle class="ic-dot gc" style="--i:4;--c:#FF5B26" cx="40" cy="50" r="1.25"/></g><circle class="ic-one lt" fill="currentColor" stroke="none" cx="40" cy="40" r="2.4"/></svg><div><h3>策略 SENSE</h3><p>讓會員資料變成可合作的資產</p></div><svg class="mp-arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5.5 15.5 10 11 14.5"/></svg></a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="alt-foot">
+  <div class="foot-inner">
+    <div class="foot-brand-col">
+      <a class="alt-brand foot-brand" href="landing-alt.html" aria-label="SENSE 首頁"><svg class="alt-logo" viewBox="0 0 112 185" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10.81 44.57C10.33 42.93 7.2 34.58 21.84 24.05C24.37 22.23 28.72 20.58 32.22 19.28C47.74 12.65 54.39 9.6 74.57 .98C80.29-1.46 86.7.7 89.36 7.18C96.3 24.02 101.8 36.97 108.85 53.68L108.92 53.65C111.9 60 109.16 66.18 103.5 68.75C101.62 69.6 77.22 80.87 69.7 84.06C63.98 86.48 57.57 84.29 54.93 77.81H54.95C49.58 65.05 37.1 35.53 35.89 33.74C33.09 29.55 24.75 28.45 18.98 31.16C14.43 33.29 9.09 38.56 10.81 44.58Z" fill="url(#p0)"/><path d="M105.83 157.14C81.67 168.1 76.86 169.98 52.75 181.03C52.04 181.35 51.18 181.73 50.22 182.11C36.01 182.86 31.54 175.97 31.54 175.97L31.51 175.93C35.1 179.98 41.76 179.52 46.03 177.76C51.93 175.33 56.74 168.43 55.55 163.54C55.04 161.44 54.15 159.42 53.25 157.44L26.63 97.53L31.25 94.33C35.16 101.74 40.29 103.63 46.5 102.3C51.89 101.18 73.5 90.84 75.39 90.03C81.11 87.59 87.51 89.75 90.19 96.23L90.13 96.26C97.69 112.74 103.52 125.55 111.25 142.03C114.23 148.37 111.49 154.56 105.84 157.13Z" fill="url(#p1)"/><path d="M18.98 31.15C21.36 30.13 25.58 29.43 29.47 30.02C32.24 30.79 34.01 31.35 35.9 33.73C40.25 42.51 54.96 77.8 54.96 77.8C54.96 77.8 58.35 86.75 66.83 84.86L45.49 31.31C41.97 22.88 28.16 18.77 15.25 26.41C10.22 29.38 6.4 32.06 4.86 39.61C3.65 45.8 5.99 50.77 5.99 50.77C5.99 50.77 22.85 88.99 26.35 96.9C26.37 96.94 26.38 96.98 26.4 97.02C28.38 101.48 31.1 107.6 31.2 107.82L53.26 157.45C53.26 157.45 55.57 162.19 55.74 164.85C55.74 164.85 56.21 168.18 52.97 172.27C52.97 172.27 49.76 176.25 47.05 177.31C44.34 178.37 42.8 178.74 42.8 178.74C42.8 178.74 39.33 180.11 34.25 177.98C34.25 177.98 32.88 177.42 31.66 176.12C31.59 176.03 31.56 175.98 31.56 175.98L30.64 174.74L26.85 168C26.85 168 6.88 124.34 5.89 122.22C4.87 121.02 4.14 119.81 1.65 121C-.84 122.19.22 124.56.22 124.56L7.54 140.82L16.73 160.94L22.78 174.13C22.78 174.13 23.69 176.28 25.68 178.65C29.35 183.04 33.67 184.45 37.91 184.9C42.14 185.35 50.22 182.13 50.22 182.13L52.45 181.12C61.74 176.93 65.75 165.9 61.32 156.72L31.24 94.35L30.17 91.79C28.64 88.26 23.33 75.82 23.33 75.82L11.93 48.48C11.93 48.48 11.36 46.49 10.8 44.57C10.67 44.14 10.45 43.31 10.45 42.12V42.34C10.45 42.34 10.54 35.22 18.96 31.15Z" fill="url(#p2)"/><path d="M45.5 91.5C43.85 92.23 41.92 91.47 41.19 89.82L21.1 44.19C20.37 42.54 21.13 40.61 22.78 39.88C24.44 39.15 26.37 39.9 27.1 41.56L47.18 87.19C47.91 88.84 47.16 90.77 45.5 91.5Z" fill="url(#p3)"/><path d="M17.58 115.81C19.23 115.07 21.16 115.81 21.9 117.46L42.25 162.97C42.98 164.61 42.25 166.56 40.59 167.29C38.94 168.03 37.01 167.29 36.27 165.64L15.92 120.14C15.18 118.49 15.92 116.55 17.57 115.81Z" fill="url(#p4)"/><defs><linearGradient id="p0" x1="76.09" y1="82.74" x2="13.82" y2="-53.48" gradientUnits="userSpaceOnUse"><stop offset=".09" stop-color="#0073F5"/><stop offset=".18" stop-color="#1495E9"/><stop offset=".3" stop-color="#29B8DC"/><stop offset=".39" stop-color="#37CED4"/><stop offset=".45" stop-color="#3CD7D2"/></linearGradient><radialGradient id="p1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(51.61 88.5) scale(110.73)"><stop stop-color="#0073F5"/><stop offset=".08" stop-color="#0D83EB"/><stop offset=".19" stop-color="#1D96E1"/><stop offset=".25" stop-color="#2CB6D9"/><stop offset=".31" stop-color="#37CED3"/><stop offset=".34" stop-color="#3CD7D2"/><stop offset=".55" stop-color="#AAC874"/><stop offset=".71" stop-color="#FFBE2D"/><stop offset=".73" stop-color="#FFAF2B"/><stop offset=".88" stop-color="#FF6025"/><stop offset=".95" stop-color="#FF4123"/></radialGradient><linearGradient id="p2" x1="51.27" y1="33.58" x2="17.61" y2="169.09" gradientUnits="userSpaceOnUse"><stop offset=".12" stop-color="#0073F5"/><stop offset=".15" stop-color="#1677F6"/><stop offset=".22" stop-color="#4F84FA"/><stop offset=".28" stop-color="#8791FF"/><stop offset=".31" stop-color="#8B92F7"/><stop offset=".36" stop-color="#9797E2"/><stop offset=".42" stop-color="#AB9EBF"/><stop offset=".49" stop-color="#C6A88F"/><stop offset=".57" stop-color="#E9B553"/><stop offset=".62" stop-color="#FFBE2D"/><stop offset=".87" stop-color="#FFBE2D"/><stop offset="1" stop-color="#FF6E2D"/></linearGradient><linearGradient id="p3" x1="23.57" y1="41.88" x2="39.94" y2="78.73" gradientUnits="userSpaceOnUse"><stop stop-color="#0073F5"/><stop offset=".2" stop-color="#1677F6"/><stop offset=".63" stop-color="#4F84FA"/><stop offset="1" stop-color="#8791FF"/></linearGradient><radialGradient id="p4" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(25.57 96.03) scale(76.77)"><stop stop-color="#0073F5"/><stop offset=".08" stop-color="#0D83EB"/><stop offset=".19" stop-color="#1D96E1"/><stop offset=".27" stop-color="#2CB6D9"/><stop offset=".34" stop-color="#37CED3"/><stop offset=".38" stop-color="#3CD7D2"/><stop offset=".42" stop-color="#4FD4C1"/><stop offset=".51" stop-color="#83CD95"/><stop offset=".64" stop-color="#D4C350"/><stop offset=".71" stop-color="#FFBE2D"/><stop offset=".73" stop-color="#FFAF2B"/><stop offset=".88" stop-color="#FF6025"/><stop offset=".95" stop-color="#FF4123"/></radialGradient></defs></svg><span class="alt-brand-word"><svg viewBox="171.8 53.7 426.1 77.5" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M203.06 131.15C212.22 131.15 233.52 128.93 233.52 108.32C233.52 96.75 226.23 90.31 209.15 86.79L199.21 84.8C190.94 83.09 189.21 78.74 189.21 75.39C189.21 70.56 192.68 65.4 202.4 65.4C207.44 65.4 211.4 66.73 213.83 69.24C215.45 70.92 216.34 73.04 216.47 75.57H231.41C230.94 61.5 220.8 53.77 202.74 53.77C184.68 53.77 173.94 61.85 173.94 75.39C173.94 86.67 180.84 93.23 195.64 96.03L206.49 98.24C212.2 99.4 218.04 101.52 218.04 108.43C218.04 115.34 212.49 119.52 203.19 119.52C193.89 119.52 187.78 114.91 186.98 106.81H171.87C172.35 122.29 183.67 131.15 203.08 131.15H203.06Z"/><path d="M314.87 97.34V86.48H281.94V67.06H318.18V54.77H267.43V130.05H319.29V117.75H281.94V97.34H314.87Z"/><path d="M400.15 130.05H416.43V54.77H401.93V105.6H399.98L368.82 54.77H353.2V130.05H367.71V80.21H369.65L400.15 130.05Z"/><path d="M481.58 131.15C490.74 131.15 512.04 128.93 512.04 108.32C512.04 96.75 504.75 90.31 487.67 86.79L477.73 84.8C469.46 83.09 467.73 78.74 467.73 75.39C467.73 70.56 471.2 65.4 480.92 65.4C485.96 65.4 489.92 66.73 492.35 69.24C493.98 70.92 494.86 73.04 494.99 75.57H509.93C509.46 61.5 499.32 53.77 481.26 53.77C463.2 53.77 452.46 61.85 452.46 75.39C452.46 86.67 459.36 93.23 474.16 96.03L485 98.24C490.71 99.4 496.55 101.52 496.55 108.43C496.55 115.34 491 119.52 481.7 119.52C472.4 119.52 466.29 114.91 465.49 106.81H450.38C450.86 122.29 462.18 131.15 481.59 131.15H481.58Z"/><path d="M593.38 97.34V86.48H560.46V67.06H596.7V54.77H545.95V130.05H597.81V117.75H560.46V97.34H593.38Z"/></svg></span></a>
+      <nav class="foot-nav" aria-label="SENSE 模組">
+      <ul><li><a href="module-product.html">商品 SENSE</a></li><li><a href="module-marketing.html">行銷 SENSE</a></li><li><a href="module-strategy.html">策略 SENSE</a></li></ul>
+      </nav>
+      <ul class="foot-info">
+        <li class="foot-co">安錢感科技股份有限公司</li>
+        <li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 14s4.5-4.2 4.5-7.5a4.5 4.5 0 0 0-9 0C3.5 9.8 8 14 8 14Z"/><circle cx="8" cy="6.5" r="1.6"/></svg><span>105 台北市松山區民生東路三段135號3樓</span></li>
+        <li><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3.5" width="12" height="9" rx="1.5"/><path d="m2.5 4.5 5.5 4 5.5-4"/></svg><a href="mailto:service@sensebiz.tw">service@sensebiz.tw</a></li>
+      </ul>
+    </div>
+    <section class="foot-col" aria-labelledby="foot-group"><h2 class="foot-label" id="foot-group">股感集團</h2>
+      <ul class="foot-card"><li><a class="foot-row" href="https://www.stockfeel.com.tw/" target="_blank" rel="noopener"><span class="foot-ic"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></span><span>股感 StockFeel</span><span class="sr-only">（開新分頁）</span></a></li><li><a class="foot-row" href="https://www.housefeel.com.tw/" target="_blank" rel="noopener"><span class="foot-ic"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></span><span>房感 HouseFeel</span><span class="sr-only">（開新分頁）</span></a></li><li><a class="foot-row" href="https://www.cashfeel.com.tw/" target="_blank" rel="noopener"><span class="foot-ic"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></span><span>安錢感 CashFeel</span><span class="sr-only">（開新分頁）</span></a></li><li><a class="foot-row" href="https://www.insfeel.com.tw/" target="_blank" rel="noopener"><span class="foot-ic"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></span><span>保險感 INS.Feel</span><span class="sr-only">（開新分頁）</span></a></li><li><a class="foot-row" href="https://www.lemongrocery.com.tw/" target="_blank" rel="noopener"><span class="foot-ic"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></span><span>檸檬商城 Lemongrocery</span><span class="sr-only">（開新分頁）</span></a></li></ul></section>
+    <div class="foot-col">
+      <section aria-labelledby="foot-about"><h2 class="foot-label" id="foot-about">關於我們</h2>
+        <ul class="foot-card"><li><a class="foot-row" href="https://sensebiz.tw/policy"><span class="foot-ic"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5"/></svg></span><span>服務條款</span></a></li><li><a class="foot-row" href="https://sensebiz.tw/security"><span class="foot-ic"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5"/></svg></span><span>資訊安全政策</span></a></li><li><a class="foot-row" href="https://sensebiz.tw/privacy"><span class="foot-ic"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5"/></svg></span><span>隱私權政策</span></a></li><li><a class="foot-row" href="https://sensebiz.tw/return-policy"><span class="foot-ic"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5"/></svg></span><span>退貨政策</span></a></li></ul></section>
+      <section aria-labelledby="foot-biz"><h2 class="foot-label" id="foot-biz">商業服務</h2>
+        <ul class="foot-card"><li><a class="foot-row" href="mailto:cooperation@sensebiz.tw?subject=%E8%81%AF%E7%B5%A1SENSE%E6%A5%AD%E5%8B%99%E5%90%88%E4%BD%9C%E4%BF%A1%E7%AE%B1"><span class="foot-ic"><svg class="ic-mail" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="6" width="12" height="7.5" rx="1.5"/><path d="M2.6 6.4 8 10.4l5.4-4"/></svg></span><span>業務合作</span></a></li></ul></section>
+    </div>
+  </div>
+  <div class="foot-bottom"><p><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6"/><path d="M10 6.2a2.6 2.6 0 1 0 0 3.6"/></svg><span>CashFeel. All rights reserved.</span></p></div>
+</footer>
+
+<div class="mp-rolebar" role="region" aria-label="目前身份">
+  <p><span class="mp-rolebar-msg" title="目前觀看的身份"><svg class="mp-eye" viewBox="0 0 20 20" aria-hidden="true"><path d="M1.8 10S5 4.2 10 4.2 18.2 10 18.2 10 15 15.8 10 15.8 1.8 10 1.8 10Z"/><circle cx="10" cy="10" r="2.6"/></svg><span class="sr-only">目前觀看的身份</span></span></p>
+  <div class="mp-roleseg" role="group" aria-label="切換身份"><button type="button" data-set="seller" aria-pressed="true">商品方</button><button type="button" data-set="promoter" aria-pressed="false">行銷方</button></div>
+</div>
+
+<div class="alt-theme" role="group" aria-label="配色切換（比較用）">
+  <button type="button" data-set="light">淺色</button>
+  <button type="button" data-set="dark">深色</button>
+</div>
+
+<script>
+/* 深淺色切換（與首頁共用同一個設定） */
+(() => {
+  const btns = [...document.querySelectorAll('.alt-theme button')];
+  const set = t => { document.documentElement.dataset.theme = t; btns.forEach(b => b.setAttribute('aria-pressed', b.dataset.set === t)); try { localStorage.setItem('sense.altTheme', t); } catch (e) {} };
+  let t = 'light'; try { if (localStorage.getItem('sense.altTheme') === 'dark') t = 'dark'; } catch (e) {}
+  btns.forEach(b => b.addEventListener('click', () => set(b.dataset.set))); set(t);
+})();
+/* 身份切換：整頁內容、首屏切換鈕、浮動列同步；記住選擇並更新網址參數 ?role= */
+(() => {
+  const root = document.documentElement, main = document.querySelector('main'), bar = document.querySelector('.mp-rolebar');
+  const segs = [...document.querySelectorAll('.mp-roleseg button')], hidden = document.getElementById('bk-role');
+  const NAME = { seller: '商品方', promoter: '行銷方' };
+  let role = 'seller', flashT = 0;
+  try { const q = new URLSearchParams(location.search).get('role'), m = localStorage.getItem('sense.mpRole'); role = NAME[q] ? q : NAME[m] ? m : 'seller'; } catch (e) {}
+  const apply = (next, user) => {
+    role = next; root.dataset.role = next;
+    segs.forEach(b => b.setAttribute('aria-pressed', b.dataset.set === next));
+    if (hidden) hidden.value = NAME[next];
+    try { localStorage.setItem('sense.mpRole', next); const u = new URL(location.href); u.searchParams.set('role', next); history.replaceState(null, '', u); } catch (e) {}
+    if (!user) return;
+    main.classList.remove('is-swapping'); void main.offsetWidth; main.classList.add('is-swapping');
+  };
+  segs.forEach(b => b.addEventListener('click', () => { if (b.dataset.set !== role) apply(b.dataset.set, true); }));   // 首屏與浮動列的切換鈕共用
+  apply(role, false);
+  // 浮動列：首屏切換鈕看得到時、或留資／footer 進到畫面時收起
+  const seen = new Map(), watch = [document.querySelector('.mp-roleseg-wrap'), document.getElementById('book'), document.querySelector('.alt-foot')];
+  const io = new IntersectionObserver(es => { es.forEach(e => seen.set(e.target, e.isIntersecting)); bar.classList.toggle('is-hidden', watch.some(el => seen.get(el))); });
+  watch.forEach(el => el && io.observe(el));
+  bar.classList.add('is-hidden');
+})();
+/* 怎麼運作：限時動態式自動播放（每步 6 秒） */
+(() => {
+  const st = document.querySelector('.st'); if (!st) return;
+  const DUR = 6000, bars = [...st.querySelectorAll('.st-bar')], panels = [...st.querySelectorAll('.st-panel')];
+  const play = st.querySelector('.st-play'), label = play.querySelector('span');
+  const EXP = [0, 0, 12400, 12400, 12400], DEAL = [0, 0, 0, 86, 86];   // 示意數字
+  const expEl = document.getElementById('st-exp'), dealEl = document.getElementById('st-deal');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let i = 0, t = 0, last = 0, started = false, paused = reduce, visible = false, ended = false;
+  const shown = { exp: 0, deal: 0 };
+  const count = (el, key, to) => {   // 數字往上數
+    const from = shown[key]; shown[key] = to; if (reduce || from === to) { el.textContent = to.toLocaleString('en-US'); return; }
+    const t0 = performance.now(); const tick = now => { const k = Math.min(1, (now - t0) / 1200), e = 1 - Math.pow(1 - k, 3);
+      el.textContent = Math.round(from + (to - from) * e).toLocaleString('en-US'); if (k < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick);
+  };
+  const go = n => {
+    i = n; t = 0; st.dataset.step = n + 1;
+    bars.forEach((b, k) => { b.style.setProperty('--f', k < n ? 1 : 0); b.toggleAttribute('aria-current', k === n); if (k === n) b.setAttribute('aria-current', 'step'); });
+    panels.forEach(p => p.classList.toggle('is-on', +p.dataset.i === n));   // 兩種身份各一組，依 data-i 對應
+    const pv = st.querySelector('.st-nav.prev'); if (pv) pv.disabled = n === 0;
+    count(expEl, 'exp', EXP[n]); count(dealEl, 'deal', DEAL[n]);
+    if (reduce) bars[n].style.setProperty('--f', 1);
+  };
+  const sync = () => { st.classList.toggle('is-paused', paused); st.classList.toggle('is-ended', ended);
+    label.textContent = ended ? '重播' : paused ? '播放' : '暫停'; play.setAttribute('aria-label', ended ? '重新播放' : paused ? '繼續自動播放' : '暫停自動播放'); play.title = play.getAttribute('aria-label'); };
+  const loop = now => {
+    const dt = Math.min(100, now - last); last = now;
+    if (started && !paused && visible && !ended && document.visibilityState === 'visible') {
+      t += dt; bars[i].style.setProperty('--f', Math.min(1, t / DUR));
+      if (t >= DUR) { if (i < bars.length - 1) go(i + 1); else { ended = true; sync(); } }
+    }
+    requestAnimationFrame(loop);
+  };
+  bars.forEach((b, k) => b.addEventListener('click', () => { ended = false; go(k); sync(); }));
+  const prev = st.querySelector('.st-nav.prev'), next = st.querySelector('.st-nav.next'), flash = st.querySelector('.st-flash');
+  const step = d => { const n = i + d; if (n < 0) return; ended = false; go(n > bars.length - 1 ? 0 : n); sync(); };   // 第 5 步按下一步＝重播
+  prev.addEventListener('click', () => step(-1)); next.addEventListener('click', () => step(1));
+  const toggle = () => {
+    if (ended) { ended = false; paused = false; go(0); } else paused = !paused;
+    sync(); flash.className = 'st-flash ' + (paused ? 'is-pause' : 'is-play'); void flash.offsetWidth; flash.classList.add('is-show');
+  };
+  play.addEventListener('click', toggle);
+  st.addEventListener('click', e => {
+    if (e.target.closest('button, a, input, select, textarea')) return;   // 箭頭、進度條、按鈕自己處理
+    if (String(getSelection()).trim()) return;                             // 正在選取文字時不切換
+    toggle();
+  });
+  st.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); } else if (e.key === 'ArrowRight') { e.preventDefault(); step(1); } });
+  new IntersectionObserver(([e]) => { visible = e.intersectionRatio >= .5; if (visible && !started) { started = true; go(0); } },
+    { threshold: [0, .5, 1] }).observe(st);
+  go(0); sync(); requestAnimationFrame(now => { last = now; requestAnimationFrame(loop); });
+})();
+/* 一筆訂單拆成三疊：每顆點固定金額，三疊各一欄、每列 7 顆由下往上疊。
+   點的編號：商品方 0…n、推廣費「倒著」編（最靠近商品方的那顆在推廣費那疊最上面），所以只改推廣費時，
+   只有交界的點換疊、從商品方那疊頂端飛到推廣費那疊頂端，其他點都不動。 */
+(() => {
+  const FEE = 8, $ = id => document.getElementById(id); let PER = 7;
+  const fitDots = (n, colW, avail) => { for (let p = 30; p > 3; p -= .25) { const per = Math.max(1, Math.floor(colW / p)); if (Math.ceil(n / per) * p <= avail) return [p, per]; } return [3, Math.max(1, Math.floor(colW / 3))]; };   // 點變多就縮小：找出放得進固定高度的最大點距
+
+  const stage = document.querySelector('.mp-stage'), amtR = $('amt'), pctR = $('pct');
+  const amts = [...stage.querySelectorAll('.mp-col-amt')], bases = [...stage.querySelectorAll('.mp-col-base')];
+  const names = document.querySelector('.mp-col-names'), pool = [];
+  const nt = v => 'NT$ ' + Math.round(v).toLocaleString('en-US');
+  const fill = r => r.style.setProperty('--p', ((r.value - r.min) / (r.max - r.min) * 100) + '%');
+  function render() {
+    const amt = +amtR.value, pct = +pctR.value, dv = 20;   // 每顆點固定 NT$20
+    const promo = amt * pct / 100, fee = amt * FEE / 100, net = amt - promo - fee;
+    const total = Math.round(amt / dv), nFee = Math.round(fee / dv), nPromo = Math.round(promo / dv), nNet = total - nFee - nPromo, n = [nNet, nPromo, nFee];
+    // 版面：三欄等寬，點距依欄寬計算（手機會自動縮小）
+    const W = stage.clientWidth, gap = Math.max(14, W * .035), colW = (W - 2 * gap) / 3, H = stage.clientHeight;
+    const [pitch, per] = fitDots(Math.max(...n), colW, H - 56), d = pitch * .74; PER = per;
+    const rows = n.map(c => Math.ceil(c / PER));
+    stage.style.setProperty('--h', H + 'px'); stage.style.setProperty('--pitch', pitch + 'px'); stage.style.setProperty('--d', d + 'px');
+    names.style.setProperty('--gap', gap + 'px');
+    while (pool.length < total) { const i = document.createElement('i'); i.className = 'is-out'; stage.prepend(i); pool.push(i); }
+    const pos = (col, k) => [col * (colW + gap) + (k % PER) * pitch + (pitch - d) / 2, H - (Math.floor(k / PER) + 1) * pitch + (pitch - d) / 2];
+    pool.forEach((el, i) => {
+      if (i >= total) { el.classList.add('is-out'); return; }
+      const col = i < nNet ? 0 : i < nNet + nPromo ? 1 : 2;
+      const k = col === 0 ? i : col === 1 ? nNet + nPromo - 1 - i : i - nNet - nPromo;
+      const [x, y] = pos(col, k);
+      el.style.transform = `translate(${x}px, ${y}px)`;
+      el.classList.toggle('is-promo', col === 1); el.classList.toggle('is-fee', col === 2);
+      el.classList.remove('is-out');
+    });
+    [net, promo, fee].forEach((v, c) => {
+      amts[c].textContent = nt(v); amts[c].style.width = colW + 'px';
+      amts[c].style.transform = `translate(${c * (colW + gap)}px, ${H - rows[c] * pitch - 48}px)`;
+      bases[c].style.left = c * (colW + gap) + 'px'; bases[c].style.width = colW + 'px';
+    });
+    $('dot-v').textContent = nt(dv); $('amt-out').textContent = nt(amt); $('pct-out').textContent = pct + '%';
+    $('p-net').textContent = (100 - pct - FEE) + '%'; $('p-promo').textContent = pct + '%';
+    $('e-amt').textContent = nt(amt); $('e-promo').textContent = nt(promo); $('e-fee').textContent = nt(fee); $('e-net').textContent = nt(net);
+    document.querySelectorAll('.mp-chips').forEach(g => { const r = $(g.dataset.for); g.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.v === +r.value)); });
+    fill(amtR); fill(pctR);
+  }
+  [amtR, pctR].forEach(r => r.addEventListener('input', render));
+  document.querySelectorAll('.mp-chips').forEach(g => g.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; $(g.dataset.for).value = b.dataset.v; render(); }));
+  stage.classList.add('no-anim'); render();
+  requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.remove('no-anim')));
+  new ResizeObserver(() => { stage.classList.add('no-anim'); render(); requestAnimationFrame(() => stage.classList.remove('no-anim')); }).observe(stage);
+})();
+</script>
+<script>
+/* 留資光環：區塊離開畫面時暫停動畫 */
+(() => {
+  const sec = document.querySelector('.alt-book'); if (!sec || !('IntersectionObserver' in window)) return;
+  new IntersectionObserver(([e]) => sec.classList.toggle('is-paused', !e.isIntersecting)).observe(sec);
+})();
+</script>
+<script>
+/* 留資表單（原型）：檢查必填，不會真的送出 */
+(() => {
+  const form = document.getElementById('book-form'); if (!form) return;
+  const msg = form.querySelector('.book-msg');
+  const mark = el => (el.type === 'checkbox' ? el.closest('.book-agree') : el.closest('.book-field')).classList.toggle('has-error', !el.checkValidity());
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const req = [...form.querySelectorAll('[required]')]; req.forEach(mark);
+    const bad = req.filter(el => !el.checkValidity());
+    msg.classList.toggle('is-error', bad.length > 0);
+    if (bad.length) { msg.textContent = '請完成標示 * 的欄位，並勾選同意隱私權政策。'; bad[0].focus(); return; }
+    msg.textContent = '已收到你的資料，SENSE 團隊會盡快與你聯繫。（原型示意，資料不會送出）';
+    form.reset();
+  });
+  form.addEventListener('input', e => { if (e.target.matches('[required]')) mark(e.target); });
+  form.addEventListener('change', e => { if (e.target.matches('[required]')) mark(e.target); });
+})();
+</script>
+<script>
+/* 瀏覽 SENSE：開關展開區塊；點外面、按 Esc、選了項目就收起 */
+(() => {
+  const btn = document.querySelector('.alt-browse'), panel = document.getElementById('browse-panel'); if (!btn || !panel) return;
+  const set = open => { btn.setAttribute('aria-expanded', open); panel.classList.toggle('is-open', open); };
+  btn.addEventListener('click', e => { e.stopPropagation(); set(btn.getAttribute('aria-expanded') !== 'true'); });
+  document.addEventListener('click', e => { if (!panel.contains(e.target)) set(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && btn.getAttribute('aria-expanded') === 'true') { set(false); btn.focus(); } });
+  panel.addEventListener('click', e => { if (e.target.closest('a')) set(false); });
+})();
+</script>
+</body>
+</html>
