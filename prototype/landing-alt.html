@@ -356,6 +356,7 @@ a.bp-item:focus-visible { outline: 2px solid var(--cta-orange); outline-offset: 
 .mod.is-open .mod-soon { display: inline-flex; }
 .mod-more { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .45s ease, opacity .3s ease; }
 .mod.is-open .mod-more { grid-template-rows: 1fr; opacity: 1; transition-delay: .12s; }
+.mod.is-link { cursor: pointer; }   /* 已上線的三張卡片整張可點，連到模組說明頁（2026-11-16） */
 .mod-detail { min-height: 0; overflow: hidden; margin: 0; font-size: 16px; line-height: 24px; font-weight: 300; letter-spacing: var(--tracking-wider); opacity: .8; }
 .mod-detail::before { content: ''; display: block; width: 24px; height: 1px; margin: 10px 0 12px; background: currentColor; opacity: .5; }
 [data-theme="light"] .alt-mods { --mod-bg: #F0F1F4; --mod-fg: var(--alt-ink); --mod-ic: #555555; --mod-ic-lt: #ABB0BA; --mod-open-bg: #142A63; --mod-open-fg: var(--white); --mod-open-lt: rgba(255,255,255,.45); }
@@ -690,7 +691,7 @@ section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿�
 <section class="alt-mods" aria-label="SENSE 服務模組">
   <div class="mods-inner">
     <div class="mods-row" data-elastic>
-      <article class="mod" tabindex="0" aria-expanded="false">
+      <article class="mod is-link" tabindex="0" aria-expanded="false" data-href="module-product.html">
         <svg class="mod-ic" data-anim="product" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="ic-bag"><path d="M20 30H60L57 64H23Z"/><path d="M31 30V24a9 9 0 0 1 18 0V30"/></g><g fill="currentColor" stroke="none"><circle class="ic-dot lt gc" style="--i:2;--c:#0073F5" cx="31" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#56BBB9" cx="35.5" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#A9C576" cx="40" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#FAB431" cx="44.5" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="49" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#0073F5" cx="31" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#56BBB9" cx="35.5" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="40" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#FAB431" cx="44.5" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#FF5B26" cx="49" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#0073F5" cx="31" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#56BBB9" cx="35.5" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#A9C576" cx="40" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#FAB431" cx="44.5" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#FF5B26" cx="49" cy="53" r="1.1"/></g></svg>
         <div class="mod-text">
           <h3 class="mod-name">商品 SENSE</h3>
@@ -698,7 +699,7 @@ section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿�
           <div class="mod-more"><p class="mod-detail">上架自有商品或服務、瀏覽生態圈合作品項</p></div>
         </div>
       </article>
-      <article class="mod" tabindex="0" aria-expanded="false">
+      <article class="mod is-link" tabindex="0" aria-expanded="false" data-href="module-marketing.html">
         <svg class="mod-ic" data-anim="marketing" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g fill="currentColor" stroke="none"><circle cx="16" cy="16" r="1.1"/><circle cx="24" cy="16" r="1.1"/><circle cx="32" cy="16" r="1.1"/><circle cx="40" cy="16" r="1.1"/><circle cx="48" cy="16" r="1.1"/><circle cx="56" cy="16" r="1.1"/><circle cx="64" cy="16" r="1.1"/><circle cx="16" cy="24" r="1.1"/><circle cx="24" cy="24" r="1.1"/><circle cx="32" cy="24" r="1.1"/><circle cx="64" cy="24" r="1.1"/><circle cx="16" cy="32" r="1.1"/><circle cx="24" cy="32" r="1.1"/><circle cx="32" cy="32" r="1.1"/><circle cx="64" cy="32" r="1.1"/><circle cx="16" cy="40" r="1.1"/><circle cx="24" cy="40" r="1.1"/><circle cx="32" cy="40" r="1.1"/><circle cx="64" cy="40" r="1.1"/><circle cx="16" cy="48" r="1.1"/><circle cx="24" cy="48" r="1.1"/><circle cx="32" cy="48" r="1.1"/><circle cx="40" cy="48" r="1.1"/><circle cx="48" cy="48" r="1.1"/><circle cx="56" cy="48" r="1.1"/><circle cx="64" cy="48" r="1.1"/><circle cx="16" cy="56" r="1.1"/><circle cx="24" cy="56" r="1.1"/><circle cx="32" cy="56" r="1.1"/><circle cx="40" cy="56" r="1.1"/><circle cx="48" cy="56" r="1.1"/><circle cx="56" cy="56" r="1.1"/><circle cx="64" cy="56" r="1.1"/><circle cx="16" cy="64" r="1.1"/><circle cx="24" cy="64" r="1.1"/><circle cx="32" cy="64" r="1.1"/><circle cx="40" cy="64" r="1.1"/><circle cx="48" cy="64" r="1.1"/><circle cx="56" cy="64" r="1.1"/><circle cx="64" cy="64" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="40" cy="24" r="2.2"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="48" cy="24" r="2.2"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="56" cy="24" r="2.2"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="40" cy="32" r="2.2"/><circle class="ic-dot lt gc ic-center" style="--i:0;--c:#0073F5" cx="48" cy="32" r="2.2"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="56" cy="32" r="2.2"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="40" cy="40" r="2.2"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="48" cy="40" r="2.2"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="56" cy="40" r="2.2"/></g><circle class="ic-ring" cx="48" cy="32" r="14"/></svg>
         <div class="mod-text">
           <h3 class="mod-name">行銷 SENSE</h3>
@@ -706,7 +707,7 @@ section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿�
           <div class="mod-more"><p class="mod-detail">上架和瀏覽受眾包，透過 EDM、APP、SMS 渠道觸及最多潛在用戶</p></div>
         </div>
       </article>
-      <article class="mod" tabindex="0" aria-expanded="false">
+      <article class="mod is-link" tabindex="0" aria-expanded="false" data-href="module-strategy.html">
         <svg class="mod-ic" data-anim="strategy" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle class="ic-l" cx="31" cy="40" r="17"/><circle class="ic-r" cx="49" cy="40" r="17"/><g fill="currentColor" stroke="none"><circle class="ic-dot gc" style="--i:0;--c:#0073F5" cx="40" cy="38" r="1.25"/><circle class="ic-dot gc" style="--i:0;--c:#0073F5" cx="40" cy="42" r="1.25"/><circle class="ic-dot gc" style="--i:1;--c:#56BBB9" cx="36" cy="38" r="1.25"/><circle class="ic-dot gc" style="--i:1;--c:#56BBB9" cx="44" cy="38" r="1.25"/><circle class="ic-dot gc" style="--i:1;--c:#56BBB9" cx="36" cy="42" r="1.25"/><circle class="ic-dot gc" style="--i:1;--c:#56BBB9" cx="44" cy="42" r="1.25"/><circle class="ic-dot gc" style="--i:2;--c:#A9C576" cx="40" cy="34" r="1.25"/><circle class="ic-dot gc" style="--i:2;--c:#A9C576" cx="40" cy="46" r="1.25"/><circle class="ic-dot gc" style="--i:3;--c:#FAB431" cx="36" cy="34" r="1.25"/><circle class="ic-dot gc" style="--i:3;--c:#FAB431" cx="44" cy="34" r="1.25"/><circle class="ic-dot gc" style="--i:3;--c:#FAB431" cx="36" cy="46" r="1.25"/><circle class="ic-dot gc" style="--i:3;--c:#FAB431" cx="44" cy="46" r="1.25"/><circle class="ic-dot gc" style="--i:4;--c:#FF5B26" cx="40" cy="30" r="1.25"/><circle class="ic-dot gc" style="--i:4;--c:#FF5B26" cx="40" cy="50" r="1.25"/></g><circle class="ic-one lt" fill="currentColor" stroke="none" cx="40" cy="40" r="2.4"/></svg>
         <div class="mod-text">
           <h3 class="mod-name">策略 SENSE</h3>
@@ -1369,8 +1370,9 @@ section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿�
     mods.forEach(m => {
       m.addEventListener('mouseenter', () => { if (wide.matches) open(m); });
       m.addEventListener('focus', () => open(m));
-      m.addEventListener('click', () => { if (!wide.matches && m.classList.contains('is-open')) { m.classList.remove('is-open'); m.setAttribute('aria-expanded', false); } else open(m); });
-      m.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(m); } });
+      m.addEventListener('click', () => { if (m.dataset.href && (wide.matches || m.classList.contains('is-open'))) { location.href = m.dataset.href; return; }   // 已上線的三張：桌機直接點、手機先展開再點一次進入模組頁
+        if (!wide.matches && m.classList.contains('is-open')) { m.classList.remove('is-open'); m.setAttribute('aria-expanded', false); } else open(m); });
+      m.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (m.dataset.href && e.key === 'Enter') location.href = m.dataset.href; else open(m); } });
     });
   });
 })();

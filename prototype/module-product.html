@@ -649,7 +649,12 @@ main.is-swapping { animation: mp-swap .35s ease; }
 @media (prefers-reduced-motion: reduce) { main.is-swapping { animation: none; } .mp-rolebar { transition: none; } }
 
 /* 7. 其他模組 */
-.mp-others { padding-bottom: calc(40px + 64px); }   /* 移到頁面最底部（留資下方、footer 上方）：底部多留 footer 往上疊的 64px */
+.mp-others { position: relative; padding-bottom: calc(40px + 64px); }
+.mp-others::before {   /* 網點背景延續留資區塊：底部中央的藍色網點往下漸淡成灰網點，footer 以圓角疊在上面 */
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(70% 70% at 50% 0%, var(--book-dot-c), transparent 75%), var(--alt-grain);
+  -webkit-mask: radial-gradient(circle, #000 .7px, transparent 1px) 0 0 / 4px 4px; mask: radial-gradient(circle, #000 .7px, transparent 1px) 0 0 / 4px 4px; }
+.mp-others .mp-wrap { position: relative; }   /* 移到頁面最底部（留資下方、footer 上方）：底部多留 footer 往上疊的 64px */
 .alt-book { padding-bottom: 120px; }   /* footer 不再疊在留資上 */
 .mp-mod { display: flex; align-items: center; gap: 24px; padding: 28px 32px; text-decoration: none; transition: transform .25s; }
 .mp-mod:hover { transform: translateY(-3px); }
@@ -661,7 +666,7 @@ main.is-swapping { animation: mp-swap .35s ease; }
 .mp-mod:focus-visible { outline: 2px solid var(--cta-orange); outline-offset: 3px; }
 
 /* 留資區塊的網點從純白段落接過來：上緣 160px 漸層淡入，避免一條硬邊（首頁上方本來就有網點，不需要） */
-.alt-book::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(var(--alt-page), transparent 160px, transparent calc(100% - 160px), var(--alt-page)); }   /* 網點上下緣都淡入／淡出，和前後的白色段落接起來 */
+.alt-book::after { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 160px; pointer-events: none; background: linear-gradient(var(--alt-page), transparent); }   /* 網點只在上緣淡入；下緣直接延續到「其他 SENSE」 */
 @media (max-width: 1079px) {
   .mp-hero .mp-wrap { grid-template-columns: minmax(0, 1fr); gap: 48px; }
   .mp-sum { max-width: 560px; }
