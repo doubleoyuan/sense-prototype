@@ -242,12 +242,12 @@
         <button class="sb-collapse" data-collapse aria-label="收合側欄" title="收合側欄" aria-controls="sidebar" aria-expanded="true">
           ${sbChevron('left')}
         </button>
-        <button class="sb-cta" data-todo="找商務合作">
+        <a class="sb-cta" href="partners.html"${mod === 'partners' ? ' aria-current="page"' : ''}>
           <img class="cta-bg" src="${A('cta-white-bg.svg')}" alt="">
           <img class="cta-line" src="${A('cta-white-line.svg')}" alt="">
           <span class="cta-icon"><span><img src="${A('ic-ionic.svg')}" alt=""></span></span>
           <span class="cta-text">找商務合作</span>
-        </button>`;
+        </a>`;
 
     MODULES.forEach(m => {
       const hasSubs = subsOn(m) && m.subs.length;
@@ -310,6 +310,8 @@
       list.push({ label:app.dataset.crumb || (l ? l.label : app.dataset.page) });
       return list;
     }
+    // 找商務合作（側欄 CTA，2026-11-17）：SENSE / 找商務合作
+    if (app.dataset.module === 'partners'){ list.push({ label:'找商務合作' }); return list; }
     if (!m) return list;
     list.push({ label:m.label, href:m.href, todo:m.label });
     const page = app.dataset.page;

@@ -58,7 +58,7 @@ img{display:block}
 .sb-card > .sb-cta,.sb-card > .sb-sec{margin-top:10px}
 
 /* 找商務合作 */
-.sb-cta{position:relative;display:flex;align-items:center;gap:40px;padding:10px 20px;border:2px solid var(--cta-orange);border-radius:40px;
+.sb-cta{position:relative;text-decoration:none;display:flex;align-items:center;gap:40px;padding:10px 20px;border:2px solid var(--cta-orange);border-radius:40px;
   background:var(--cta-orange);filter:drop-shadow(0 2px 0 var(--black-200));transition:filter .15s}
 .sb-cta:hover{filter:drop-shadow(0 2px 0 var(--black-200)) brightness(1.05)}
 .sb-cta .cta-bg{position:absolute;left:0;top:0;width:90px;height:44px}

@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>找商務合作</title>
+<link rel="icon" type="image/svg+xml" href="shared/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="shared/tokens.css?v=20261110a">
+<link rel="stylesheet" href="shared/components.css?v=20261117j">
+<link rel="stylesheet" href="shared/forms.css?v=20261109a">
+<style>
+  /* ── 找商務合作：頁內元件（草稿，需求確認後再決定是否抽到 shared/），class 以 bp- 開頭 ──
+     版面三段：① 生態系合作機會（總量數字）② 探索 SENSE 機會（AI 推薦，中間區塊）③ 瀏覽生態系夥伴（名錄） */
+
+  /* ① 生態系總量：區塊標題＋說明，下方一列四個圓環數字（2026-11-17 使用者提供參考圖；不用票券樣式）。
+     每個數字一種圓環：商品＝放射刻度、行銷＝錶盤刻度、策略＝液面波浪、實名夥伴＝品牌漸層環＋認證勾勾。
+     顏色取模組色與 --accent-ring；圓環為裝飾，不代表比例。窄螢幕 2×2 */
+  /* 大螢幕（視窗 ≥1560px，內容區達最大寬度）圓環放大 96 → 120、數字 ×1.5，減少四欄之間的空曠感（2026-11-17 使用者選定方案 A） */
+  @media (min-width:1560px){
+    .bp-stats .bp-ring{width:120px;height:120px}
+    .bp-stats .bp-ring b{font-size:36px;line-height:48px}
+  }
+  /* 2026-11-17 使用者要求：拿掉區塊說明與外框線 */
+  .bp-stats{width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;padding:20px 0}
+  .bp-stat{display:flex;flex-direction:column;align-items:center;gap:10px;white-space:nowrap}
+  /* 可點的欄位（商品／行銷／策略機會）：hover／鍵盤聚焦時標題轉橘 --cta-orange（2026-11-17 使用者要求） */
+  a.bp-stat{text-decoration:none;color:inherit;border-radius:var(--r-16)}
+  a.bp-stat small{transition:color .15s}
+  a.bp-stat:hover small,a.bp-stat:focus-visible small{color:var(--cta-orange)}
+  .bp-ring{position:relative;width:96px;height:96px;flex:none;display:grid;place-items:center}
+  .bp-ring > svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+  .bp-ring b{position:relative;font-size:28.8px;line-height:38.4px;  /* 2026-11-17 使用者要求放大約 1.2 倍 */
+    font-weight:500;font-style:italic;letter-spacing:var(--tracking-super);
+    margin-right:calc(-1 * var(--tracking-super));color:var(--black-800)}
+  .bp-stat small{font-size:14px;font-weight:600;line-height:24px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+  /* 商品：放射刻度（黃→橘漸層） */
+  .bp-ring.ticks line{stroke-width:1.6;stroke-linecap:round}  /* 顏色在 RING.ticks 逐條設定（黃→橘） */
+  /* 行銷：錶盤刻度。短刻度淺黃、每 5 格與主刻度為橘（2026-11-17 使用者要求；--mod-finance／--cta-orange） */
+  .bp-ring.dots line{stroke:var(--mod-finance);stroke-width:1.6}  /* 淡黃調細（2026-11-17 使用者要求），橘色維持 2.6 */
+  .bp-ring.dots line.hi{stroke:var(--cta-orange);stroke-width:2.6}
+  .bp-ring.dots line.major{stroke:var(--cta-orange);stroke-width:3}
+  /* 策略：液面波浪（兩層前後錯開流動） */
+  .bp-ring.wave .bg{fill:var(--black-50);stroke:var(--black-200);stroke-width:1}
+  /* 後方波浪淡黃、前方波浪由上往下黃→橘漸層（2026-11-17 使用者要求；--mod-finance／--toast-line→--cta-orange） */
+  .bp-ring.wave .w1{fill:var(--mod-finance);animation:bp-wave 5s linear infinite}
+  .bp-ring.wave .w2{fill:url(#bp-wave-grad);animation:bp-wave 3.6s linear infinite reverse}
+  @keyframes bp-wave{to{transform:translateX(-50px)}}
+  /* 實名夥伴：品牌漸層環（同 CTA 圖示外框的 --accent-ring），右下角認證勾勾 */
+  .bp-ring.brand::before{content:"";position:absolute;inset:0;border-radius:50%;border:5px solid transparent;
+    background:linear-gradient(var(--white),var(--white)) padding-box,var(--accent-ring) border-box}
+  .bp-ring.brand .bp-ring-badge{position:absolute;right:-2px;bottom:-2px;width:30px;height:30px;inset:auto -2px -2px auto}
+  /* 數字進場：逐字由下往上淡入（2026-11-17 參考 React Bits 的 Split Text：每字錯開 0.1 秒、0.6 秒、
+     從下方 40px 淡入、power3.out 緩出）。捲到畫面內才播放一次 */
+  .bp-ring b .ch{display:inline-block;opacity:0;transform:translateY(40px)}
+  .bp-stats.is-in .bp-ring b .ch{animation:bp-split .6s cubic-bezier(.215,.61,.355,1) both;animation-delay:calc(var(--i) * .1s)}
+  @keyframes bp-split{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}
+  /* 呼吸燈：4 秒一次慢慢變淡再恢復 */
+  /* 呼吸燈同步（2026-11-17 使用者要求）：商品刻度、行銷全部刻度（含橘色）、實名夥伴漸層環（勾勾不動）。
+     同一組動畫、同時開始，節奏一致 */
+  .bp-ring.dots line,.bp-ring.ticks line,.bp-ring.brand::before{animation:bp-breathe 4s ease-in-out infinite}
+  @keyframes bp-breathe{0%,100%{opacity:1}50%{opacity:.55}}  /* 最低 55%（使用者覺得 25% 太低） */
+  @media (prefers-reduced-motion:reduce){
+    .bp-ring.dots line,.bp-ring.ticks line,.bp-ring.brand::before{animation:none}
+    .bp-ring.wave path{animation:none}
+    .bp-ring b .ch,.bp-stats.is-in .bp-ring b .ch{opacity:1;transform:none;animation:none}
+  }
+
+  /* ② AI 推薦：區塊標題放在外面（2026-11-17 使用者要求），標題下方的內容用淺灰底卡片包起來 */
+  .bp-ai{width:100%;display:flex;flex-direction:column;gap:20px;align-items:flex-start;padding:20px;background:var(--black-50);border:1px solid var(--line-soft);border-radius:var(--r-30)}
+  .bp-spark{width:16px;height:16px;flex:none;color:var(--accent-border)}
+
+  /* AI 合作對象搜尋：輸入框＋主要按鈕，下方為「試試」範例 */
+  .bp-ask{width:100%;display:flex;gap:10px;align-items:center}
+  .bp-ask .input{flex:1}
+  .bp-ask .input::placeholder{color:var(--black-500)}  /* 提示文字比表單預設的 --black-400 深一階（2026-11-17 使用者要求） */
+  .bp-ask .btn{flex:none}
+  .bp-try{width:100%;display:flex;align-items:center;gap:10px}
+  .bp-try .chips{flex:1;min-width:0}
+  .bp-try .chip{font-weight:400}  /* 範例字重比篩選標籤預設的 600 輕（2026-11-17 使用者要求） */
+  .bp-try .chip:not(:hover){color:var(--black-500)}  /* 文字比預設 --black-400 深一階；hover 仍維持白字 */
+
+
+  /* 推薦分組：小標題＋數量＋說明 */
+  /* 推薦結果兩張卡片左右並排；卡片內的推薦卡改為單欄（大螢幕兩欄），窄螢幕改上下排列 */
+  .bp-split{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:start}
+  .bp-group-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .bp-more{flex:none;display:inline-flex;align-items:center;gap:2px;font-size:13px;font-weight:600;line-height:20px;letter-spacing:var(--tracking-wider);
+    color:var(--accent-border);white-space:nowrap}
+  .bp-more svg{width:16px;height:16px;flex:none}  /* 箭頭為 16px inline SVG、線寬 1.2（2026-11-17 使用者要求放大、調細） */
+  .bp-more:hover{text-decoration:underline}
+
+  /* 推薦輪播（頁內元件，做法同兌換頁 .ex-carousel）：一次 1 筆，橫向捲動切頁（手機可滑）；
+     每 6 秒自動換頁，滑鼠停留／鍵盤焦點在內時暫停，系統設定減少動態時不自動播放 */
+  .bp-carousel{display:flex;flex-direction:column;gap:12px}
+  .bp-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;padding-bottom:6px}  /* 下方留空間給卡片陰影 */
+  .bp-track::-webkit-scrollbar{display:none}
+  .bp-page{flex:0 0 100%;min-width:0;display:flex;flex-direction:column;gap:20px;scroll-snap-align:start}  /* min-width:0 才不會被卡片內容撐寬 */
+  .bp-car-nav{display:flex;align-items:center;justify-content:center;gap:12px}
+  /* 2026-11-17 使用者要求拿掉左右箭頭，只留圓點（仍可滑動、鍵盤左右鍵切換） */
+  .bp-dots{display:flex;gap:8px}
+  .bp-dots button{position:relative;width:8px;height:8px;border-radius:4px;background:var(--black-300);transition:width .2s,background .2s}
+  .bp-dots button::before{content:"";position:absolute;inset:-8px}  /* 可點範圍放大到 24px */
+  .bp-dots button[aria-current="true"]{width:20px;background:var(--accent-border)}
+
+  /* 完整列表對話框：兩欄，手機一欄 */
+  .bp-dialog .card-grid{--cols:2}
+  @media (max-width:559px){ .bp-dialog .card-grid{--cols:1} }
+  @media (max-width:899px){ .bp-split{grid-template-columns:minmax(0,1fr)} }
+  .bp-group{width:100%;display:flex;flex-direction:column;gap:14px}
+  .bp-group-ic{width:20px;height:20px;flex:none;margin-right:-4px;color:var(--accent-border)}
+  .bp-group-head{display:flex;flex-direction:column;gap:2px}
+  .bp-group-head h3{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:700;line-height:24px;letter-spacing:var(--tracking-super)}
+  .bp-ai .empty{padding:30px 20px;background:var(--white)}
+
+  /* 推薦卡片（TabCard）：只有公司頁籤，不顯示適配度小頁籤（2026-11-17 使用者要求）；AI 標籤貼齊卡片底部 */
+  /* 標題用 h4，共用的 reset 只歸零 h1–h3，瀏覽器預設會加上下各約 21px 的外距，這裡歸零 */
+  h4.tab-card-title{margin:0}
+  /* AI 標籤：照行銷 SENSE 受眾包卡片的 AI 標籤（marketing-sense.html .ms-ai／.ms-tags，2026-11-17 使用者要求）。
+     淡黃膠囊、只顯示一行，超出的左右捲動（觸控直接滑、滑鼠可拖曳），兩側淡出提示還有內容 */
+  .bp-tags{margin-top:auto;display:flex;align-items:center;gap:8px}
+  .bp-tags > .bp-spark{color:var(--mod-finance)}
+  .bp-taglist{flex:1;min-width:0;display:flex;gap:8px;margin:0;padding:0;list-style:none;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;cursor:grab;
+    --fade-l:0px;--fade-r:0px;
+    -webkit-mask-image:linear-gradient(to right,transparent,black var(--fade-l),black calc(100% - var(--fade-r)),transparent);
+    mask-image:linear-gradient(to right,transparent,black var(--fade-l),black calc(100% - var(--fade-r)),transparent)}
+  .bp-taglist::-webkit-scrollbar{display:none}
+  .bp-taglist.is-dragging{cursor:grabbing;user-select:none}
+  .bp-taglist.fade-l{--fade-l:32px}
+  .bp-taglist.fade-r{--fade-r:32px}
+  .bp-taglist li{flex:none;white-space:nowrap;padding:4px 10px;border-radius:var(--r-16);background:color-mix(in srgb,var(--mod-finance) 30%,var(--white));
+    color:var(--black-700);font-size:13px;line-height:20px;letter-spacing:var(--tracking-wider)}
+
+  /* 夥伴卡片（TabCard）：名稱後的認證勾勾、右上小頁籤為產業；指標三格 */
+  .bp-verified{width:16px;height:16px;flex:none;color:var(--badge-blue)}
+  .bp-card .tab-card-org .org-name{flex:0 1 auto}
+  .bp-card .tab-card-desc{min-height:44px}
+  .bp-card .tab-card-desc.is-empty{color:var(--black-400)}
+  .bp-card .r-card-metrics{margin-top:auto}
+  .bp-card .r-card-metrics .metric{align-items:center}
+
+  @media (max-width:899px){
+    .bp-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+  @media (max-width:767px){
+    .bp-ai{padding:16px}
+  }
+  @media (max-width:559px){
+    .bp-try{flex-direction:column;align-items:flex-start}
+    .bp-ask{flex-direction:column;align-items:stretch}  /* 手機：輸入框滿版，按鈕放下方 */
+  }
+</style>
+</head>
+<body>
+<!-- 僅供內部使用，非經許可不得外流。頁面中的公司、受眾包與數據皆為示意。草稿（2026-11-17）：AI 推薦區塊融入找商務合作頁。 -->
+<div class="app" data-module="partners" data-page="home">
+  <aside class="sidebar" id="sidebar" aria-label="主選單"></aside>
+  <div class="main">
+    <header class="header" id="header"></header>
+
+    <main class="content">
+      <!-- ① 生態系合作機會：區塊標題＋一列四個數字 -->
+      <section class="content-section bp-hero" aria-labelledby="h-hero">
+        <div class="section-title"><h2 id="h-hero">生態系合作機會</h2></div>
+        <div class="bp-stats" id="hero-stats"></div>
+      </section>
+
+      <!-- ② 探索 SENSE 機會（AI 推薦） -->
+      <section class="content-section" aria-labelledby="h-ai">
+        <div class="section-title"><h2 id="h-ai">探索 SENSE 機會</h2></div>
+        <!-- 第一張卡片：AI 搜尋（標題「合作對象搜尋」，2026-11-17 使用者要求，樣式同推薦卡片標題） -->
+        <div class="bp-ai">
+        <div class="bp-group-head">
+          <h3><svg class="bp-group-ic" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="9" r="5.25"/><path d="m13 13 3.5 3.5"/></svg>合作對象搜尋</h3>
+        </div>
+
+        <form class="bp-ask" id="ask">
+          <label class="visually-hidden" for="ask-input">AI 合作對象搜尋</label>
+          <input class="input" id="ask-input" type="search" placeholder="用自然語言描述你想找的合作對象、受眾或標籤" autocomplete="off">
+          <button class="btn btn-outline-blue" type="submit"><svg class="bp-spark" style="color:currentColor" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M6 2.5 7.1 5.9 10.5 7 7.1 8.1 6 11.5 4.9 8.1 1.5 7 4.9 5.9z"/><path d="M12 9.5l.6 1.9 1.9.6-1.9.6-.6 1.9-.6-1.9-1.9-.6 1.9-.6z"/><path d="M12 1.5l.45 1.3 1.3.45-1.3.45L12 5l-.45-1.3-1.3-.45 1.3-.45z"/></svg>AI 推薦</button>
+        </form>
+        <div class="bp-try">
+          <div class="chips" id="examples"></div>
+        </div>
+        </div>
+
+        <!-- 推薦結果：兩張卡片並排（2026-11-17 使用者要求與搜尋卡片拆開，兩組左右並排）。
+             每組最多顯示 5 筆、一次 1 筆，自動輪播＋手動切換；「瀏覽全部」開啟完整列表 -->
+        <div class="bp-split">
+          <div class="bp-ai">
+            <div class="bp-group" data-list="aud">
+              <div class="bp-group-head">
+                <div class="bp-group-row">
+                  <h3><svg class="bp-group-ic" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7.5" cy="7" r="2.75"/><path d="M2.5 16c.4-2.6 2.5-4.25 5-4.25s4.6 1.65 5 4.25"/><circle cx="13.75" cy="7.75" r="2.25"/><path d="M13 11.9c2.3-.3 4.1 1.1 4.5 3.6"/></svg>適合你採購的受眾包</h3>
+                  <button type="button" class="bp-more" data-more="aud">瀏覽全部<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5"/></svg></button>
+                </div>
+              </div>
+              <div data-carousel></div>
+            </div>
+          </div>
+
+          <div class="bp-ai">
+            <div class="bp-group" data-list="prod">
+              <div class="bp-group-head">
+                <div class="bp-group-row">
+                  <h3><svg class="bp-group-ic" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 6.5h11l-.8 10H5.3z"/><path d="M7.5 8.5V5.5a2.5 2.5 0 0 1 5 0v3"/></svg>想找你代投的商品</h3>
+                  <button type="button" class="bp-more" data-more="prod">瀏覽全部<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5"/></svg></button>
+                </div>
+              </div>
+              <div data-carousel></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ③ 瀏覽生態系夥伴 -->
+      <section class="content-section" aria-labelledby="h-partners">
+        <div class="section-title" id="partners"><h2 id="h-partners">瀏覽生態系夥伴</h2></div>
+        <div class="list-toolbar">
+          <div class="chips" id="chips" role="group" aria-label="產業分類"></div>
+          <div class="list-actions" id="list-actions"></div>
+        </div>
+        <div class="card-grid" id="grid" aria-live="polite"></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- 完整推薦列表 -->
+<dialog class="dialog wide bp-dialog" id="more-dlg" aria-labelledby="more-title">
+  <form method="dialog">
+    <div class="dialog-head"><h2 id="more-title"></h2><button type="submit" class="dialog-x" aria-label="關閉">×</button></div>
+    <div class="dialog-body"><div class="card-grid" id="more-grid"></div></div>
+  </form>
+</dialog>
+
+<script src="shared/shell.js?v=20261117m"></script>
+<script src="shared/components.js?v=20261028d"></script>
+<script>
+/* ═════════ 示意資料（僅供原型展示，公司皆為虛構） ═════════ */
+// counts：各 SENSE 的上架數；active：近期活躍，false 時顯示 idle 文字
+const ORGS = {
+  sf: { name:'股感媒體科技股份有限公司', mark:'stockfeel', ind:'金融', active:true, order:6,
+        intro:'致力於推動普惠金融與財經知識普及，以內容與社群連結投資理財族群。', counts:{ product:8, marketing:36, strategy:13 } },
+  ys: { name:'曜石運動娛樂股份有限公司', color:'var(--mod-strategy-strong)', ind:'運動', active:true, order:5,
+        intro:'經營職業球隊與賽事活動，致力推動運動產業發展與球迷社群經營。', counts:{ product:0, marketing:10, strategy:7 } },
+  qt: { name:'青田永續生活股份有限公司', color:'var(--mod-marketing-strong)', ind:'健康', active:true, order:4,
+        intro:'推廣循環容器與永續生活服務，串連店家與消費者減少一次性包材。', counts:{ product:0, marketing:0, strategy:0 } },
+  xl: { name:'行旅移動科技股份有限公司', color:'var(--mod-product-strong)', ind:'交通', active:true, order:3,
+        intro:'提供租車與共享移動服務，讓城市通勤與旅遊交通更便利。', counts:{ product:0, marketing:0, strategy:0 } },
+  yf: { name:'遠帆旅行社股份有限公司', color:'var(--mod-pr-strong)', ind:'旅遊', active:true, order:2,
+        intro:'', counts:{ product:0, marketing:0, strategy:0 } },
+  hx: { name:'禾新生物科技股份有限公司', color:'var(--mod-finance-strong)', ind:'生技', active:false, idle:'7 天未活動', order:1,
+        intro:'', counts:{ product:0, marketing:0, strategy:0 } }
+};
+const INDUSTRIES = ['運動', '健康', '交通', '旅遊', '金融', '生技'];
+
+const EXAMPLES = ['我想找高消費女性受眾', '誰適合代投我的母親節禮盒', '哪些商家的標籤跟我互補'];
+
+// AI 推薦的受眾包：fit 為適配度（top／high／mid），卡片目前不顯示（2026-11-17 使用者要求）
+const RECS = [
+  { id:'r1', org:'ys', fit:'top',  title:'超商取票便利族', size:222,
+    reason:'常使用超商服務，與獨立包裝、可即食的餅乾點心契合，適合做通路聯名或超商加購推廣。', tags:['便利生活', '即時服務', '線上線下'] },
+  { id:'r2', org:'ys', fit:'high', title:'現場觀賽體驗族', size:440,
+    reason:'有現場觀賽經驗，對賽事周邊與餐飲優惠接受度高，適合搭配方便分享的零食禮盒作為觀賽補給。', tags:['現場活動', '體驗型消費', '活動票券'] },
+  { id:'r3', org:'ys', fit:'high', title:'揪團觀賽決策者', size:118,
+    reason:'重視多人共享情境，多袋組、箱購點心很適合做聚會分享與團購優惠。', tags:['揪團', '社交聚會', '活動策劃'] },
+  { id:'r4', org:'ys', fit:'high', title:'熱血應援核心球迷', size:244,
+    reason:'常參與現場互動，適合搭配可邊看球邊食用的零食與應援周邊做情境行銷。', tags:['核心球迷', '賽事關注', '現場互動'] },
+  { id:'r5', org:'ys', fit:'high', title:'運動賽事高頻觀賽族', size:330,
+    reason:'有穩定的賽事消費習慣，對便利攜帶、分食型點心需求高，適合長期投放與回購。', tags:['運動賽事', '高頻觀賽', '體育內容'] },
+  { id:'r6', org:'ys', fit:'mid',  title:'校園學生運動迷', size:16,
+    reason:'重視 CP 值與分享性，箱購或多入組零食能滿足同儕分食與價格敏感需求。', tags:['校園族群', '年輕族群', '社群互動'] }
+];
+
+// AI 推薦的代投商品（示意）：metric 為卡片指標
+const PRODS = [
+  { id:'p1', org:'qt', fit:'top',  title:'循環餐盒體驗組', metric:['契合受眾包', 4, '個'],
+    reason:'你的受眾重視生活品質，對永續、可重複使用的生活用品接受度高，適合以體驗組導入。', tags:['永續生活', '體驗組', '都會族群'] },
+  { id:'p2', org:'xl', fit:'high', title:'城市租車週末券', metric:['契合受眾包', 3, '個'],
+    reason:'都會購屋族群常有週末出遊需求，租車優惠券適合搭配生活類內容投放。', tags:['週末出遊', '都會通勤', '優惠券'] },
+  { id:'p3', org:'yf', fit:'high', title:'秋季溫泉兩日遊', metric:['契合受眾包', 2, '個'],
+    reason:'高互動受眾對旅遊內容點擊率高，適合以限時早鳥方案搭配投放。', tags:['國內旅遊', '限時早鳥', '家庭出遊'] },
+  { id:'p4', org:'hx', fit:'mid',  title:'益生菌每日保健包', metric:['契合受眾包', 1, '個'],
+    reason:'受眾年齡層與保健需求部分重疊，適合先以小量試投測試轉換。', tags:['保健', '訂閱制', '試投'] },
+  { id:'p5', org:'ys', fit:'mid',  title:'主場賽事家庭套票', metric:['契合受眾包', 1, '個'],
+    reason:'部分受眾有親子活動偏好，賽事家庭套票可作為假日活動提案。', tags:['運動賽事', '親子', '票券'] }
+];
+// 兩組推薦：detail 為詳情頁名稱（尚未製作）
+const LISTS = {
+  aud:  { title:'適合你採購的受眾包', items:RECS,  detail:'受眾包詳情頁' },
+  prod: { title:'想找你代投的商品',   items:PRODS, detail:'商品詳情頁' }
+};
+const PREVIEW = 5, PER_PAGE = 1, AUTO_MS = 6000;  // 2026-11-17 使用者調整：一次顯示 1 筆、最多 5 筆
+
+const SORTS = [
+  { key:'active', label:'近期活躍' },
+  { key:'most',   label:'合作機會：多到少' }
+];
+
+/* ═════════ 卡片 ═════════ */
+const { esc } = SenseUI;
+const num = (n) => n.toLocaleString('en-US');
+const SPARKLE = '<svg class="bp-spark" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M6 2.5 7.1 5.9 10.5 7 7.1 8.1 6 11.5 4.9 8.1 1.5 7 4.9 5.9z"/><path d="M12 9.5l.6 1.9 1.9.6-1.9.6-.6 1.9-.6-1.9-1.9-.6 1.9-.6z"/><path d="M12 1.5l.45 1.3 1.3.45-1.3.45L12 5l-.45-1.3-1.3-.45 1.3-.45z"/></svg>';
+const VERIFIED = '<svg class="bp-verified" viewBox="0 0 16 16" aria-label="已認證"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="M5 8.2 7 10.2 11 6" fill="none" stroke="var(--white)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const total = (o) => o.counts.product + o.counts.marketing + o.counts.strategy;
+
+function recCard(r, list){
+  const org = ORGS[r.org];
+  const [mLabel, mValue, mUnit] = r.metric || ['受眾規模', r.size, '人'];
+  return `
+    <article class="tab-card" data-rec="${r.id}" data-list="${list}" tabindex="0" aria-label="${esc(r.title)}，${esc(org.name)}">
+      <div class="tab-card-tabs">
+        <div class="tab-card-org" title="${esc(org.name)}">${SenseUI.orgLogo(org)}<span class="org-name">${esc(org.name)}</span></div>
+      </div>
+      <div class="tab-card-body">
+        <div class="tab-card-intro">
+          <h4 class="tab-card-title" title="${esc(r.title)}">${esc(r.title)}</h4>
+          <p class="tab-card-desc">${esc(r.reason)}</p>
+        </div>
+        <span class="r-card-metrics compact"><span class="metric"><small>${mLabel}</small><b><em>${num(mValue)}</em> ${mUnit}</b></span></span>
+        <div class="bp-tags">${SPARKLE}<ul class="bp-taglist" tabindex="0" aria-label="AI 標籤">${r.tags.map(t => `<li>${esc(t)}</li>`).join('')}</ul></div>
+      </div>
+    </article>`;
+}
+
+function partnerCard([key, o]){
+  const status = o.active
+    ? '<span class="status-tag blue"><span class="dot"></span>近期活躍</span>'
+    : `<span class="status-tag"><span class="dot"></span>${esc(o.idle)}</span>`;
+  const m = [['商品', o.counts.product], ['行銷', o.counts.marketing], ['策略', o.counts.strategy]];
+  return `
+    <article class="tab-card bp-card" data-org="${key}" tabindex="0" aria-label="${esc(o.name)}，${esc(o.ind)}">
+      <div class="tab-card-tabs">
+        <div class="tab-card-org" title="${esc(o.name)}">${SenseUI.orgLogo(o)}<span class="org-name">${esc(o.name)}</span>${VERIFIED}</div>
+        <div class="tab-card-side">${esc(o.ind)}</div>
+      </div>
+      <div class="tab-card-body">
+        <div class="tab-card-intro">
+          <div>${status}</div>
+          <p class="tab-card-desc${o.intro ? '' : ' is-empty'}">${o.intro ? esc(o.intro) : '尚未填寫公司簡介'}</p>
+        </div>
+        <span class="r-card-metrics">${m.map(([l, v]) => `<span class="metric"><small>${l}</small><b>${v}</b></span>`).join('<span class="divider"></span>')}</span>
+      </div>
+    </article>`;
+}
+
+/* ═════════ 狀態與渲染 ═════════ */
+const state = { ind:'all', query:'', sort:'active' };
+
+/* ═════════ 推薦輪播 ═════════ */
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function renderCarousel(key){
+  const L = LISTS[key], group = document.querySelector(`.bp-group[data-list="${key}"]`);
+  const shown = L.items.slice(0, PREVIEW);
+  const pages = [];
+  for (let i = 0; i < shown.length; i += PER_PAGE) pages.push(shown.slice(i, i + PER_PAGE));
+  // 「瀏覽全部」一律顯示（使用者要求）
+  const box = group.querySelector('[data-carousel]');
+  if (!shown.length){ box.innerHTML = '<p class="empty">目前沒有適合的推薦</p>'; return; }
+  box.innerHTML = `
+    <div class="bp-carousel" aria-roledescription="輪播" aria-label="${esc(L.title)}，共 ${pages.length} 頁">
+      <div class="bp-track" tabindex="0" aria-label="可左右滑動切換">
+        ${pages.map((pg, i) => `<div class="bp-page" role="group" aria-roledescription="頁" aria-label="第 ${i + 1} 頁，共 ${pages.length} 頁">${pg.map(r => recCard(r, key)).join('')}</div>`).join('')}
+      </div>
+      ${pages.length > 1 ? `<div class="bp-car-nav">
+        <div class="bp-dots">${pages.map((_, i) => `<button type="button" data-dot="${i}" aria-label="第 ${i + 1} 頁"></button>`).join('')}</div>
+      </div>` : ''}
+    </div>`;
+  bindCarousel(box.querySelector('.bp-carousel'), pages.length);
+}
+
+/* 切頁：圓點切換、自動播放循環；捲動（含手機滑動）時同步圓點；自動播放在滑鼠停留、焦點在內或分頁隱藏時暫停 */
+function bindCarousel(root, n){
+  const track = root.querySelector('.bp-track'), dots = [...root.querySelectorAll('[data-dot]')];
+  const cur = () => Math.round(track.scrollLeft / track.clientWidth);
+  const go = (i) => track.scrollTo({ left:((i + n) % n) * track.clientWidth });
+  const sync = () => { const i = cur(); dots.forEach((d, k) => d.setAttribute('aria-current', k === i)); };
+  root.addEventListener('click', (e) => {
+    const d = e.target.closest('[data-dot]');
+    if (d) go(+d.dataset.dot);
+  });
+  track.addEventListener('keydown', (e) => {
+    if (e.target !== track) return;
+    if (e.key === 'ArrowRight'){ e.preventDefault(); go(cur() + 1); }
+    if (e.key === 'ArrowLeft'){ e.preventDefault(); go(cur() - 1); }
+  });
+  track.addEventListener('scroll', sync, { passive:true });
+  sync();
+  if (n < 2 || reduceMotion) return;
+  let hold = false;
+  root.addEventListener('pointerenter', () => hold = true);
+  root.addEventListener('pointerleave', () => hold = false);
+  setInterval(() => { if (!hold && !root.contains(document.activeElement) && !document.hidden) go(cur() + 1); }, AUTO_MS);
+}
+
+/* 瀏覽全部：對話框列出完整推薦 */
+const moreDlg = document.getElementById('more-dlg');
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-more]'); if (!b) return;
+  const L = LISTS[b.dataset.more];
+  document.getElementById('more-title').textContent = `${L.title}（${L.items.length}）`;
+  document.getElementById('more-grid').innerHTML = L.items.map(r => recCard(r, b.dataset.more)).join('');
+  moreDlg.showModal();
+});
+
+/* 圓環裝飾（inline SVG，viewBox 100×100、圓心 50,50） */
+const RING = (() => {
+  const pt = (r, deg) => { const a = (deg - 90) * Math.PI / 180; return [(50 + r * Math.cos(a)).toFixed(2), (50 + r * Math.sin(a)).toFixed(2)]; };
+  const line = (r1, r2, deg, op) => { const [x1, y1] = pt(r1, deg), [x2, y2] = pt(r2, deg); return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"${op != null ? ` opacity="${op}"` : ''}/>`; };
+  // 商品：60 條刻度，顏色順時針由黃到橘（2026-11-17 使用者要求；黃 --toast-line、橘 --cta-orange，tokens 目前最鮮明的兩色）
+  const ticks = Array.from({ length:60 }, (_, i) => line(41, 49, i * 6)
+    .replace('/>', ` style="stroke:color-mix(in srgb, var(--cta-orange) ${Math.round(100 * i / 59)}%, var(--toast-line))"/>`)).join('');
+  // 行銷：錶盤刻度（2026-11-17 依參考圖）。60 格短刻度為淺黃，每 5 格一格橘色；12／3／6／9 點鐘為較長的橘色主刻度（往外超出圓環 4）
+  const dots = Array.from({ length:60 }, (_, i) => i % 15 === 0 ? ''
+      : i % 5 === 0 ? line(42, 48, i * 6).replace('<line', '<line class="hi"') : line(42, 48, i * 6)).join('')
+    + [0, 90, 180, 270].map(d => line(36, 54, d).replace('<line', '<line class="major"')).join('');
+  // 策略：圓形裁切內兩層波浪（寬 200、每 50 一個週期，往左平移 50 無縫循環）
+  const wavePath = (y, amp) => { let d = `M0 ${y}`; for (let x = 0; x < 200; x += 50) d += ` q12.5 ${-amp} 25 0 t25 0`; return d + ' V100 H0Z'; };
+  const wave = `<defs><clipPath id="bp-wave-clip"><circle cx="50" cy="50" r="47"/></clipPath>
+      <linearGradient id="bp-wave-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--toast-line)"/><stop offset="1" style="stop-color:var(--cta-orange)"/></linearGradient></defs>
+    <circle class="bg" cx="50" cy="50" r="47"/>
+    <g clip-path="url(#bp-wave-clip)"><path class="w1" d="${wavePath(54, 6)}"/><path class="w2" d="${wavePath(66, 5)}"/></g>`;
+  // 實名夥伴：環本身由 CSS 畫，這裡只放右下角的認證勾勾
+  const brand = '';
+  return {
+    ticks:`<svg viewBox="0 0 100 100">${ticks}</svg>`,
+    dots:`<svg viewBox="0 0 100 100">${dots}</svg>`,
+    wave:`<svg viewBox="0 0 100 100">${wave}</svg>`,
+    brand:`<svg class="bp-ring-badge" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7.2" style="fill:var(--badge-blue);stroke:var(--white);stroke-width:1.2"/><path d="M5 8.2 7 10.2 11 6" fill="none" style="stroke:var(--white)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+  };
+})();
+
+function renderHero(){
+  const sum = (k) => Object.values(ORGS).reduce((s, o) => s + o.counts[k], 0);
+  // href：有目的地的欄位整格可點（2026-11-17：商品／行銷／策略機會連到對應的 SENSE；實名夥伴尚無目的地）
+  const stats = [
+    { n:sum('product'),   label:'商品機會', kind:'ticks', href:'product-sense.html', dest:'商品 SENSE' },
+    { n:sum('marketing'), label:'行銷機會', kind:'dots', href:'marketing-sense.html', dest:'行銷 SENSE' },
+    { n:sum('strategy'),  label:'策略機會', kind:'wave', href:'strategy-sense.html', dest:'策略 SENSE' },
+    { n:Object.keys(ORGS).length, label:'實名夥伴', kind:'brand' }
+  ];
+  const html = stats.map(({ n, label, kind, href, dest }) => {
+    const inner = `<span class="bp-ring ${kind}" aria-hidden="true">${RING[kind]}<b>${[...String(n)].map((c, k) => `<span class="ch" style="--i:${k}">${c}</span>`).join('')}</b></span><small aria-hidden="true">${label}</small>`;
+    return href
+      ? `<a class="bp-stat" href="${href}" aria-label="${n} ${label}，前往${dest}">${inner}</a>`
+      : `<p class="bp-stat">${inner}<span class="visually-hidden">${n} ${label}</span></p>`;
+  }).join('');
+  document.getElementById('hero-stats').innerHTML = html;
+}
+
+/* 數字區捲到畫面內才播放逐字進場；不支援 IntersectionObserver 時直接播放 */
+function playStats(){
+  document.querySelectorAll('.bp-stats').forEach(box => {
+    if (!('IntersectionObserver' in window)) return box.classList.add('is-in');
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some(e => e.isIntersecting)){ box.classList.add('is-in'); io.disconnect(); }
+    }, { threshold:0.1 });
+    io.observe(box);
+  });
+}
+
+function renderChips(){
+  const all = Object.values(ORGS);
+  const items = [{ key:'all', label:`全部 ${all.length}` }]
+    .concat(INDUSTRIES.map(i => ({ key:i, label:`${i} ${all.filter(o => o.ind === i).length}` })));
+  document.getElementById('chips').innerHTML = SenseUI.chips(items, state.ind);
+}
+
+function renderList(){
+  const q = state.query.toLowerCase();
+  const list = Object.entries(ORGS)
+    .filter(([, o]) => state.ind === 'all' || o.ind === state.ind)
+    .filter(([, o]) => !q || [o.name, o.intro, o.ind].some(s => s.toLowerCase().includes(q)))
+    .sort(([, a], [, b]) => state.sort === 'most' ? total(b) - total(a) : (b.active - a.active) || (b.order - a.order));
+  document.getElementById('grid').innerHTML = list.length
+    ? list.map(partnerCard).join('')
+    : `<p class="empty" style="grid-column:1/-1">找不到符合條件的夥伴<br>換個分類或關鍵字試試看</p>`;
+}
+
+SenseShell.mount();
+renderHero();
+playStats();
+document.getElementById('examples').innerHTML = EXAMPLES.map(t => `<button type="button" class="chip" data-example>${esc(t)}</button>`).join('');
+Object.keys(LISTS).forEach(renderCarousel);
+renderChips();
+renderList();
+
+/* AI 搜尋：範例帶入輸入框；送出後的結果頁尚未製作 */
+const askInput = document.getElementById('ask-input');
+document.getElementById('examples').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-example]'); if (!b) return;
+  askInput.value = b.textContent; askInput.focus();
+});
+document.getElementById('ask').addEventListener('submit', (e) => {
+  e.preventDefault();
+  if (!askInput.value.trim()){ askInput.focus(); return; }
+  SenseShell.notYet('AI 搜尋結果');
+});
+
+/* 名錄：產業篩選、搜尋、排序 */
+document.getElementById('chips').addEventListener('click', (e) => {
+  const c = e.target.closest('[data-chip]'); if (!c) return;
+  state.ind = c.dataset.chip; renderChips(); renderList();
+});
+const actions = document.getElementById('list-actions');
+actions.innerHTML = SenseUI.listActions({ sorts:SORTS, sort:state.sort, placeholder:'搜尋公司名稱或簡介' });
+SenseUI.bindListActions(actions, {
+  onQuery: (q) => { state.query = q; renderList(); },
+  onSort:  (k) => { state.sort = k; renderList(); }
+});
+
+/* 卡片點擊：詳情頁尚未製作 */
+const openCard = (el) => SenseShell.notYet(el.matches('[data-rec]') ? LISTS[el.dataset.list].detail : '夥伴詳情頁');
+document.addEventListener('click', (e) => { const c = e.target.closest('[data-rec],[data-org]'); if (c) openCard(c); });
+document.addEventListener('keydown', (e) => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-rec],[data-org]')){ e.preventDefault(); openCard(e.target); }
+});
+/* AI 標籤列：兩側淡出（左邊捲過才淡出左側，右邊還有內容才淡出右側）＋滑鼠拖曳捲動（做法同行銷 SENSE） */
+function updateFade(list){
+  const max = list.scrollWidth - list.clientWidth;
+  list.classList.toggle('fade-l', list.scrollLeft > 1);
+  list.classList.toggle('fade-r', list.scrollLeft < max - 1);
+}
+const updateFades = () => document.querySelectorAll('.bp-taglist').forEach(updateFade);
+document.addEventListener('scroll', (e) => { if (e.target.classList && e.target.classList.contains('bp-taglist')) updateFade(e.target); }, true);
+window.addEventListener('resize', updateFades);
+if (document.fonts) document.fonts.ready.then(updateFades);
+updateFades();
+// 對話框打開後也要算一次
+document.addEventListener('click', (e) => { if (e.target.closest('[data-more]')) requestAnimationFrame(updateFades); });
+
+let tagDrag = null;
+document.addEventListener('pointerdown', (e) => {
+  const list = e.target.closest('.bp-taglist');
+  if (!list || e.pointerType !== 'mouse' || e.button !== 0) return;
+  tagDrag = { list, x:e.clientX, left:list.scrollLeft, moved:false };
+});
+document.addEventListener('pointermove', (e) => {
+  if (!tagDrag) return;
+  const dx = e.clientX - tagDrag.x;
+  if (!tagDrag.moved && Math.abs(dx) < 4) return;
+  tagDrag.moved = true;
+  tagDrag.list.classList.add('is-dragging');
+  tagDrag.list.scrollLeft = tagDrag.left - dx;
+});
+document.addEventListener('pointerup', () => {
+  if (!tagDrag) return;
+  tagDrag.list.classList.remove('is-dragging');
+  // 拖過就不觸發卡片點擊
+  if (tagDrag.moved) document.addEventListener('click', (e) => e.stopPropagation(), { capture:true, once:true });
+  tagDrag = null;
+});
+</script>
+</body>
+</html>
