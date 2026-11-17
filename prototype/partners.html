@@ -240,7 +240,7 @@
 <script src="shared/components.js?v=20261028d"></script>
 <script>
 /* ═════════ 示意資料（僅供原型展示，公司皆為虛構） ═════════ */
-// counts：各 SENSE 的上架數；active：近期活躍，false 時顯示 idle 文字
+// counts：各 SENSE 的上架數；active：近期活躍（排序用；卡片上的活躍標籤 2026-11-17 使用者要求移除）
 const ORGS = {
   sf: { name:'股感媒體科技股份有限公司', mark:'stockfeel', ind:'金融', active:true, order:6,
         intro:'致力於推動普惠金融與財經知識普及，以內容與社群連結投資理財族群。', counts:{ product:8, marketing:36, strategy:13 } },
@@ -327,9 +327,6 @@ function recCard(r, list){
 }
 
 function partnerCard([key, o]){
-  const status = o.active
-    ? '<span class="status-tag blue"><span class="dot"></span>近期活躍</span>'
-    : `<span class="status-tag"><span class="dot"></span>${esc(o.idle)}</span>`;
   const m = [['商品', o.counts.product], ['行銷', o.counts.marketing], ['策略', o.counts.strategy]];
   return `
     <article class="tab-card bp-card" data-org="${key}" tabindex="0" aria-label="${esc(o.name)}，${esc(o.ind)}">
@@ -339,7 +336,6 @@ function partnerCard([key, o]){
       </div>
       <div class="tab-card-body">
         <div class="tab-card-intro">
-          <div>${status}</div>
           <p class="tab-card-desc${o.intro ? '' : ' is-empty'}">${o.intro ? esc(o.intro) : '尚未填寫公司簡介'}</p>
         </div>
         <span class="r-card-metrics">${m.map(([l, v]) => `<span class="metric"><small>${l}</small><b>${v}</b></span>`).join('<span class="divider"></span>')}</span>
@@ -464,9 +460,8 @@ function playStats(){
 }
 
 function renderChips(){
-  const all = Object.values(ORGS);
-  const items = [{ key:'all', label:`全部 ${all.length}` }]
-    .concat(INDUSTRIES.map(i => ({ key:i, label:`${i} ${all.filter(o => o.ind === i).length}` })));
+  // 篩選標籤不顯示數量（2026-11-17 使用者要求）
+  const items = [{ key:'all', label:'全部' }].concat(INDUSTRIES.map(i => ({ key:i, label:i })));
   document.getElementById('chips').innerHTML = SenseUI.chips(items, state.ind);
 }
 
