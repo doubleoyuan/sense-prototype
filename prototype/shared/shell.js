@@ -62,7 +62,96 @@
   // 麵包屑根層「SENSE」連到後台首頁；首頁尚未製作，決定網址後填入（null 時點了提示尚未製作）
   const ROOT_HREF = null;
 
-  const CHEVRON_LEFT = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.5 4.5 7 10l5.5 5.5"/></svg>';
+  /* ── 通知（2026-11-17）：header 鈴鐺展開下拉預覽，「查看全部」到 notifications.html。
+     本階段不含財務、公關。level：action 需處理／progress 進度／system 系統／announce 公告；
+     time 為相對時間（m 分、h 小時、d 天）；day 為舊版分組欄位，目前未使用。read:true 為示範的預設已讀；
+     使用者點過或「全部標為已讀」的 id 記在 localStorage（失敗時只用預設）。
+     行銷事件為推測，待確認實際流程 ── */
+  const NOTIFY_LEVELS = { action:'需處理', progress:'進度', system:'系統', announce:'公告' };
+  // 通知左側 icon：模組用 2026-11-12 選定的細線 icon（assets/mod-*.svg）；不屬於模組的來源（公司資料、平台）
+  // 共用同風格的通知 icon（assets/ic-notify.svg，2026-11-17）
+  const NOTIFY_SOURCES = { mine:{ label:'公司資料', icon:'ic-notify.svg' }, system:{ label:'SENSE 平台', icon:'ic-notify.svg' } };
+  const NOTIFS = [
+    { id:'n1',  src:'points',    level:'action',   day:'today',   time:'10m',
+      title:'凌雲航空邀請你開通雙向點數交換', desc:'比例依雙方點數兌台幣比值自動換算，同意後即可開始交換。', cta:'前往處理', href:'points-sense.html#browse' },
+    { id:'n2',  src:'product',   level:'action',   day:'today',   time:'5h',
+      title:'商品「手沖咖啡體驗組」審核未通過', desc:'商品主圖解析度不足，請修改後重新送出審核。', cta:'修改後重送', href:'product-sense-add-product.html' },
+    { id:'n3',  src:'mine',      level:'action',   day:'today',   time:'6h',
+      title:'公司資料還有 2 個欄位未填寫', desc:'尚未填寫：公司簡介、退貨地址。', cta:'前往補齊', href:'company-details.html' },
+    { id:'n4',  src:'strategy',  level:'progress', day:'today',   time:'7h',
+      title:'媒合預估已完成', desc:'預估交集人數已更新，可以查看結果。', cta:'查看結果', href:'strategy-sense.html#browse' },
+    { id:'n5',  src:'product',   level:'progress', day:'week',    time:'1d', read:true,
+      title:'商品「冬季保暖禮盒」已通過審核並上架', desc:'合作夥伴現在可以在瀏覽商品看到這項商品。', cta:'查看商品', href:'product-sense.html#browse' },
+    { id:'n6',  src:'exchange',  level:'progress', day:'week',    time:'1d', read:true,
+      title:'兌換平台申請已受理', desc:'專人將與你聯繫，洽談 SSO 與點數串接細節。', cta:'查看申請', href:'exchange-sense.html' },
+    { id:'n7',  src:'points',    level:'progress', day:'week',    time:'2d', read:true,
+      title:'與禾豐超市的單向交換已開通', desc:'會員現在可以把點數換成禾豐超市點數。', cta:'查看交換', href:'points-sense.html#browse' },
+    { id:'n8',  src:'marketing', level:'progress', day:'week',    time:'3d', read:true,
+      title:'受眾包「都會通勤族｜北北基桃地區」已更新', desc:'名單人數已依最新資料重新計算。', cta:'查看受眾包', href:'marketing-sense.html#browse' },
+    { id:'n9',  src:'system',    level:'system',   day:'week',    time:'4d', read:true,
+      title:'新成員王小明已加入公司', desc:'可以到成員與角色調整權限。', cta:'成員與角色', todo:'成員與角色' },
+    { id:'n10', src:'system',    level:'system',   day:'earlier', time:'9d', read:true,
+      title:'系統維護公告：11/20（五）02:00–04:00', desc:'維護期間暫停服務，造成不便敬請見諒。' },
+    { id:'n11', src:'system',    level:'announce', day:'earlier', time:'14d', read:true,
+      title:'點數 SENSE 開放申請', desc:'加入後可以和其他企業直接交換點數。', cta:'了解點數 SENSE', href:'points-sense.html' }
+  ];
+  const NOTIFY_KEY = 'sense.notifyRead';
+  const NOTIFY_PREVIEW = 5;
+  function loadIds(key){ try { const v = JSON.parse(localStorage.getItem(key)); if (Array.isArray(v)) return new Set(v); } catch(e){} return new Set(); }
+  function saveIds(key, set){ try { localStorage.setItem(key, JSON.stringify([...set])); } catch(e){} }
+  const readIds = loadIds(NOTIFY_KEY);
+  const notifyListeners = [];
+  const saveRead = () => saveIds(NOTIFY_KEY, readIds);
+  const notifyItems = () => NOTIFS;
+  const isUnread = (n) => !n.read && !readIds.has(n.id);
+  const unreadCount = () => notifyItems().filter(isUnread).length;
+  function notifySource(key){
+    const m = MODULES.find(x => x.key === key);
+    return m ? { label:m.label, icon:`mod-${m.key}.svg` } : NOTIFY_SOURCES[key];
+  }
+  function changed(){ updateBell(); notifyListeners.forEach(fn => fn()); }
+  function markRead(id){ if (!readIds.has(id)){ readIds.add(id); saveRead(); changed(); } }
+  function markAllRead(){ NOTIFS.forEach(n => readIds.add(n.id)); saveRead(); changed(); }
+
+  const escHtml = (s) => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+  /* 一則通知（樣式參考使用者提供的截圖，2026-11-17）：左側來源 icon（圓框）、中間內文、右上相對時間；未讀為淡藍底。
+     整列可點，帶到下一步（href）；尚未製作的目的地用 data-todo；沒有目的地的只顯示內容。點了即標為已讀 */
+  function notifyRow(n){
+    const s = notifySource(n.src), unread = isUnread(n);
+    const inner = `<span class="ntf-avatar" title="${s.label}"><img src="${A(s.icon)}" alt=""></span>
+      <span class="ntf-text">${unread ? '<span class="visually-hidden">未讀：</span>' : ''}<span class="ntf-title">${escHtml(n.title)}</span>${n.desc ? `<span class="ntf-desc">${escHtml(n.desc)}</span>` : ''}</span>
+      <time class="ntf-time">${escHtml(n.time)}</time>`;
+    const cls = `ntf-item${unread ? ' is-unread' : ''}`;
+    if (n.href) return `<a class="${cls}" href="${n.href}" data-ntf="${n.id}">${inner}</a>`;
+    if (n.todo) return `<button type="button" class="${cls}" data-ntf="${n.id}" data-todo="${escHtml(n.todo)}">${inner}</button>`;
+    return `<div class="${cls}" data-ntf="${n.id}">${inner}</div>`;
+  }
+
+  function bellHtml(){
+    const n = unreadCount();
+    return `<img src="${A('ic-bell.svg')}" alt="">${n ? `<span class="ntf-count">${n > 99 ? '99+' : n}</span>` : ''}`;
+  }
+  function panelListHtml(){
+    const list = notifyItems().slice(0, NOTIFY_PREVIEW);
+    return list.length ? list.map(notifyRow).join('') : '<p class="ntf-empty">目前沒有通知</p>';
+  }
+  function updateBell(){
+    const bell = document.querySelector('.ntf-bell'); if (!bell) return;
+    const n = unreadCount();
+    bell.innerHTML = bellHtml();
+    bell.setAttribute('aria-label', n ? `通知，${n} 則未讀` : '通知');
+    const list = document.querySelector('.ntf-panel .ntf-list'); if (list) list.innerHTML = panelListHtml();
+    const all = document.querySelector('[data-ntf-readall]'); if (all) all.disabled = !n;
+  }
+  function setPanel(open){
+    const panel = document.getElementById('ntf-panel'), bell = document.querySelector('.ntf-bell');
+    if (!panel || !bell) return;
+    panel.hidden = !open;
+    bell.setAttribute('aria-expanded', open);
+    bell.classList.toggle('is-on', open);
+  }
+
+  const CHEVRON_LEFT ='<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.5 4.5 7 10l5.5 5.5"/></svg>';
 
   /* ── 展開狀態：可同時展開多個；記在 localStorage（失敗時就只用預設） ── */
   const STORE_KEY = 'sense.navOpen';
@@ -237,7 +326,15 @@
       </button>
       ${renderBreadcrumb(app)}
       <span class="header-spacer"></span>
-      <button class="icon-btn" data-toast="目前沒有新通知" aria-label="通知"><img src="${A('ic-bell.svg')}" alt=""></button></div>`;
+      <div class="ntf-wrap">
+        <button type="button" class="icon-btn ntf-bell" data-ntf-toggle aria-haspopup="true" aria-expanded="false" aria-controls="ntf-panel">${bellHtml()}</button>
+        <div class="ntf-panel" id="ntf-panel" role="region" aria-label="通知預覽" hidden>
+          <div class="ntf-panel-head"><b>通知</b><button type="button" class="ntf-link" data-ntf-readall>全部標為已讀</button></div>
+          <div class="ntf-list">${panelListHtml()}</div>
+          <a class="ntf-panel-foot" href="notifications.html">查看全部通知</a>
+        </div>
+      </div></div>`;
+    updateBell();
   }
 
   let mounted = null;   // { app, open }：refresh() 用
@@ -266,7 +363,16 @@
     app.addEventListener('click', (e) => {
       // 手機抽屜：點側欄連結（含同頁錨點）後收起
       if (e.target.closest('.sidebar a')) app.classList.remove('nav-open');
-      const t = e.target.closest('[data-toggle],[data-todo],[data-toast],[data-nav-toggle],[data-collapse]');
+      // 通知：點任一則（下拉或通知中心）先標為已讀，再照原本的連結／data-todo 走
+      const item = e.target.closest('[data-ntf]');
+      if (item) markRead(item.dataset.ntf);
+      if (e.target.closest('[data-ntf-toggle]')){ setPanel(document.getElementById('ntf-panel').hidden); return; }
+      if (e.target.closest('[data-ntf-readall]')){ markAllRead(); toast('已全部標為已讀'); return; }
+      // 下拉裡點了下一步才收起；只點列上其他地方（標為已讀）維持展開
+      // 下拉裡點了可前往的通知就收起；沒有目的地的只標為已讀，維持展開（重畫後元素已不在，擋下冒泡免得被當成點在外面）
+      if (item && item.closest('.ntf-panel') && item.matches('a,button')) setPanel(false);
+      else if (item) e.stopPropagation();
+      const t =e.target.closest('[data-toggle],[data-todo],[data-toast],[data-nav-toggle],[data-collapse]');
       if (!t) return;
       if ('collapse' in t.dataset){
         app.classList.add('nav-anim');
@@ -291,8 +397,22 @@
         const hb = document.querySelector('.hamburger'); if (hb) hb.setAttribute('aria-expanded', on);
       }
     });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') app.classList.remove('nav-open'); });
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      app.classList.remove('nav-open');
+      const panel = document.getElementById('ntf-panel');
+      if (panel && !panel.hidden){ setPanel(false); document.querySelector('.ntf-bell').focus(); }
+    });
+    // 點下拉以外的地方收起通知
+    document.addEventListener('click', (e) => { if (!e.target.closest('.ntf-wrap')) setPanel(false); });
   }
 
-  window.SenseShell = { mount, refresh, toast, notYet, asset:A };
+  // 通知中心頁用：資料、分級、來源、已讀狀態與變更通知
+  const notify = {
+    items:notifyItems, levels:NOTIFY_LEVELS, source:notifySource, row:notifyRow,
+    isUnread, unreadCount, markRead, markAllRead,
+    onChange:(fn) => notifyListeners.push(fn)
+  };
+
+  window.SenseShell = { mount, refresh, toast, notYet, asset:A, notify };
 })();

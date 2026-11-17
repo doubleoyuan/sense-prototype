@@ -391,6 +391,50 @@ a.sb-mod-label:hover{color:var(--strong)}
 .empty{width:100%;padding:60px 20px;border:1px dashed var(--black-300);border-radius:var(--r-30);text-align:center;color:var(--black-500);
   font-size:14px;letter-spacing:var(--tracking-wider);line-height:1.8}
 
+/* 只給螢幕閱讀器讀的文字 */
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+/* Notify：header 鈴鐺＋下拉預覽（shell.js），通知中心頁沿用 .ntf-item（2026-11-17，樣式待使用者確認）。
+   未讀數徽章先用 --cta-orange；未讀列為淡藍底 */
+.ntf-wrap{position:relative}
+.ntf-bell{position:relative}
+.ntf-count{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 6px;border-radius:10px;border:2px solid var(--white);
+  background:var(--cta-orange);color:var(--white);font-size:10px;font-weight:700;line-height:16px;letter-spacing:0;text-align:center}
+.ntf-panel{position:absolute;right:0;top:calc(100% + 10px);z-index:40;width:400px;max-height:calc(100vh - var(--header-h) - 40px);
+  display:flex;flex-direction:column;background:var(--white);border:1px solid var(--black-200);border-radius:var(--r-16);box-shadow:0 8px 24px rgba(0,0,0,.08);overflow:hidden}
+.ntf-panel[hidden]{display:none}
+.ntf-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--black-200);
+  font-size:14px;letter-spacing:var(--tracking-wider);color:var(--black-800)}
+.ntf-link{font-size:12px;font-weight:600;letter-spacing:var(--tracking-wider);color:var(--accent-border);border-radius:6px}
+.ntf-link:hover{text-decoration:underline}
+.ntf-link[disabled]{color:var(--black-400);text-decoration:none;cursor:default}
+.ntf-panel .ntf-list{overflow-y:auto}
+.ntf-panel-foot{display:block;padding:12px 16px;border-top:1px solid var(--black-200);text-align:center;text-decoration:none;
+  font-size:13px;font-weight:600;letter-spacing:var(--tracking-wider);color:var(--black-700)}
+.ntf-panel-foot:hover{background:var(--black-50);color:var(--black-800)}
+
+/* 通知列（2026-11-17 依使用者提供的參考截圖）：白底、列間細線；左側來源 icon、右上相對時間；
+   整列可點；未讀為淡藍底 */
+.ntf-list{display:flex;flex-direction:column}
+.ntf-item{position:relative;width:100%;display:flex;align-items:flex-start;gap:14px;padding:16px 64px 16px 20px;text-align:left;text-decoration:none;color:inherit;
+  background:var(--white);border-bottom:1px solid var(--black-200);transition:background .15s}
+a.ntf-item:hover,button.ntf-item:hover{background:var(--black-50)}
+/* 未讀：淡藍底（沿用 --mod-product-tint，與 .status-tag.blue 同色） */
+.ntf-item.is-unread{background:var(--mod-product-tint)}
+a.ntf-item.is-unread:hover,button.ntf-item.is-unread:hover{background:var(--mod-product-tint);filter:brightness(.98)}
+.ntf-avatar{width:48px;height:48px;flex:none;border-radius:50%;border:1px solid var(--black-200);background:var(--black-50);display:grid;place-items:center;overflow:hidden}
+.ntf-item.is-unread .ntf-avatar{background:var(--white)}
+.ntf-avatar img{width:40px;height:40px;display:block}
+.ntf-list > .ntf-item:last-child{border-bottom:0}
+.ntf-text{flex:1;min-width:0;display:block;font-size:14px;font-weight:400;line-height:24px;letter-spacing:var(--tracking-wider);color:var(--black-800)}
+/* 標題稍加重（2026-11-17 使用者要求）；說明維持一般字重 */
+.ntf-title{font-weight:500}
+.ntf-desc{display:block;color:var(--black-600)}
+.ntf-panel .ntf-desc{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:1;line-clamp:1;overflow:hidden}
+/* 右上相對時間（10m／22h／1d），對齊內文第一行 */
+.ntf-time{position:absolute;top:16px;right:20px;font-size:12px;line-height:24px;letter-spacing:var(--tracking-wider);color:var(--black-500);white-space:nowrap}
+.ntf-empty{padding:40px 20px;text-align:center;font-size:14px;letter-spacing:var(--tracking-wider);color:var(--black-500)}
+
 /* Toast：右上角提示（Figma 4288:883）。白底黃框，左側對話泡泡（出現時三顆點依序跳，共三輪），文字超過 320px 自然換行 */
 .toast{position:fixed;top:calc(var(--header-h) + 20px);right:20px;z-index:60;width:max-content;max-width:min(394px,calc(100vw - 32px));
   display:flex;align-items:flex-start;gap:10px;padding:20px;background:var(--white);border:2px solid var(--toast-line);border-radius:var(--r-10);
@@ -465,6 +509,9 @@ a.sb-mod-label:hover{color:var(--strong)}
 
   .card-grid{--cols:1}
   .list-toolbar{flex-direction:column-reverse;align-items:stretch;gap:12px}
+  /* 通知下拉：改貼齊視窗左右各 16px */
+  .ntf-wrap{position:static}
+  .ntf-panel{position:fixed;left:16px;right:16px;top:calc(var(--header-h) + 8px);width:auto;max-height:calc(100vh - var(--header-h) - 24px)}
   .search-box.open{max-width:calc(100vw - 98px)}
 }
 @media (prefers-reduced-motion:reduce){ *{transition:none!important} }
