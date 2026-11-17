@@ -9,16 +9,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="shared/tokens.css?v=20261110a">
-<link rel="stylesheet" href="shared/components.css?v=20261117f">
+<link rel="stylesheet" href="shared/components.css?v=20261117i">
 <style>
   /* ── 通知中心：頁內版面（通知列 .ntf-item 在 components.css，與 header 下拉共用） ── */
-  .ntf-head-actions{display:flex;align-items:center;gap:10px}
-  .ntf-filter .icon-btn{gap:6px;font-size:12px;font-weight:600;letter-spacing:var(--tracking-wider);color:var(--black-700);white-space:nowrap}
-  .ntf-filter .icon-btn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-  /* 來源選單（2026-11-17 使用者確認，只套在本頁）：選定項目改藍字、不打勾；字級 13 → 14 */
-  .ntf-filter .dropdown-menu button{font-size:14px;line-height:24px}
-  .ntf-filter .dropdown-menu button[aria-checked="true"]{color:var(--accent-border)}
-  .ntf-filter .dropdown-menu button[aria-checked="true"]::after{content:none}
   .ntf-groups{width:100%;display:flex;flex-direction:column;gap:24px}
   .ntf-group{display:flex;flex-direction:column;gap:10px}
   .ntf-group .ntf-list{border:1px solid var(--black-200);border-radius:var(--r-16);overflow:hidden}
@@ -43,10 +36,6 @@
 
         <div class="list-toolbar">
           <div class="chips" id="chips" role="group" aria-label="通知篩選"></div>
-          <div class="ntf-head-actions">
-            <div class="dropdown ntf-filter" id="src-filter"></div>
-            <button type="button" class="ntf-link" data-ntf-readall>全部標為已讀</button>
-          </div>
         </div>
         <div class="ntf-groups" id="groups" aria-live="polite"></div>
       </section>
@@ -54,63 +43,36 @@
   </div>
 </div>
 
-<script src="shared/shell.js?v=20261117g"></script>
+<script src="shared/shell.js?v=20261117k"></script>
 <script src="shared/components.js?v=20261028d"></script>
 <script>
 SenseShell.mount();
 const N = SenseShell.notify, esc = SenseUI.esc;
 
-// 篩選標籤只留「全部」（2026-11-17 使用者確認拿掉未讀、需處理、進度、系統、公告）
-const FILTERS = [ { key:'all', label:'全部' } ];
-const SOURCES = [...new Set(N.items().map(n => n.src))];
+// 篩選標籤：全部＋各來源（2026-11-17 使用者確認：拿掉來源下拉，來源改成左側篩選標籤；
+// 先前的未讀／需處理／進度／系統／公告標籤已拿掉）。依側欄模組順序，只列有通知的來源
+const SRC_ORDER = ['product', 'marketing', 'strategy', 'exchange', 'points', 'mine', 'system'];
+const SOURCES = SRC_ORDER.filter(k => N.items().some(n => n.src === k));
+const FILTERS = [ { key:'all', label:'全部' }, ...SOURCES.map(k => ({ key:k, label:N.source(k).label })) ];
 const state = { src:'all' };
 
-const CHEV_DOWN = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>';
-function srcLabel(k){ return k === 'all' ? '全部來源' : N.source(k).label; }
-function renderSrcFilter(){
-  document.getElementById('src-filter').innerHTML = `
-    <button type="button" class="icon-btn" data-src-toggle aria-haspopup="menu" aria-expanded="false">${esc(srcLabel(state.src))}${CHEV_DOWN}</button>
-    <div class="dropdown-menu" role="menu" hidden>
-      ${['all', ...SOURCES].map(k => `<button role="menuitemradio" aria-checked="${k === state.src}" data-src="${k}">${esc(srcLabel(k))}</button>`).join('')}
-    </div>`;
-}
-
 function render(){
-  document.getElementById('chips').innerHTML = SenseUI.chips(FILTERS, 'all');
-  const list = N.items().filter(n =>
-    state.src === 'all' || n.src === state.src);
+  document.getElementById('chips').innerHTML = SenseUI.chips(FILTERS, state.src);
+  const list = N.items().filter(n => state.src === 'all' || n.src === state.src);
   // 不分今天／本週等區段標題（2026-11-17 使用者確認），依時間由新到舊排成一串
   document.getElementById('groups').innerHTML = list.length
     ? `<div class="ntf-group"><div class="ntf-list">${list.map(N.row).join('')}</div></div>`
     : '<p class="empty">目前沒有符合條件的通知</p>';
-  document.querySelector('main [data-ntf-readall]').disabled = !N.unreadCount();
 }
 
-
-const srcBox = document.getElementById('src-filter');
-function closeSrc(){ const m = srcBox.querySelector('.dropdown-menu'), b = srcBox.querySelector('[data-src-toggle]'); m.hidden = true; b.setAttribute('aria-expanded', 'false'); b.classList.remove('is-on'); }
-srcBox.addEventListener('click', (e) => {
-  const toggle = e.target.closest('[data-src-toggle]'), opt = e.target.closest('[data-src]');
-  if (toggle){
-    const m = srcBox.querySelector('.dropdown-menu'), on = m.hidden;
-    m.hidden = !on; toggle.setAttribute('aria-expanded', on); toggle.classList.toggle('is-on', on);
-    if (on) m.querySelector('[aria-checked="true"]').focus();
-  } else if (opt){
-    state.src = opt.dataset.src; renderSrcFilter(); render();
-    srcBox.querySelector('[data-src-toggle]').focus();
-  }
+document.getElementById('chips').addEventListener('click', (e) => {
+  const c = e.target.closest('[data-chip]'); if (!c) return;
+  state.src = c.dataset.chip; render();
 });
-srcBox.addEventListener('keydown', (e) => {
-  const items = [...srcBox.querySelectorAll('[data-src]')], i = items.indexOf(document.activeElement);
-  if (i < 0) return;
-  if (e.key === 'ArrowDown'){ e.preventDefault(); items[(i + 1) % items.length].focus(); }
-  if (e.key === 'ArrowUp'){ e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
-  if (e.key === 'Escape'){ closeSrc(); srcBox.querySelector('[data-src-toggle]').focus(); }
-});
-document.addEventListener('click', (e) => { if (!e.target.closest('#src-filter')) closeSrc(); });
 
 N.onChange(render);
-renderSrcFilter();
+// 進到通知中心也算看過：鈴鐺數字歸零（未讀的淡藍底保留）
+N.markSeen();
 render();
 </script>
 </body>

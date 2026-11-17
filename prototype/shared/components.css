@@ -405,9 +405,6 @@ a.sb-mod-label:hover{color:var(--strong)}
 .ntf-panel[hidden]{display:none}
 .ntf-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--black-200);
   font-size:14px;letter-spacing:var(--tracking-wider);color:var(--black-800)}
-.ntf-link{font-size:12px;font-weight:600;letter-spacing:var(--tracking-wider);color:var(--accent-border);border-radius:6px}
-.ntf-link:hover{text-decoration:underline}
-.ntf-link[disabled]{color:var(--black-400);text-decoration:none;cursor:default}
 .ntf-panel .ntf-list{overflow-y:auto}
 .ntf-panel-foot{display:block;padding:12px 16px;border-top:1px solid var(--black-200);text-align:center;text-decoration:none;
   font-size:13px;font-weight:600;letter-spacing:var(--tracking-wider);color:var(--black-700)}

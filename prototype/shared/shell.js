@@ -65,15 +65,21 @@
   /* ── 通知（2026-11-17）：header 鈴鐺展開下拉預覽，「查看全部」到 notifications.html。
      本階段不含財務、公關。level：action 需處理／progress 進度／system 系統／announce 公告；
      time 為相對時間（m 分、h 小時、d 天）；day 為舊版分組欄位，目前未使用。read:true 為示範的預設已讀；
-     使用者點過或「全部標為已讀」的 id 記在 localStorage（失敗時只用預設）。
-     行銷事件為推測，待確認實際流程 ── */
+     使用者點過的 id 記在 localStorage（失敗時只用預設）。
+     行銷事件為推測，待確認實際流程。
+     已讀規則（2026-11-17 使用者確認，C＋D 混合）：
+     - 看過（seen）：打開鈴鐺下拉或進到通知中心頁，鈴鐺數字歸零；數字只算之後的新通知。
+     - 已讀（read）：點了那則通知，淡藍底消失。（「全部標為已讀」2026-11-17 使用者要求先刪除）
+     - 完成（resolved）：需處理通知要等事情處理完才結束，未完成前固定排在最上面；
+       點擊不會讓它完成。完成由各模組流程呼叫 SenseShell.notify.resolve(id)；
+       目前各模組頁還沒有可完成的流程（點數頁內頁暫時一律顯示已開通），所以原型裡需處理通知會一直置頂 ── */
   const NOTIFY_LEVELS = { action:'需處理', progress:'進度', system:'系統', announce:'公告' };
   // 通知左側 icon：模組用 2026-11-12 選定的細線 icon（assets/mod-*.svg）；不屬於模組的來源（公司資料、平台）
   // 共用同風格的通知 icon（assets/ic-notify.svg，2026-11-17）
   const NOTIFY_SOURCES = { mine:{ label:'公司資料', icon:'ic-notify.svg' }, system:{ label:'SENSE 平台', icon:'ic-notify.svg' } };
   const NOTIFS = [
     { id:'n1',  src:'points',    level:'action',   day:'today',   time:'10m',
-      title:'凌雲航空邀請你開通雙向點數交換', desc:'比例依雙方點數兌台幣比值自動換算，同意後即可開始交換。', cta:'前往處理', href:'points-sense.html#browse' },
+      title:'拾光百貨邀請你開通雙向點數交換', desc:'比例依雙方點數兌台幣比值自動換算，同意後即可開始交換。', cta:'前往處理', href:'points-sense.html#co=c5' },
     { id:'n2',  src:'product',   level:'action',   day:'today',   time:'5h',
       title:'商品「手沖咖啡體驗組」審核未通過', desc:'商品主圖解析度不足，請修改後重新送出審核。', cta:'修改後重送', href:'product-sense-add-product.html' },
     { id:'n3',  src:'mine',      level:'action',   day:'today',   time:'6h',
@@ -95,23 +101,35 @@
     { id:'n11', src:'system',    level:'announce', day:'earlier', time:'14d', read:true,
       title:'點數 SENSE 開放申請', desc:'加入後可以和其他企業直接交換點數。', cta:'了解點數 SENSE', href:'points-sense.html' }
   ];
-  const NOTIFY_KEY = 'sense.notifyRead';
+  const NOTIFY_KEY = 'sense.notifyRead', SEEN_KEY = 'sense.notifySeen', RESOLVED_KEY = 'sense.notifyResolved';
   const NOTIFY_PREVIEW = 5;
   function loadIds(key){ try { const v = JSON.parse(localStorage.getItem(key)); if (Array.isArray(v)) return new Set(v); } catch(e){} return new Set(); }
   function saveIds(key, set){ try { localStorage.setItem(key, JSON.stringify([...set])); } catch(e){} }
-  const readIds = loadIds(NOTIFY_KEY);
+  const readIds = loadIds(NOTIFY_KEY), seenIds = loadIds(SEEN_KEY), resolvedIds = loadIds(RESOLVED_KEY);
   const notifyListeners = [];
   const saveRead = () => saveIds(NOTIFY_KEY, readIds);
-  const notifyItems = () => NOTIFS;
   const isUnread = (n) => !n.read && !readIds.has(n.id);
-  const unreadCount = () => notifyItems().filter(isUnread).length;
+  const isPending = (n) => n.level === 'action' && !resolvedIds.has(n.id);
+  // 未完成的需處理通知排最上面，其餘依時間（資料順序）
+  const notifyItems = () => NOTIFS.filter(isPending).concat(NOTIFS.filter(n => !isPending(n)));
+  const unreadCount = () => NOTIFS.filter(isUnread).length;
+  // 鈴鐺數字：未讀且還沒在下拉／通知中心看過的
+  const newCount = () => NOTIFS.filter(n => isUnread(n) && !seenIds.has(n.id)).length;
   function notifySource(key){
     const m = MODULES.find(x => x.key === key);
     return m ? { label:m.label, icon:`mod-${m.key}.svg` } : NOTIFY_SOURCES[key];
   }
   function changed(){ updateBell(); notifyListeners.forEach(fn => fn()); }
   function markRead(id){ if (!readIds.has(id)){ readIds.add(id); saveRead(); changed(); } }
-  function markAllRead(){ NOTIFS.forEach(n => readIds.add(n.id)); saveRead(); changed(); }
+  function markSeen(){
+    if (!newCount()) return;
+    NOTIFS.forEach(n => seenIds.add(n.id)); saveIds(SEEN_KEY, seenIds); changed();
+  }
+  // 事情處理完（由各模組頁呼叫）：通知結束置頂，也一併標為已讀
+  function resolve(id){
+    resolvedIds.add(id); saveIds(RESOLVED_KEY, resolvedIds);
+    readIds.add(id); saveRead(); changed();
+  }
 
   const escHtml = (s) => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
   /* 一則通知（樣式參考使用者提供的截圖，2026-11-17）：左側來源 icon（圓框）、中間內文、右上相對時間；未讀為淡藍底。
@@ -128,7 +146,7 @@
   }
 
   function bellHtml(){
-    const n = unreadCount();
+    const n = newCount();
     return `<img src="${A('ic-bell.svg')}" alt="">${n ? `<span class="ntf-count">${n > 99 ? '99+' : n}</span>` : ''}`;
   }
   function panelListHtml(){
@@ -137,16 +155,16 @@
   }
   function updateBell(){
     const bell = document.querySelector('.ntf-bell'); if (!bell) return;
-    const n = unreadCount();
+    const n = newCount();
     bell.innerHTML = bellHtml();
-    bell.setAttribute('aria-label', n ? `通知，${n} 則未讀` : '通知');
+    bell.setAttribute('aria-label', n ? `通知，${n} 則新通知` : '通知');
     const list = document.querySelector('.ntf-panel .ntf-list'); if (list) list.innerHTML = panelListHtml();
-    const all = document.querySelector('[data-ntf-readall]'); if (all) all.disabled = !n;
   }
   function setPanel(open){
     const panel = document.getElementById('ntf-panel'), bell = document.querySelector('.ntf-bell');
     if (!panel || !bell) return;
     panel.hidden = !open;
+    if (open) markSeen();
     bell.setAttribute('aria-expanded', open);
     bell.classList.toggle('is-on', open);
   }
@@ -329,7 +347,7 @@
       <div class="ntf-wrap">
         <button type="button" class="icon-btn ntf-bell" data-ntf-toggle aria-haspopup="true" aria-expanded="false" aria-controls="ntf-panel">${bellHtml()}</button>
         <div class="ntf-panel" id="ntf-panel" role="region" aria-label="通知預覽" hidden>
-          <div class="ntf-panel-head"><b>通知</b><button type="button" class="ntf-link" data-ntf-readall>全部標為已讀</button></div>
+          <div class="ntf-panel-head"><b>通知</b></div>
           <div class="ntf-list">${panelListHtml()}</div>
           <a class="ntf-panel-foot" href="notifications.html">查看全部通知</a>
         </div>
@@ -367,7 +385,6 @@
       const item = e.target.closest('[data-ntf]');
       if (item) markRead(item.dataset.ntf);
       if (e.target.closest('[data-ntf-toggle]')){ setPanel(document.getElementById('ntf-panel').hidden); return; }
-      if (e.target.closest('[data-ntf-readall]')){ markAllRead(); toast('已全部標為已讀'); return; }
       // 下拉裡點了下一步才收起；只點列上其他地方（標為已讀）維持展開
       // 下拉裡點了可前往的通知就收起；沒有目的地的只標為已讀，維持展開（重畫後元素已不在，擋下冒泡免得被當成點在外面）
       if (item && item.closest('.ntf-panel') && item.matches('a,button')) setPanel(false);
@@ -410,7 +427,7 @@
   // 通知中心頁用：資料、分級、來源、已讀狀態與變更通知
   const notify = {
     items:notifyItems, levels:NOTIFY_LEVELS, source:notifySource, row:notifyRow,
-    isUnread, unreadCount, markRead, markAllRead,
+    isUnread, isPending, unreadCount, markRead, markSeen, resolve,
     onChange:(fn) => notifyListeners.push(fn)
   };
 
