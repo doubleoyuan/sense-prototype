@@ -397,7 +397,16 @@ a.bp-item:focus-visible { outline: 2px solid var(--cta-orange); outline-offset: 
 .mod.is-open .ic-col { animation: ic-grow .5s cubic-bezier(.2, .8, .2, 1) calc(var(--i) * 90ms) backwards; }
 .mod.is-open .ic-roof { animation: ic-drop .45s cubic-bezier(.2, .8, .2, 1) .5s backwards; }
 .mod-ic .ic-gem { transform-box: fill-box; transform-origin: center; }
-.mod-ic[data-anim="finance"] { overflow: visible; }   /* 讓圓點從 icon 外飛進來時看得到整段弧線 */
+.mod-ic[data-anim="finance"] { overflow: visible; }
+/* 技術（2026-11-18 新增）：晶片＝AI 平台、中間心跳線＝數位健檢。展開時晶片輕縮一下、心跳線由左畫到右，
+   四邊接腳末端的點依序彈出並換成 logo 漸層色（上藍、右綠、下黃、左橘） */
+.mod-ic .ic-chip { transform-box: fill-box; transform-origin: center; }
+@keyframes ic-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes ic-chip { 0% { transform: scale(1); } 35% { transform: scale(.88); } 70% { transform: scale(1.04); } 100% { transform: none; } }
+.mod.is-open .ic-chip { animation: ic-chip .5s ease-out; }
+.mod.is-open .ic-pulse { stroke-dasharray: 1; animation: ic-draw .7s cubic-bezier(.4, 0, .2, 1) .15s backwards; }
+.mod-ic .ic-pulse { color: var(--mod-ic-lt); transition: color .35s ease; }   /* 收合時心跳線是淡色，展開畫線時轉成主色 */
+.mod.is-open .mod-ic .ic-pulse { color: var(--mod-open-fg); }   /* 讓圓點從 icon 外飛進來時看得到整段弧線 */
 .mod.is-open .ic-throw-x { animation: ic-throw-x .6s linear .7s backwards; }
 .mod.is-open .ic-throw-y { animation: ic-throw-y .6s .7s backwards; }
 @media (max-width: 1079px) {
@@ -748,6 +757,14 @@ section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿�
           <h3 class="mod-name">財務 SENSE<span class="mod-soon">COMING SOON</span></h3>
           <p class="mod-tag">募資、融資、併購從這裡開始</p>
           <div class="mod-more"><p class="mod-detail">提供標的財務細節，協助全方位投資決策</p></div>
+        </div>
+      </article>
+      <article class="mod" tabindex="0" aria-expanded="false">
+        <svg class="mod-ic" data-anim="tech" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="ic-chip"><rect x="26" y="26" width="28" height="28" rx="3"/></g><path class="lt" d="M32 26V19M54 32H61M32 54V61M26 32H19M40 26V19M54 40H61M40 54V61M26 40H19M48 26V19M54 48H61M48 54V61M26 48H19"/><path class="ic-pulse" pathLength="1" d="M30 41H35L37.5 35L41.5 47L44.5 39L46 41H50"/><g fill="currentColor" stroke="none"><circle class="ic-dot lt gc" style="--i:0;--c:#0073F5" cx="32" cy="17" r="1.4"/><circle class="ic-dot lt gc" style="--i:1;--c:#71D1A6" cx="63" cy="32" r="1.4"/><circle class="ic-dot lt gc" style="--i:2;--c:#FAB431" cx="32" cy="63" r="1.4"/><circle class="ic-dot lt gc" style="--i:3;--c:#FF5B26" cx="17" cy="32" r="1.4"/><circle class="ic-dot lt gc" style="--i:0;--c:#0073F5" cx="40" cy="17" r="1.4"/><circle class="ic-dot lt gc" style="--i:1;--c:#71D1A6" cx="63" cy="40" r="1.4"/><circle class="ic-dot lt gc" style="--i:2;--c:#FAB431" cx="40" cy="63" r="1.4"/><circle class="ic-dot lt gc" style="--i:3;--c:#FF5B26" cx="17" cy="40" r="1.4"/><circle class="ic-dot lt gc" style="--i:0;--c:#0073F5" cx="48" cy="17" r="1.4"/><circle class="ic-dot lt gc" style="--i:1;--c:#71D1A6" cx="63" cy="48" r="1.4"/><circle class="ic-dot lt gc" style="--i:2;--c:#FAB431" cx="48" cy="63" r="1.4"/><circle class="ic-dot lt gc" style="--i:3;--c:#FF5B26" cx="17" cy="48" r="1.4"/></g></svg>
+        <div class="mod-text">
+          <h3 class="mod-name">技術 SENSE<span class="mod-soon">COMING SOON</span></h3>
+          <p class="mod-tag">AI 平台建置與企業數位健檢</p>
+          <div class="mod-more"><p class="mod-detail">提供企業導入 AI ready 平台與企業數位健檢服務</p></div>
         </div>
       </article>
     </div>
