@@ -16,6 +16,7 @@
   --alt-page: #0A1530;
   --alt-bg: radial-gradient(ellipse 70% 60% at 40% 38%, #1E3A6E 0, #142B57 45%, #0A1530 100%);
   --alt-grain: rgba(255,255,255,.07);      /* 整面細網點 */
+  --alt-num-a: #FAB431;                    /* 數據輪播漸層：橘（--cta-orange）→ 黃（取自 --accent-ring 的黃），深淺色相同 */
   --alt-ink: var(--white);                 /* 主要文字 */
   --alt-ink-soft: var(--white);           /* 次要文字：深色模式改為白色（2026-11-10） */
   --alt-line: rgba(255,255,255,.18);
@@ -194,10 +195,10 @@ a.bp-item:focus-visible { outline: 2px solid var(--cta-orange); outline-offset: 
   color: transparent; -webkit-background-clip: text; background-clip: text;
   background-image: radial-gradient(ellipse 64% 125% at 41% -25%, var(--alt-grad-in), var(--alt-grad-out));
 }
-/* 灰字：四組數據輪播，用 Warp 效果切換（canvas 比文字四周多留 24px 給扭曲） */
+/* 數據輪播（橘色）：四組數據，用 Warp 效果切換（canvas 比文字四周多留 24px 給扭曲） */
 .alt-rot { position: relative; display: block; height: 1.25em; margin-top: 20px; font-size: 32px; }
 .alt-rot canvas { position: absolute; left: -24px; top: -24px; width: calc(100% + 48px); height: calc(100% + 48px); }
-.alt-rot .fallback { display: none; color: var(--alt-ink-soft); transition: opacity .4s; }
+.alt-rot .fallback { display: none; width: fit-content; color: transparent; -webkit-background-clip: text; background-clip: text; background-image: linear-gradient(90deg, var(--cta-orange), var(--alt-num-a)); transition: opacity .4s; }   /* 數據輪播（11-18 起）：橘→黃漸層，深淺色相同 */
 .no-gl .alt-rot .fallback { display: block; }
 .no-gl .alt-rot canvas { display: none; }
 
@@ -672,8 +673,8 @@ section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿�
     <div class="alt-copy">
       <h1 class="alt-title">
         <span class="lead">跨品牌合作，一站搞定。</span>
-        <span class="sr-only">99+ 合作夥伴、900萬+ 可觸及會員、999+ 受眾包、999+ 商品 / 服務（數字為佔位）</span>
-        <span class="alt-rot" aria-hidden="true"><canvas></canvas><span class="fallback">99+ 合作夥伴</span></span>
+        <span class="sr-only">45+ 合作夥伴、320萬+ 可觸及會員、500+ 受眾包、100+ 商品 / 服務</span>
+        <span class="alt-rot" aria-hidden="true"><canvas></canvas><span class="fallback">45+ 合作夥伴</span></span>
       </h1>
       <a class="alt-hbtn lg book" href="#book"><svg class="ico" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21.4 2.6a.6.6 0 0 0-.65-.13L2.9 9.6a.6.6 0 0 0-.03 1.1l7.2 3.2 3.2 7.2a.6.6 0 0 0 1.1-.03l7.13-17.85a.6.6 0 0 0-.1-.62Z" fill="currentColor"/></svg><span class="divider" aria-hidden="true"></span><span class="label">預約洽談</span></a>
     </div>
@@ -860,7 +861,7 @@ section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿�
 
 <script>
 /* 網點球（WebGL：每格依球體明暗決定點的大小，緩慢轉動、變形，滑鼠靠近時散開）
-   ＋ 灰字輪播（文字先畫進 canvas，再用 Warp 扭曲效果切換；原生 WebGL，不依賴套件）。 */
+   ＋ 數據輪播（文字先畫進 canvas，再用 Warp 扭曲效果切換；原生 WebGL，不依賴套件）。 */
 (() => {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const hero = document.getElementById('hero');
@@ -942,8 +943,8 @@ section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿�
       gl_FragColor=vec4(col*al,al);
     }`;
 
-  // ── 灰字輪播：四組數據（佔位）依序以 Warp 效果切換 ──
-  const PHRASES = ['99+ 合作夥伴', '900萬+ 可觸及會員', '999+ 受眾包', '999+ 商品 / 服務'];
+  // ── 數據輪播：四組數據依序以 Warp 效果切換 ──
+  const PHRASES = ['45+ 合作夥伴', '320萬+ 可觸及會員', '500+ 受眾包', '100+ 商品 / 服務'];
   const IN = 900, HOLD = 2400, OUT = 600, PAD = 24;
   const TEXT_FS = `precision highp float;varying vec2 v;uniform sampler2D tex;uniform vec2 res;uniform float t;uniform float warp;${NOISE}
     void main(){
@@ -961,19 +962,10 @@ section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿�
     c.font = `${cs.fontWeight} ${parseFloat(cs.fontSize) * k}px ${cs.fontFamily}`;
     c.letterSpacing = cs.letterSpacing;
     const root = getComputedStyle(document.documentElement), x0 = PAD * k;
-    c.fillStyle = root.getPropertyValue('--alt-ink-soft').trim();
-    if (theme === 'light') {
-      // 和主標同一組徑向漸層：以文字外框為準，圓心在左上方 (41%, -25%)，半徑 64% 寬 × 125% 高
-      const tw = c.measureText(text).width, th = parseFloat(cs.fontSize) * k * 1.25, y0 = hgt / 2 - th / 2;
-      c.textBaseline = 'middle'; c.fillStyle = '#000'; c.fillText(text, x0, hgt / 2);
-      const g = c.createRadialGradient(0, 0, 0, 0, 0, 1);
-      g.addColorStop(0, root.getPropertyValue('--alt-grad-in').trim()); g.addColorStop(1, root.getPropertyValue('--alt-grad-out').trim());
-      c.globalCompositeOperation = 'source-in';
-      c.save(); c.translate(x0 + tw * .41, y0 - th * .25); c.scale(tw * .64, th * 1.25);
-      c.fillStyle = g; c.fillRect(-50, -50, 100, 100);
-      c.restore(); c.globalCompositeOperation = 'source-over';
-      return;
-    }
+    // 數據輪播：橘 → 黃的水平漸層（以文字寬度為準），深淺色相同
+    const tw = c.measureText(text).width, g = c.createLinearGradient(x0, 0, x0 + tw, 0);
+    g.addColorStop(0, root.getPropertyValue('--cta-orange').trim()); g.addColorStop(1, root.getPropertyValue('--alt-num-a').trim());
+    c.fillStyle = g;
     c.textBaseline = 'middle';
     c.fillText(text, x0, hgt / 2);
   }
@@ -1009,7 +1001,7 @@ section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿�
     theme = next; document.documentElement.dataset.theme = next;
     toggle.forEach(b => b.setAttribute('aria-pressed', b.dataset.set === next));
     try { localStorage.setItem('sense.altTheme', next); } catch (e) {}
-    uploadPhrase();  // 灰字顏色跟著主題重畫
+    uploadPhrase();  // 數據文字跟著主題重畫
   }
   toggle.forEach(b => b.addEventListener('click', () => setTheme(b.dataset.set)));
   addEventListener('pointermove', e => { pointer.x = e.clientX; pointer.y = e.clientY; pointer.on = e.pointerType === 'mouse' ? 1 : 0; });
@@ -1034,7 +1026,7 @@ section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿�
       gl.uniform3fv(dots.U('pal'), PAL);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
-    // 灰字：進場 IN → 停留 HOLD → 退場 OUT → 換下一組
+    // 數據：進場 IN → 停留 HOLD → 退場 OUT → 換下一組
     let el = now - phaseStart;
     if (!reduce && el > IN + HOLD + OUT) { idx = (idx + 1) % PHRASES.length; phaseStart = now; el = 0; uploadPhrase(); rotFallback.textContent = PHRASES[idx]; }
     const ez = x => x * x * (3 - 2 * x);
@@ -1057,7 +1049,7 @@ section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿�
   document.addEventListener('visibilitychange', run);
   new ResizeObserver(uploadPhrase).observe(rotBox);
 
-  // 等字型載入後再把灰字畫進 canvas，避免先出現系統字型
+  // 等字型載入後再把數據畫進 canvas，避免先出現系統字型
   Promise.all(['600 52px "Roboto Condensed"', '600 52px "Noto Sans TC"'].map(f => document.fonts.load(f, PHRASES.join(''))))
     .catch(() => {}).then(() => { fontsReady = true; phaseStart = performance.now(); uploadPhrase(); });
   // 底部 SENSE：捲動時五個字母以不同速度往上滑（S 最快、E 最慢），循環出現；停止捲動就靜止
