@@ -122,6 +122,14 @@ body { margin: 0; color: var(--alt-ink); font-family: var(--font); -webkit-font-
 .alt-header.is-compact .label, .alt-header.is-compact .divider { max-width: 0; opacity: 0; }
 .alt-header.is-compact .ghost .ico { max-width: 18px; opacity: 1; margin-right: 0; }
 .alt-header .alt-hbtn { min-width: 40px; }
+/* 首屏的圓形按鈕（瀏覽 SENSE、登入）改成毛玻璃珠（2026-11-18）：原本是透明底＋細框，捲到深色內容上會看不見。
+   半透明底＋背景模糊，外框改半透明白，頂部一道內側高光、底部淡陰影，做出玻璃珠的立體感；捲動後的膠囊文字按鈕不受影響 */
+[data-theme="light"] .alt-header { --alt-glass: rgba(255,255,255,.6); --alt-glass-hover: rgba(255,255,255,.82); --alt-glass-edge: rgba(255,255,255,.9); --alt-glass-hi: rgba(255,255,255,.9); --alt-glass-shadow: rgba(31,42,107,.32); }
+[data-theme="dark"] .alt-header  { --alt-glass: rgba(10,21,48,.4); --alt-glass-hover: rgba(10,21,48,.6); --alt-glass-edge: rgba(255,255,255,.24); --alt-glass-hi: rgba(255,255,255,.22); --alt-glass-shadow: rgba(0,0,0,.45); }
+.alt-header.is-compact .alt-hbtn.ghost { background: var(--alt-glass); border-color: var(--alt-glass-edge);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4); backdrop-filter: blur(12px) saturate(1.4);
+  box-shadow: inset 0 1px 1px var(--alt-glass-hi), inset 0 -2px 4px rgba(31,42,107,.06), 0 6px 16px -8px var(--alt-glass-shadow); }
+.alt-header.is-compact .alt-hbtn.ghost:hover, .alt-header.is-compact .alt-browse[aria-expanded="true"] { background: var(--alt-glass-hover); }
 /* 瀏覽 SENSE（2026-11-16）：預約洽談與登入之間，樣式同登入（首屏是三條線圓形 icon，捲動後展開成文字「瀏覽 SENSE」）。
    點擊在 header 下方展開商品／行銷／策略 SENSE；點外面、按 Esc 或選了項目就收起。三個模組頁都可以點。 */
 .alt-browse { border: 1px solid var(--alt-ghost); background: none; font: inherit; font-size: 14px; font-weight: 700; letter-spacing: var(--tracking-wider); color: var(--alt-ink); cursor: pointer; }
