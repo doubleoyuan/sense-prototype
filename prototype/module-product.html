@@ -395,6 +395,9 @@ section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿�
 /* 1. 首屏：網點底＋左側主標、右側「三個重點」摘要（沒時間的人看這張就懂） */
 .mp-hero { position: relative; padding: 200px 40px 120px; overflow: hidden;
   background: radial-gradient(48% 60% at 85% 30%, var(--mp-tint), transparent 70%), var(--alt-page); }
+/* 全頁滑鼠網點拖尾（11-19）：固定在視窗上的一層 canvas，疊在內容上方、header 下方，不擋點擊；卡片、插圖、表單等元件的範圍會挖掉不畫，看起來像在背景。
+   滑鼠經過的網格亮起空心圓環（少數實心點），品牌橘／淺橘／淡灰隨機，約 0.8 秒淡出；移動越快軌跡越粗。只在有滑鼠的桌機啟用，減少動態效果時不啟用 */
+.mp-trail { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 35; }
 .mp-hero::before { content: ''; position: absolute; inset: 0; pointer-events: none;
   background: radial-gradient(circle, var(--alt-grain) .7px, transparent 1px) 0 0 / 4px 4px; }
 .mp-hero .mp-wrap { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 80px; align-items: center; }
@@ -436,6 +439,72 @@ section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿�
 .mp-item { padding: 28px; }
 .mp-item h3 { margin: 0 0 8px; font-size: 18px; line-height: 28px; font-weight: 700; letter-spacing: var(--tracking-wider); color: var(--alt-ink); }
 .mp-item p { margin: 0; font-size: 15px; line-height: 26px; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); }
+/* 2. 適合誰（11-19 改版：發牌卡片）：三張白卡（沿用 .mp-card），邊框用原本三個色塊的顏色（青、藍、鵝黃，換成同色系實色才看得到）。
+   區塊進到畫面時自動依序發牌：每張從下方滑上來、落定時轉到各自角度，往右錯開、後一張蓋住前一張約 1/4，排成扇形。
+   只播一次；切換身份時重發一次；減少動態效果時直接顯示排好的扇形。顏色先留在本頁（--who-*） */
+#who { --who-ink: #1C2433; --who-line-a: #BFEFF8; --who-line-b: #C9DFF5; --who-line-c: #FFE9A8; }
+[data-theme="dark"] #who { --who-ink: var(--alt-ink); --who-line-a: rgba(64, 215, 240, .45); --who-line-b: rgba(111, 178, 255, .45); --who-line-c: rgba(255, 214, 90, .45); }
+.who-deal { position: relative; width: 880px; max-width: 100%; height: 520px; margin: 0 auto; }   /* 11-19 卡片改直式 3:4 */
+.who-dcard { position: absolute; top: 0; box-sizing: border-box; width: 340px; aspect-ratio: 3 / 4; padding: 36px;
+  display: flex; flex-direction: column; justify-content: space-between; border: 2px solid var(--who-line-a);
+  box-shadow: 0 18px 36px -24px rgba(31, 42, 107, .35);
+  opacity: 0; transform: translateY(140px) rotate(0deg);
+  transition: transform .75s cubic-bezier(.2, .9, .25, 1) var(--d, 0s), opacity .3s ease var(--d, 0s); }
+.who-dcard:nth-child(1) { left: 0;   --r: -5deg; --y: 0px;  --d: 0s; }
+.who-dcard:nth-child(2) { left: 270px; --r: -1deg; --y: 36px; --d: .2s; border-color: var(--who-line-b); }
+.who-dcard:nth-child(3) { left: 540px; --r: 4deg;  --y: 10px; --d: .4s; border-color: var(--who-line-c); }
+.who-deal.is-dealt .who-dcard { opacity: 1; transform: translateY(var(--y)) rotate(var(--r)); }
+.who-dcard h3 { max-width: 232px; margin: 0; font-size: 20px; line-height: 30px; font-weight: 700; letter-spacing: var(--tracking-wider); color: var(--who-ink); }
+.who-dcard p { max-width: 200px; margin: 0; font-size: 15px; line-height: 26px; letter-spacing: var(--tracking-wider); color: var(--who-ink); opacity: .8; }   /* 文字限寬 200px，避開後一張卡蓋住的右側約 1/5 */
+@media (prefers-reduced-motion: reduce) { .who-dcard { transition: none; } }
+@media (max-width: 1079px) {
+  .who-deal { width: 100%; height: auto; display: flex; flex-direction: column; gap: 0; }
+  .who-dcard { position: relative; left: auto !important; width: min(420px, 92%); aspect-ratio: auto; min-height: 180px; gap: 24px; }
+  .who-dcard + .who-dcard { margin-top: -20px; }
+  .who-dcard:nth-child(1) { --r: -2deg; --y: 0px; }
+  .who-dcard:nth-child(2) { --r: 1.5deg; --y: 0px; align-self: flex-end; }
+  .who-dcard:nth-child(3) { --r: -1deg; --y: 0px; align-self: center; }
+  .who-dcard h3, .who-dcard p { max-width: none; }
+}
+@media (max-width: 767px) {
+  .who-dcard { padding: 26px 24px; min-height: 0; gap: 16px; }
+  .who-dcard h3 { font-size: 18px; line-height: 28px; }
+  .who-dcard p { font-size: 14px; line-height: 24px; }
+}
+/* 卡片頂端放大號碼（11-19 定案 A 款，同參考範例），標題與說明在卡片下半部 */
+.who-deal.is-num .who-dcard { justify-content: flex-start; }
+.who-num { margin-bottom: auto; font-family: "Roboto Condensed", sans-serif; font-size: 64px; line-height: 1; font-weight: 700; letter-spacing: -.02em; color: var(--who-ink); }
+.who-deal.is-num .who-dcard h3 { margin-bottom: 12px; }
+@media (max-width: 1079px) { .who-num { font-size: 44px; margin-bottom: 20px; } }
+/* 卡片配色（11-19，參考手牌配色；1、3 已改淺色調）：每張不同的實心底色、和白色背景拉開；細框（1px 半透明白）＋頂部淡淡的反光漸層，做出玻璃片的感覺。
+   第一張深靛藍、第二張品牌橘（重點）、第三張更深的夜藍；深色卡上文字白，橘卡上文字深色 */
+#who { --card-a: #D3DEF4; --card-b: var(--cta-orange); --card-c: #F8F9FC; }   /* 11-19：1、3 淺色調並拉開對比——1 較深的淺藍、3 接近白的淺灰；2 維持品牌橘 */
+[data-theme="dark"] #who { --card-a: #24346E; --card-c: #1A2350; }
+.who-dcard.mp-card { border: 1px solid rgba(31, 42, 107, .1); color: var(--who-ink);
+  background: linear-gradient(160deg, rgba(255, 255, 255, .7) 0%, rgba(255, 255, 255, 0) 38%), var(--card-a);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12), 0 24px 40px -24px rgba(16, 22, 61, .55); }
+.who-dcard.mp-card:nth-child(2) { background: linear-gradient(160deg, rgba(255, 255, 255, .22) 0%, rgba(255, 255, 255, 0) 40%), var(--card-b); border-color: rgba(255, 255, 255, .3); color: #1A0E05; }
+.who-dcard.mp-card:nth-child(3) { background: linear-gradient(160deg, rgba(255, 255, 255, .7) 0%, rgba(255, 255, 255, 0) 38%), var(--card-c); }
+.who-dcard.mp-card h3 { color: inherit; }
+/* 號碼鋼印凹下效果（11-19）：顏色取卡片底色再調淺；左上一道暗邊（凹槽陰影）、右下一道亮邊（受光邊），看起來像壓進紙裡 */
+.who-dcard.mp-card .who-num { color: color-mix(in srgb, var(--num-base) 55%, #fff);
+  text-shadow: -1px -1px 1px var(--num-dark), 1px 1px 1px rgba(255, 255, 255, .9); }
+.who-dcard.mp-card:nth-child(1) { --num-base: var(--card-a); --num-dark: rgba(31, 42, 107, .45); }
+.who-dcard.mp-card:nth-child(2) { --num-base: var(--card-b); --num-dark: rgba(120, 40, 0, .45); }
+.who-dcard.mp-card:nth-child(2) .who-num { color: color-mix(in srgb, var(--num-base) 75%, #fff); text-shadow: -1px -1px 1px var(--num-dark), 1px 1px 1px rgba(255, 220, 190, .7); }
+.who-dcard.mp-card:nth-child(3) { --num-base: var(--card-c); --num-dark: rgba(31, 42, 107, .42); }
+/* 淺色卡（1、3）的鋼印加深（11-19）：號碼比底色深一階，暗邊加重並加一層 2px 的柔和凹槽，亮邊維持白色 */
+[data-theme="light"] .who-dcard.mp-card:is(:nth-child(1), :nth-child(3)) .who-num { color: color-mix(in srgb, var(--num-base) 88%, #1F2A6B);
+  text-shadow: -1px -1px 1px var(--num-dark), -2px -2px 3px rgba(31, 42, 107, .12), 1px 1px 0 rgba(255, 255, 255, 1), 2px 2px 2px rgba(255, 255, 255, .7); }
+[data-theme="dark"] .who-dcard.mp-card .who-num { color: color-mix(in srgb, var(--num-base) 70%, #fff); text-shadow: -1px -1px 1px rgba(0, 0, 0, .5), 1px 1px 1px rgba(255, 255, 255, .18); }
+.who-dcard.mp-card p { color: inherit; opacity: .78; }
+/* 段落標題 B 款（11-19 起全頁段落標題都套用）：眉標前放橘色實心圓點、文字橘色；標題加粗到 900 */
+.mp-eyebrow-star { display: flex; align-items: center; gap: 10px; color: var(--cta-orange); }   /* 11-19 眉標文字也改橘色 */
+.mp-ball { width: 7px; height: 7px; flex: none; border-radius: 50%; background: var(--cta-orange); }   /* 11-19 縮小一半：14→7px */
+.mp-h2-mark { width: fit-content; font-weight: 900; font-size: clamp(26px, 2.6vw, 34px); }   /* 11-19 字級稍降（原最大 40px） */
+[data-theme="light"] .mp-h2-mark {   /* 與首屏主標同一組徑向漸層 */
+  color: transparent; -webkit-background-clip: text; background-clip: text;
+  background-image: radial-gradient(ellipse 64% 125% at 41% -25%, var(--alt-grad-in), var(--alt-grad-out)); }
 .mp-panel[hidden] { display: none; }
 .mp-panel { animation: mp-in .35s ease; }
 @keyframes mp-in { from { opacity: 0; transform: translateY(8px); } }
@@ -563,7 +632,7 @@ section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿�
 .mp-ctrl + .mp-ctrl { margin-top: 28px; padding-top: 28px; border-top: 1px solid var(--alt-line); }
 .mp-ctrl-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
 .mp-ctrl-head label { font-size: 15px; font-weight: 700; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); }
-.mp-ctrl-head output { font-family: "Roboto Condensed", sans-serif; font-size: 52px; line-height: 60px; font-weight: 700; color: var(--alt-ink); font-variant-numeric: tabular-nums; }
+.mp-ctrl-head output { font-family: "Roboto Condensed", sans-serif; font-size: 38px; line-height: 46px; font-weight: 700; color: var(--alt-ink); font-variant-numeric: tabular-nums; }
 .mp-ctrl-head output.is-promo { color: var(--mp-c-promo); }
 .mp-range { --c: var(--mp-c-net); --p: 50%; -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 30px; margin: 14px 0 18px; background: none; cursor: pointer; }
 .mp-range.is-promo { --c: var(--mp-c-promo); }
@@ -574,11 +643,15 @@ section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿�
 .mp-range::-webkit-slider-thumb { -webkit-appearance: none; width: 32px; height: 32px; margin-top: -10px; border-radius: 50%; background: var(--alt-card); border: 7px solid var(--c); box-shadow: 0 2px 8px rgba(0,0,0,.18); }
 .mp-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--alt-card); border: 7px solid var(--c); box-shadow: 0 2px 8px rgba(0,0,0,.18); }
 .mp-range:focus-visible { outline: 2px solid var(--cta-orange); outline-offset: 4px; border-radius: 16px; }
-.mp-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.mp-chips button { min-width: 64px; height: 40px; padding: 0 16px; border: 1px solid var(--alt-line); border-radius: var(--r-30); background: var(--alt-card);
-  font-family: "Roboto Condensed", sans-serif; font-size: 15px; font-weight: 600; color: var(--alt-ink); cursor: pointer; transition: background .2s, color .2s, border-color .2s; }
-.mp-chips button:hover { border-color: var(--alt-ink-soft); }
-.mp-chips button[aria-pressed="true"] { background: var(--alt-ink); border-color: var(--alt-ink); color: var(--alt-page); }
+/* 快捷選項（11-19 改用平台一般按鈕，對照 shared/forms.css 的 .btn）：尺寸用小按鈕（.btn-sm：高 32、內距 0／16、12px）；
+   未選取＝次要按鈕（.btn-secondary：白底、淡灰框、底部 2px 灰陰影），選取中＝主要按鈕（.btn-primary：實心藍、深藍框、白字） */
+.mp-chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.mp-chips button { min-width: 0; height: 32px; padding: 0 16px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--r-30);
+  font: inherit; font-size: 12px; font-weight: 700; letter-spacing: var(--tracking-wider); cursor: pointer;
+  background: var(--white); border: 1px solid var(--black-200); color: var(--black-700); filter: drop-shadow(0 2px 0 var(--black-200)); transition: filter .15s, background .15s; }
+.mp-chips button:hover { background: var(--black-50); }
+.mp-chips button[aria-pressed="true"] { background: var(--accent); border: 2px solid var(--accent-border); color: var(--white); }
+.mp-chips button[aria-pressed="true"]:hover { filter: drop-shadow(0 2px 0 var(--black-200)) brightness(1.06); }
 .mp-viz { min-width: 0; }
 .mp-stage { position: relative; height: 400px;   /* 固定高度（2026-11-16）：點變多時改成縮小，區塊高度不變 */
   background: radial-gradient(circle, var(--mp-grid-dot) 1.6px, transparent 2.2px) 0 100% / var(--pitch, 30px) var(--pitch, 30px); }
@@ -598,10 +671,10 @@ section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿�
 .mp-col-names span { display: block; font-family: "Roboto Condensed", sans-serif; font-size: 14px; color: var(--alt-ink-soft); }
 .mp-you { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; font-style: normal; font-size: 12px; font-weight: 700; background: var(--cta-orange); color: var(--white); }
 .mp-eq { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px 28px; margin-top: 64px; }
-.mp-eq b { display: block; font-family: "Roboto Condensed", sans-serif; font-size: 46px; line-height: 52px; font-weight: 700; color: var(--alt-ink); font-variant-numeric: tabular-nums; }
+.mp-eq b { display: block; font-family: "Roboto Condensed", sans-serif; font-size: 34px; line-height: 40px; font-weight: 700; color: var(--alt-ink); font-variant-numeric: tabular-nums; }
 .mp-eq .c-net b { color: var(--mp-c-net); } .mp-eq .c-promo b { color: var(--mp-c-promo); } .mp-eq .c-fee b { color: var(--mp-c-fee); }
 .mp-eq span { font-size: 14px; line-height: 22px; letter-spacing: var(--tracking-wider); color: var(--alt-ink-soft); }
-.mp-eq > i { font-style: normal; font-size: 40px; line-height: 52px; color: var(--alt-ink-soft); }
+.mp-eq > i { font-style: normal; font-size: 30px; line-height: 40px; color: var(--alt-ink-soft); }
 
 /* 5. 計價與保障：四張說明卡＋結算流程（天數依平台設定） */
 .mp-grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
@@ -723,13 +796,13 @@ main.is-swapping { animation: mp-swap .35s ease; }
   .st-split p { font-size: 11px; }
   .st-cols { height: 6.5em; }
   .mp-ctrl-card { padding: 24px 20px; }
-  .mp-ctrl-head output { font-size: 40px; line-height: 48px; }
+  .mp-ctrl-head output { font-size: 30px; line-height: 38px; }
   .mp-col-amt { font-size: 20px; line-height: 26px; }
   .mp-stage { height: 260px; }
   .mp-col-names strong { font-size: 13px; line-height: 20px; }
   .mp-eq { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 16px; margin-top: 40px; }   /* 手機改 2×2，不顯示運算符號 */
   .mp-eq > i { display: none; }
-  .mp-eq b { font-size: 28px; line-height: 34px; }
+  .mp-eq b { font-size: 24px; line-height: 30px; }
   .mp-eq > i { font-size: 24px; line-height: 34px; }
   .mp-flow { grid-template-columns: 1fr; padding: 24px; }
   .mp-faq details { padding: 0 20px; }
@@ -738,6 +811,147 @@ main.is-swapping { animation: mp-swap .35s ease; }
 }
 @media (prefers-reduced-motion: reduce) { .mp-panel { animation: none; } .st-panel, .st-ch, .st-bag, .st-ok, .st-deal, .st-split, .st-cols span { transition: none !important; } .st-links path, .st-buy { animation: none !important; } .mp-stage, .mp-stage i, .mp-col-amt { transition: none; } .mp-mod, .mp-mod .mp-arrow { transition: none; } }
 
+
+/* 怎麼運作的配色（11-19，參考暖灰展示窗）：面板暖淺灰、框線與分隔線暖灰、說明卡更深一階的暖灰；深色模式維持原本的深藍系 */
+[data-theme="light"] .st { --st-bg: #FAF9F7; --st-line: #EAE7E2; --st-card: #F0EDE8; --st-seg: #E6E2DC; --st-hover: rgba(60, 50, 40, .03);   /* 11-19 再調淡：面板接近白，只留一點暖灰 */
+  --st-scene: #FFFFFF; }   /* 11-19 右側插圖區改純白 */   /* 右側插圖區：同色調再調淡，中心更亮 */
+[data-theme="dark"] .st  { --st-scene: radial-gradient(70% 70% at 60% 55%, var(--mp-tint), transparent 72%), var(--alt-card); --st-bg: var(--mp-band); --st-line: var(--alt-line); --st-card: color-mix(in srgb, var(--alt-ink) 7%, var(--mp-band)); --st-seg: rgba(255, 255, 255, .14); --st-hover: rgba(255, 255, 255, .05); }
+/* 怎麼運作（11-19 改版，參考分頁式展示窗）：整塊大圓角面板；上方 5 個分頁（目前步驟整格品牌橘、步驟名稱＋等寬小編號），
+   分頁下方是橘色分段進度條；左下一張灰底卡片放目前步驟的標題與說明，下方保留曝光／成交數字；右半邊是插圖，背景柔和光暈。
+   功能不變：每步 6 秒自動播放、點區塊暫停、點分頁或箭頭切換 */
+.st { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto auto 1fr auto auto 1fr;
+  grid-template-areas: "bars bars" "prog scene" ". scene" "copy scene" "foot scene" ". scene";   /* 11-19 說明卡＋數字在左欄垂直置中 */ gap: 0; align-items: stretch;
+  border: 1px solid var(--st-line); border-radius: 32px; background: var(--st-bg); overflow: hidden; }
+.st-text { display: contents; }
+.st-bars { grid-area: bars; display: flex; gap: 0; border-bottom: 1px solid var(--st-line); }   /* 11-19 分頁依文字寬度排列、靠左，不撐滿整列（同參考圖） */
+.st-bar { gap: 0; }
+.st-lbl { order: 0; display: flex; align-items: baseline; gap: 8px; padding: 22px 40px; white-space: nowrap; font-size: 18px; line-height: 24px; font-weight: 800;
+  letter-spacing: .02em; color: var(--alt-ink); transition: background .3s, color .3s; }
+.st-lbl b { order: 2; margin: 0; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11px; font-weight: 500; letter-spacing: .04em; color: var(--alt-ink-soft); }
+.st-bar[aria-current="step"] .st-lbl { background: var(--cta-orange); color: #fff; font-weight: 800; }
+.st-bar[aria-current="step"] .st-lbl b { color: rgba(255, 255, 255, .8); }
+.st-bar:not([aria-current="step"]):hover .st-lbl { background: var(--st-hover); }
+.st-track { display: none; }   /* 11-19：進度條移到左欄頂端（.st-prog），分頁裡不再顯示 */
+.st-prog { grid-area: prog; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin: 32px 40px 0; }   /* 11-19 移到左欄頂端（同參考圖）；下方不留固定間距，讓說明卡上下空間相等 */
+.st-prog span { height: 5px; background: var(--st-seg); overflow: hidden; }
+.st-prog i { display: block; height: 100%; width: calc(var(--f, 0) * 100%); background: var(--cta-orange); }
+.st-fill { background: var(--cta-orange); }
+.st-copy { grid-area: copy; align-self: end; margin: 0 32px; min-height: 0; }
+.st-panel { padding: 28px 32px; border-radius: 28px; background: var(--st-card); }
+.st-panel h3 { margin-bottom: 14px; font-size: 24px; line-height: 1.35; }
+.st-panel p { font-size: 15px; line-height: 27px; }
+.st-foot { grid-area: foot; margin: 18px 32px 0; padding: 0 0 0 32px; border: 0; }
+.st-stats { flex-wrap: wrap; gap: 6px 28px; }
+.st-stats em { flex-basis: 100%; font-size: 12px; line-height: 18px; color: var(--alt-ink-soft); opacity: .6; }   /* 11-19「示意數字」移到數字下方、淺灰小字 */
+.st-stats b { font-size: 36px; line-height: 42px; }   /* 11-19 放大 */
+.st-stats span { font-size: 15px; line-height: 22px; }
+.st-stats b.is-empty { color: var(--alt-ink-soft); opacity: .45; }   /* 還沒有數字時的「–」 */
+.st-stats > div:first-child b { min-width: 5.6ch; }                    /* 曝光欄固定寬度，數字出現時「成交」不會跟著跳 */
+.st-stats { gap: 6px 36px; }
+.st-scene { grid-area: scene; aspect-ratio: auto; min-height: 520px; border-left: 1px solid var(--st-line);
+  background: var(--st-scene); }
+.st-art { inset: 10% 8%; }
+.st-nav.prev { left: 12px; } .st-nav.next { right: 12px; }
+@media (max-width: 1079px) {
+  .st { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; grid-template-areas: "bars" "scene" "prog" "copy" "foot"; }
+  .st-prog { margin: 24px 40px 16px; }   /* 單欄時進度條和說明卡之間留 16px */
+  .st-foot { margin-bottom: 28px; }       /* 曝光／成交下方留白，不貼著面板底 */
+  /* 窄一點的寬度：分頁改成上下兩行（步驟名稱在上、編號在下），平均分配寬度，不會一個字一行 */
+  .st-bar { flex: 1 1 0; min-width: 0; }
+  .st-lbl { flex-direction: column; align-items: flex-start; gap: 2px; padding: 16px 20px; }
+  .st-scene { min-height: 0; aspect-ratio: 5 / 4; max-width: none; border-left: 0; border-bottom: 1px solid var(--st-line); }
+  .st-copy { align-self: start; }
+}
+@media (max-width: 767px) {
+  .st { display: grid; border-radius: 24px; }
+  .st-bars { display: flex; overflow-x: auto; scrollbar-width: none; }   /* 手機：分頁可以橫向滑動 */
+  .st-bars::-webkit-scrollbar { display: none; }
+  .st-bar { flex: 0 0 auto; }
+  .st-lbl { padding: 16px 18px; font-size: 15px; }
+  .st-prog { margin: 18px 16px 16px; }
+  .st-scene { margin-top: 0; }
+  .st-art { inset: 6% 4%; }
+  .st-copy { margin: 0 16px; min-height: 0; }
+  .st-panel { padding: 22px 22px 24px; border-radius: 22px; }
+  .st-panel h3 { font-size: 20px; }
+  .st-panel p { font-size: 14px; line-height: 25px; }
+  .st-foot { margin: 14px 16px 26px; padding-left: 22px; }
+  .st-stats b { font-size: 30px; line-height: 36px; }
+  .st-stats span { font-size: 14px; }
+}
+
+/* 試算區兩行說明（11-19）：比照「※ 示意數字」——12px、淺灰（次要文字色再淡 40%） */
+#split .mp-viz-note, #split .mp-note { font-size: 12px; line-height: 18px; color: var(--alt-ink-soft); opacity: .6; }
+
+/* 段落眉標改成橘色膠囊標籤（11-19，參考 TEAM 標籤）：實心品牌橘、白色大寫小字；不顯示前面的圓點 */
+.mp-eyebrow-star { display: inline-flex; width: fit-content; align-items: center; padding: 3px 10px; border-radius: var(--r-30); background: var(--cta-orange); color: #fff; letter-spacing: .1em; font-size: 11px; line-height: 16px; }   /* 11-19 縮小：字 14→11px、膠囊內距縮小 */
+.mp-eyebrow-star .mp-ball { display: none; }
+
+/* 計價與保障（11-19 改版，參考弧形評論輪播）：四張卡片排在一條向下彎的弧線上，中間那張擺正、兩側依距離往下沉並往外旋轉；
+   最外側的卡片會切出畫面。下方「上一個／下一個」＋圓點切換，點兩側卡片也會轉到中間；鍵盤左右鍵可切換。卡片複製一組讓兩側都有卡 */
+#pricing { overflow-x: clip; }
+.mp-grid2.pc-arc { --gap: 400px; --cw: 360px; display: block; position: relative; height: 330px; margin-bottom: 8px; }
+.pc-arc .mp-item { position: absolute; left: 50%; top: 24px; box-sizing: border-box; width: var(--cw); min-height: 210px; margin: 0;
+  transform: translateX(calc(-50% + var(--d, 0) * var(--gap))) translateY(calc(var(--d, 0) * var(--d, 0) * 26px)) rotate(calc(var(--d, 0) * 7deg));
+  transform-origin: 50% 100%; transition: transform .6s cubic-bezier(.3, .8, .3, 1), opacity .4s ease, box-shadow .3s; cursor: pointer;
+  box-shadow: 0 18px 40px -28px rgba(31, 42, 107, .15); }   /* 11-19 陰影調淡 */
+.pc-arc .mp-item.is-center { cursor: default; z-index: 2; box-shadow: 0 24px 48px -26px rgba(31, 42, 107, .2); }
+.pc-arc .mp-item.is-off { opacity: 0; pointer-events: none; }
+.pc-arc .mp-item h3 { font-size: 20px; line-height: 30px; margin-bottom: 12px; }
+.pc-arc .mp-item { border: 1px solid var(--alt-line); }   /* 11-19 卡片邊框：灰色細線 */
+.pc-stars { display: flex; gap: 4px; margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid var(--alt-line); }   /* 11-19 星星下方加分隔線 */
+.pc-stars svg { width: 16px; height: 16px; fill: var(--cta-orange); }
+.pc-ctrl { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 8px 0 56px; }
+.pc-ctrl button.pc-btn { height: 40px; padding: 0 22px; border-radius: var(--r-30); font: inherit; font-size: 14px; font-weight: 700; letter-spacing: var(--tracking-wider); cursor: pointer; transition: background .2s, filter .2s; }
+.pc-btn.prev { border: 1px solid var(--alt-line); background: var(--alt-card); color: var(--alt-ink); }
+.pc-btn.prev:hover { background: var(--alt-ghost-hover); }
+.pc-btn.next { border: 1px solid var(--alt-ink); background: var(--alt-ink); color: var(--alt-page); }
+.pc-btn.next:hover { filter: brightness(1.15); }
+.pc-btn:focus-visible { outline: 2px solid var(--cta-orange); outline-offset: 2px; }
+.pc-dots { display: flex; gap: 6px; }
+.pc-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--alt-line); transition: background .3s, width .3s; }
+.pc-dots i.is-on { background: var(--cta-orange); }
+@media (max-width: 767px) {
+  .mp-grid2.pc-arc { --gap: 270px; --cw: 250px; height: 300px; }
+  .pc-arc .mp-item { min-height: 200px; padding: 22px; }
+  .pc-arc .mp-item h3 { font-size: 18px; line-height: 26px; }
+  .pc-ctrl { margin-bottom: 40px; }
+}
+@media (prefers-reduced-motion: reduce) { .pc-arc .mp-item { transition: none; } }
+
+/* 輪播控制改成分段進度條（11-19，同「怎麼運作」）：灰底 5px，目前那段隨 4 秒填滿品牌橘，已看過的整段橘；不要上一個／下一個 */
+.pc-ctrl { gap: 0; }
+.pc-prog { display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); gap: 6px; width: min(520px, 100%); }
+.pc-prog button { height: 15px; padding: 5px 0; border: 0; background: none; cursor: pointer; }
+.pc-prog button i { display: block; height: 5px; background: #E2DFDA; overflow: hidden; position: relative; }
+.pc-prog button i::after { content: ''; position: absolute; inset: 0; width: calc(var(--f, 0) * 100%); background: var(--cta-orange); }
+.pc-prog button:focus-visible { outline: 2px solid var(--cta-orange); outline-offset: 2px; }
+[data-theme="dark"] .pc-prog button i { background: rgba(255, 255, 255, .14); }
+
+/* 結算流程（11-19，參考貼紙風卡片）：整排包成一張白卡＋1px 深靛藍細框，下方一塊實心淡橘偏移底（往下錯開 6px）；
+   左上角壓一個波浪邊圓章「結算流程」：波浪形狀慢慢轉（14 秒一圈），文字不轉；減少動態效果時不轉 */
+.flow-card { position: relative; margin-top: 56px; }
+.flow-card .mp-flow { margin-top: 0; padding: 32px 32px 30px 48px; border: 1px solid var(--alt-line); box-shadow: none; }   /* 11-19 邊框改灰色；移除淡橘偏移底 */
+[data-theme="dark"] .flow-card .mp-flow { border-color: rgba(255, 255, 255, .5); }
+.flow-badge { position: absolute; left: -16px; top: -18px; z-index: 2; width: 44px; height: 44px; display: grid; place-items: center; }   /* 11-19 拿掉文字、縮小成 44px 的純圖形 */
+.flow-badge svg { position: absolute; inset: 0; width: 100%; height: 100%; fill: var(--cta-orange); animation: flow-badge-spin 14s linear infinite; }
+.flow-badge b { position: relative; font-size: 15px; line-height: 18px; font-weight: 800; letter-spacing: .06em; text-align: center; color: #fff; }
+@keyframes flow-badge-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .flow-badge svg { animation: none; } }
+@media (max-width: 767px) {
+  .flow-card { margin-top: 44px; }
+  .flow-card .mp-flow { padding: 30px 24px 24px; }
+  .flow-badge { left: -10px; top: -14px; width: 36px; height: 36px; }
+}
+
+/* 輪播導覽改成膠囊點（11-19，參考圖一）：一般是淺橘短膠囊，輪到的那張展開成較長的實心品牌橘；寬度以動畫展開 */
+.pc-prog { display: flex; justify-content: center; gap: 10px; width: auto; }
+.pc-prog button { width: 32px; height: 12px; padding: 0; border-radius: 6px; background: #FFE2D1; transition: width .4s cubic-bezier(.3, .8, .3, 1), background .3s; }
+.pc-prog button.is-on { width: 64px; background: var(--cta-orange); }
+.pc-prog button i { display: none; }
+[data-theme="dark"] .pc-prog button { background: rgba(255, 97, 0, .25); }
+[data-theme="dark"] .pc-prog button.is-on { background: var(--cta-orange); }
+@media (prefers-reduced-motion: reduce) { .pc-prog button { transition: none; } }
 </style>
 </head>
 <body>
@@ -753,25 +967,13 @@ main.is-swapping { animation: mp-swap .35s ease; }
   </div>
 </header>
 
+<canvas class="mp-trail" aria-hidden="true"></canvas>
 <main>
 <section class="mp-hero" aria-labelledby="mp-title">
   <div class="mp-wrap">
     <div>
       <h1 class="mp-h1" id="mp-title"><span class="for-seller">好商品，<br>缺的是被看見的場景。</span><span class="for-promoter">你的會員，<br>值得更好的推薦。</span></h1>
       <p class="mp-lead"><span class="for-seller">在商品 SENSE 上架商品，生態圈夥伴會把它帶進自家會員每天打開的電子報、APP 和簡訊。有人買，才付推廣費。</span><span class="for-promoter">在商品 SENSE 的商品市集挑選會員會喜歡的商品，用你自己的電子報、APP 和簡訊推廣。每成交一筆，就有推廣費。</span></p>
-      <aside class="mp-sum mp-card" aria-labelledby="mp-sum-title">
-        <h2 class="sr-only" id="mp-sum-title">三個重點</h2>
-        <ol class="for-seller">
-          <li><strong>不用先付廣告費</strong><span>推廣費按成交計算，沒有成交就不用付。</span></li>
-          <li><strong>會員場景是現成的</strong><span>直接進入夥伴的電子報、APP 與簡訊。</span></li>
-          <li><strong>結算交給平台</strong><span>成交追蹤、金流與發票都由平台處理。</span></li>
-        </ol>
-        <ol class="for-promoter">
-          <li><strong>不用備貨、不用自己談</strong><span>商品市集直接挑，每件都標好成交一筆的推廣費。</span></li>
-          <li><strong>用你現有的渠道</strong><span>電子報、APP、簡訊，用你自己的名義推薦。</span></li>
-          <li><strong>成交就有推廣費</strong><span>平台追蹤成交，鑑賞期後入帳、可申請提領。</span></li>
-        </ol>
-      </aside>
     </div>
     <div class="mp-kv" aria-hidden="true"><canvas></canvas><svg class="mp-ic" data-anim="product" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="ic-bag"><path d="M20 30H60L57 64H23Z"/><path d="M31 30V24a9 9 0 0 1 18 0V30"/></g><g fill="currentColor" stroke="none"><circle class="ic-dot lt gc" style="--i:2;--c:#0073F5" cx="31" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#56BBB9" cx="35.5" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#A9C576" cx="40" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#FAB431" cx="44.5" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="49" cy="44" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#0073F5" cx="31" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#56BBB9" cx="35.5" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="40" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#FAB431" cx="44.5" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:1;--c:#FF5B26" cx="49" cy="48.5" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#0073F5" cx="31" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#56BBB9" cx="35.5" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#A9C576" cx="40" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#FAB431" cx="44.5" cy="53" r="1.1"/><circle class="ic-dot lt gc" style="--i:0;--c:#FF5B26" cx="49" cy="53" r="1.1"/></g></svg></div>
   </div>
@@ -780,24 +982,14 @@ main.is-swapping { animation: mp-swap .35s ease; }
 <section class="mp-sec" id="who" aria-labelledby="who-title">
   <div class="mp-wrap">
     <div class="mp-head">
-      <p class="mp-eyebrow">Who it's for</p>
-      <h2 class="mp-h2" id="who-title">誰適合用商品 SENSE？</h2>
+      <p class="mp-eyebrow mp-eyebrow-star"><span class="mp-ball" aria-hidden="true"></span>Who it's for</p>
+      <h2 class="mp-h2 mp-h2-mark" id="who-title">誰適合用商品 SENSE？</h2>
     </div>
     <div class="mp-panel for-seller">
-      <p class="mp-panel-sum">你有商品，想找到願意推薦它的會員場景。</p>
-      <div class="mp-grid3">
-        <article class="mp-item mp-card"><h3>有好商品，缺穩定曝光</h3><p>不用自己經營新渠道，直接進入夥伴每天打開的電子報、APP 與簡訊。</p></article>
-        <article class="mp-item mp-card"><h3>不想先砸廣告預算</h3><p>只有真正成交的訂單才付推廣費，每一筆都看得到成效。</p></article>
-        <article class="mp-item mp-card"><h3>想觸及其他品牌的會員</h3><p>讓商品出現在夥伴的會員面前，接觸原本觸及不到的客群。</p></article>
-      </div>
+      <div class="who-deal is-num"><article class="who-dcard mp-card"><span class="who-num" aria-hidden="true">1.</span><h3>有好商品，缺穩定曝光</h3><p>不用自己經營新渠道，直接進入夥伴每天打開的電子報、APP 與簡訊。</p></article><article class="who-dcard mp-card"><span class="who-num" aria-hidden="true">2.</span><h3>不想先砸廣告預算</h3><p>只有真正成交的訂單才付推廣費，每一筆都看得到成效。</p></article><article class="who-dcard mp-card"><span class="who-num" aria-hidden="true">3.</span><h3>想觸及其他品牌的會員</h3><p>讓商品出現在夥伴的會員面前，接觸原本觸及不到的客群。</p></article></div>
     </div>
     <div class="mp-panel for-promoter">
-      <p class="mp-panel-sum">你有會員和渠道，想找到值得推薦的商品。</p>
-      <div class="mp-grid3">
-        <article class="mp-item mp-card"><h3>手上有會員與渠道</h3><p>電子報、APP、簡訊已經在運作，缺的是值得推薦給會員的內容。</p></article>
-        <article class="mp-item mp-card"><h3>想把渠道變成收入</h3><p>每一筆從你渠道來的成交，都會計入你的推廣費。</p></article>
-        <article class="mp-item mp-card"><h3>不想自己談合作、對帳</h3><p>在商品市集挑商品、送出提案，成交追蹤與結算由平台處理。</p></article>
-      </div>
+      <div class="who-deal is-num"><article class="who-dcard mp-card"><span class="who-num" aria-hidden="true">1.</span><h3>手上有會員與渠道</h3><p>電子報、APP、簡訊已經在運作，缺的是值得推薦給會員的內容。</p></article><article class="who-dcard mp-card"><span class="who-num" aria-hidden="true">2.</span><h3>想把渠道變成收入</h3><p>每一筆從你渠道來的成交，都會計入你的推廣費。</p></article><article class="who-dcard mp-card"><span class="who-num" aria-hidden="true">3.</span><h3>不想自己談合作、對帳</h3><p>在商品市集挑商品、送出提案，成交追蹤與結算由平台處理。</p></article></div>
     </div>
   </div>
 </section>
@@ -805,16 +997,16 @@ main.is-swapping { animation: mp-swap .35s ease; }
 <section class="mp-sec mp-how" id="how" aria-labelledby="how-title">
   <div class="mp-wrap">
     <div class="mp-head">
-      <p class="mp-eyebrow">How it works</p>
-      <h2 class="mp-h2" id="how-title"><span class="for-seller">一件商品，怎麼被賣出去</span><span class="for-promoter">一筆推廣費，怎麼賺進來</span></h2>
+      <p class="mp-eyebrow mp-eyebrow-star"><span class="mp-ball" aria-hidden="true"></span>How it works</p>
+      <h2 class="mp-h2 mp-h2-mark" id="how-title"><span class="for-seller">一件商品，怎麼被賣出去</span><span class="for-promoter">一筆推廣費，怎麼賺進來</span></h2>
     </div>
     <div class="st" data-step="1">
       <div class="st-text">
-        <div class="st-bars" role="group" aria-label="選擇步驟"><button type="button" class="st-bar" data-i="0" aria-label="第 1 步"><span class="st-track"><span class="st-fill"></span></span><span class="st-lbl"><b>1</b><span class="for-seller">上架</span><span class="for-promoter">挑商品</span></span></button><button type="button" class="st-bar" data-i="1" aria-label="第 2 步"><span class="st-track"><span class="st-fill"></span></span><span class="st-lbl"><b>2</b><span class="for-seller">場景</span><span class="for-promoter">備渠道</span></span></button><button type="button" class="st-bar" data-i="2" aria-label="第 3 步"><span class="st-track"><span class="st-fill"></span></span><span class="st-lbl"><b>3</b><span class="for-seller">媒合</span><span class="for-promoter">送提案</span></span></button><button type="button" class="st-bar" data-i="3" aria-label="第 4 步"><span class="st-track"><span class="st-fill"></span></span><span class="st-lbl"><b>4</b><span class="for-seller">成交</span><span class="for-promoter">成交</span></span></button><button type="button" class="st-bar" data-i="4" aria-label="第 5 步"><span class="st-track"><span class="st-fill"></span></span><span class="st-lbl"><b>5</b><span class="for-seller">分帳</span><span class="for-promoter">領推廣費</span></span></button></div>
+        <div class="st-bars" role="group" aria-label="選擇步驟"><button type="button" class="st-bar" data-i="0" aria-label="第 1 步"><span class="st-track"><span class="st-fill"></span></span><span class="st-lbl"><b>01</b><span class="for-seller">上架</span><span class="for-promoter">挑商品</span></span></button><button type="button" class="st-bar" data-i="1" aria-label="第 2 步"><span class="st-track"><span class="st-fill"></span></span><span class="st-lbl"><b>02</b><span class="for-seller">場景</span><span class="for-promoter">備渠道</span></span></button><button type="button" class="st-bar" data-i="2" aria-label="第 3 步"><span class="st-track"><span class="st-fill"></span></span><span class="st-lbl"><b>03</b><span class="for-seller">媒合</span><span class="for-promoter">送提案</span></span></button><button type="button" class="st-bar" data-i="3" aria-label="第 4 步"><span class="st-track"><span class="st-fill"></span></span><span class="st-lbl"><b>04</b><span class="for-seller">成交</span><span class="for-promoter">成交</span></span></button><button type="button" class="st-bar" data-i="4" aria-label="第 5 步"><span class="st-track"><span class="st-fill"></span></span><span class="st-lbl"><b>05</b><span class="for-seller">分帳</span><span class="for-promoter">領推廣費</span></span></button></div>
+        <div class="st-prog" aria-hidden="true"><span><i></i></span><span><i></i></span><span><i></i></span><span><i></i></span><span><i></i></span></div>
         <div class="st-copy"><article class="st-panel for-seller" data-i="0"><h3>先把商品放上架</h3><p>寫好商品資訊和價格條件，再決定每成交一筆，願意付多少行銷推廣費給幫你賣的夥伴。</p></article><article class="st-panel for-promoter" data-i="0"><h3>先挑一件會員會想買的商品</h3><p>商品市集裡的每件商品，都標好了成交一筆你能拿到多少推廣費。挑你的會員會想買的。</p></article><article class="st-panel for-seller" data-i="1"><h3>會員已經在那裡了</h3><p>生態圈夥伴手上有現成的會員，以及他們每天會打開的電子報、APP 和簡訊。你不用從零經營。</p></article><article class="st-panel for-promoter" data-i="1"><h3>你的會員已經在那裡了</h3><p>你的會員每天都會打開你的電子報、APP 和簡訊，缺的是值得推薦給他們的東西。</p></article><article class="st-panel for-seller" data-i="2"><h3>一個提案，商品就上場</h3><p>行銷方挑中你的商品、送出合作提案。你按下確認，商品就出現在他們的會員面前。</p></article><article class="st-panel for-promoter" data-i="2"><h3>送出提案，商品就上場</h3><p>對想推的商品發起合作提案。商品方確認後，就能在你自己的渠道推廣它。</p></article><article class="st-panel for-seller" data-i="3"><h3>有人買，才算數</h3><p>沒有前期廣告預算，也不用猜哪個渠道有效。只有真正成交的訂單才付推廣費，由平台負責追蹤。</p></article><article class="st-panel for-promoter" data-i="3"><h3>有人買，就算你的</h3><p>從你渠道來的每一筆成交都記在你名下，由平台負責追蹤，不用自己對帳。</p></article><article class="st-panel for-seller" data-i="4"><h3>錢怎麼分，一目了然</h3><p>過了鑑賞期，推廣費付給行銷方，平台收商品處理費（含金流、發票），其餘就是你的實收。</p></article><article class="st-panel for-promoter" data-i="4"><h3>推廣費，一目了然</h3><p>過了鑑賞期，推廣費計入你的應收帳款，入帳滿一段時間就能申請提領。</p></article></div>
         <div class="st-foot">
-          <div class="st-stats"><div><span>曝光</span><b id="st-exp">0</b></div><div><span>成交</span><b class="is-deal" id="st-deal">0</b></div><em>示意數字</em></div>
-          <button type="button" class="st-play" aria-label="暫停自動播放"><svg class="i-pause" viewBox="0 0 16 16"><path d="M5 3.5v9M11 3.5v9"/></svg><svg class="i-play" viewBox="0 0 16 16"><path d="M5 3.2v9.6L12.8 8Z"/></svg><svg class="i-replay" viewBox="0 0 16 16"><path d="M3.2 8a4.8 4.8 0 1 0 1.5-3.5M3.5 2.5v2.6h2.6"/></svg><span class="st-play-txt">暫停</span></button>
+          <div class="st-stats"><div><span>曝光</span><b class="is-empty" id="st-exp">–</b></div><div><span>成交</span><b class="is-deal is-empty" id="st-deal">–</b></div><em>※ 示意數字</em></div>
         </div>
       </div>
       <div class="st-scene">
@@ -844,7 +1036,7 @@ main.is-swapping { animation: mp-swap .35s ease; }
 <section class="mp-sec" id="split" aria-labelledby="split-title">
   <div class="mp-wrap">
     <div class="mp-head mp-head-row">
-      <div><p class="mp-eyebrow">Revenue split</p><h2 class="mp-h2" id="split-title">一筆訂單，拆成三疊</h2></div>
+      <div><p class="mp-eyebrow mp-eyebrow-star"><span class="mp-ball" aria-hidden="true"></span>Revenue split</p><h2 class="mp-h2 mp-h2-mark" id="split-title">一筆訂單，拆成三疊</h2></div>
     </div>
     <div class="mp-split">
       <div class="mp-ctrl-card mp-card">
@@ -869,7 +1061,6 @@ main.is-swapping { animation: mp-swap .35s ease; }
           <li><strong>行銷推廣費 <em class="mp-you for-promoter">你</em></strong><span id="p-promo">12%</span></li>
           <li><strong>商品處理費</strong><span>8%</span></li>
         </ul>
-        <p class="mp-viz-note">每一顆點是 <span id="dot-v">NT$ 20</span>。調整金額和推廣費，點會在三疊之間移動，<span class="for-seller">藍色那疊就是你最後拿到的錢。</span><span class="for-promoter">橘色那疊就是你拿到的推廣費。</span></p>
       </div>
     </div>
     <div class="mp-eq" aria-live="polite">
@@ -885,37 +1076,29 @@ main.is-swapping { animation: mp-swap .35s ease; }
 <section class="mp-sec mp-how" id="pricing" aria-labelledby="pricing-title">
   <div class="mp-wrap">
     <div class="mp-head">
-      <p class="mp-eyebrow">Pricing &amp; settlement</p>
-      <h2 class="mp-h2" id="pricing-title"><span class="for-seller">成交才付費，結算看得見</span><span class="for-promoter">成交就有推廣費，入帳看得見</span></h2>
+      <p class="mp-eyebrow mp-eyebrow-star"><span class="mp-ball" aria-hidden="true"></span>Pricing &amp; settlement</p>
+      <h2 class="mp-h2 mp-h2-mark" id="pricing-title"><span class="for-seller">成交才付費，結算看得見</span><span class="for-promoter">成交就有推廣費，入帳看得見</span></h2>
     </div>
-    <div class="mp-grid2 for-promoter">
+    <div class="mp-grid2 pc-arc for-promoter" role="region" aria-roledescription="輪播" aria-label="計價與保障">
       <article class="mp-item mp-card"><h3>不用先墊任何費用</h3><p>挑商品、送提案都不用付費，成交才計推廣費。</p></article>
       <article class="mp-item mp-card"><h3>平台追蹤每一筆成交</h3><p>從你渠道來的訂單由平台記錄，不用自己對帳。</p></article>
       <article class="mp-item mp-card"><h3>鑑賞期過後才入帳</h3><p>退貨的訂單不計推廣費。</p></article>
       <article class="mp-item mp-card"><h3>在「帳戶與結算」提領</h3><p>入帳滿一段時間就能申請提領，上傳發票後由平台撥款。</p></article>
     </div>
-    <div class="mp-grid2 for-seller">
+    <div class="mp-grid2 pc-arc for-seller" role="region" aria-roledescription="輪播" aria-label="計價與保障">
       <article class="mp-item mp-card"><h3>沒有前期廣告費</h3><p>推廣費按成交計算，沒有成交就沒有推廣費。</p></article>
       <article class="mp-item mp-card"><h3>平台追蹤每一筆成交</h3><p>從夥伴渠道來的訂單由平台記錄，雙方不用自己對帳。</p></article>
       <article class="mp-item mp-card"><h3>鑑賞期過後才結算</h3><p>退貨的訂單不計推廣費。</p></article>
       <article class="mp-item mp-card"><h3>金流與發票由平台處理</h3><p>商品處理費包含金流與發票服務，比例依平台設定。</p></article>
     </div>
-    <ol class="mp-flow mp-card" aria-label="結算流程">
-      <li><strong>成交</strong><span>會員在夥伴渠道下單</span></li>
-      <li><strong>鑑賞期</strong><span>確認沒有退貨</span></li>
-      <li><strong>合作完成</strong><span>推廣費入帳</span></li>
-      <li><strong>可提領</strong><span>入帳滿一段時間後申請</span></li>
-      <li><strong>撥款</strong><span>收到發票後撥款</span></li>
-    </ol>
-    <p class="mp-note">※ 各階段天數依平台設定。</p>
   </div>
 </section>
 
 <section class="mp-sec" id="faq" aria-labelledby="faq-title">
   <div class="mp-wrap">
     <div class="mp-head">
-      <p class="mp-eyebrow">FAQ</p>
-      <h2 class="mp-h2" id="faq-title"><span class="for-seller">上架前，大家常問</span><span class="for-promoter">推廣前，大家常問</span></h2>
+      <p class="mp-eyebrow mp-eyebrow-star"><span class="mp-ball" aria-hidden="true"></span>FAQ</p>
+      <h2 class="mp-h2 mp-h2-mark" id="faq-title"><span class="for-seller">上架前，大家常問</span><span class="for-promoter">推廣前，大家常問</span></h2>
     </div>
     <div class="mp-faq">
       <details class="mp-card for-promoter"><summary>推廣商品要先付費嗎？</summary><p>不用。挑商品、送提案都不需要付費，成交才計推廣費。</p></details>
@@ -923,7 +1106,6 @@ main.is-swapping { animation: mp-swap .35s ease; }
       <details class="mp-card"><summary>退貨的訂單怎麼算？</summary><p>訂單要過了鑑賞期才進入結算，退貨的訂單不計推廣費。</p></details>
       <details class="mp-card"><summary>推廣費多久可以領到？</summary><p>合作完成後入帳，入帳滿一段時間即可申請提領；上傳發票後由平台撥款。各階段天數依平台設定。</p></details>
     </div>
-    <p class="mp-note">沒看到你的問題？在下方留下聯絡資訊，我們直接聊。</p>
   </div>
 </section>
 
@@ -968,8 +1150,8 @@ main.is-swapping { animation: mp-swap .35s ease; }
 <section class="mp-sec mp-others" aria-labelledby="others-title">
   <div class="mp-wrap">
     <div class="mp-head">
-      <p class="mp-eyebrow">More SENSE</p>
-      <h2 class="mp-h2" id="others-title">也看看其他 SENSE</h2>
+      <p class="mp-eyebrow mp-eyebrow-star"><span class="mp-ball" aria-hidden="true"></span>More SENSE</p>
+      <h2 class="mp-h2 mp-h2-mark" id="others-title">也看看其他 SENSE</h2>
     </div>
     <div class="mp-grid2">
       <a class="mp-mod mp-card" href="module-marketing.html"><svg class="mp-ic" data-anim="marketing" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g fill="currentColor" stroke="none"><circle cx="16" cy="16" r="1.1"/><circle cx="24" cy="16" r="1.1"/><circle cx="32" cy="16" r="1.1"/><circle cx="40" cy="16" r="1.1"/><circle cx="48" cy="16" r="1.1"/><circle cx="56" cy="16" r="1.1"/><circle cx="64" cy="16" r="1.1"/><circle cx="16" cy="24" r="1.1"/><circle cx="24" cy="24" r="1.1"/><circle cx="32" cy="24" r="1.1"/><circle cx="64" cy="24" r="1.1"/><circle cx="16" cy="32" r="1.1"/><circle cx="24" cy="32" r="1.1"/><circle cx="32" cy="32" r="1.1"/><circle cx="64" cy="32" r="1.1"/><circle cx="16" cy="40" r="1.1"/><circle cx="24" cy="40" r="1.1"/><circle cx="32" cy="40" r="1.1"/><circle cx="64" cy="40" r="1.1"/><circle cx="16" cy="48" r="1.1"/><circle cx="24" cy="48" r="1.1"/><circle cx="32" cy="48" r="1.1"/><circle cx="40" cy="48" r="1.1"/><circle cx="48" cy="48" r="1.1"/><circle cx="56" cy="48" r="1.1"/><circle cx="64" cy="48" r="1.1"/><circle cx="16" cy="56" r="1.1"/><circle cx="24" cy="56" r="1.1"/><circle cx="32" cy="56" r="1.1"/><circle cx="40" cy="56" r="1.1"/><circle cx="48" cy="56" r="1.1"/><circle cx="56" cy="56" r="1.1"/><circle cx="64" cy="56" r="1.1"/><circle cx="16" cy="64" r="1.1"/><circle cx="24" cy="64" r="1.1"/><circle cx="32" cy="64" r="1.1"/><circle cx="40" cy="64" r="1.1"/><circle cx="48" cy="64" r="1.1"/><circle cx="56" cy="64" r="1.1"/><circle cx="64" cy="64" r="1.1"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="40" cy="24" r="2.2"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="48" cy="24" r="2.2"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="56" cy="24" r="2.2"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="40" cy="32" r="2.2"/><circle class="ic-dot lt gc ic-center" style="--i:0;--c:#0073F5" cx="48" cy="32" r="2.2"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="56" cy="32" r="2.2"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="40" cy="40" r="2.2"/><circle class="ic-dot lt gc" style="--i:1;--c:#A9C576" cx="48" cy="40" r="2.2"/><circle class="ic-dot lt gc" style="--i:2;--c:#FF5B26" cx="56" cy="40" r="2.2"/></g><circle class="ic-ring" cx="48" cy="32" r="14"/></svg><div><h3>行銷 SENSE</h3><p>選受眾、選渠道，由夥伴具名觸及會員</p></div><svg class="mp-arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5.5 15.5 10 11 14.5"/></svg></a>
@@ -1048,16 +1230,18 @@ main.is-swapping { animation: mp-swap .35s ease; }
 (() => {
   const st = document.querySelector('.st'); if (!st) return;
   const DUR = 6000, bars = [...st.querySelectorAll('.st-bar')], panels = [...st.querySelectorAll('.st-panel')];
-  const play = st.querySelector('.st-play'), label = play.querySelector('span');
+  const play = st.querySelector('.st-play'), label = play && play.querySelector('span');   // 11-19 移除暫停按鈕：改成點區塊暫停／播放，結束後點區塊重播
   const EXP = [0, 0, 12400, 12400, 12400], DEAL = [0, 0, 0, 86, 86];   // 示意數字
   const expEl = document.getElementById('st-exp'), dealEl = document.getElementById('st-deal');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let i = 0, t = 0, last = 0, started = false, paused = reduce, visible = false, ended = false;
   const shown = { exp: 0, deal: 0 };
   const count = (el, key, to) => {   // 數字往上數
-    const from = shown[key]; shown[key] = to; if (reduce || from === to) { el.textContent = to.toLocaleString('en-US'); return; }
+    // 11-19：數值是 0（還沒開始）時顯示「–」淡灰；有數字時照原本往上數
+    const show = v => { el.textContent = v ? v.toLocaleString('en-US') : '–'; el.classList.toggle('is-empty', !v); };
+    const from = shown[key]; shown[key] = to; if (reduce || from === to) { show(to); return; }
     const t0 = performance.now(); const tick = now => { const k = Math.min(1, (now - t0) / 1200), e = 1 - Math.pow(1 - k, 3);
-      el.textContent = Math.round(from + (to - from) * e).toLocaleString('en-US'); if (k < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick);
+      show(Math.round(from + (to - from) * e)); if (k < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick);
   };
   const go = n => {
     i = n; t = 0; st.dataset.step = n + 1;
@@ -1068,6 +1252,7 @@ main.is-swapping { animation: mp-swap .35s ease; }
     if (reduce) bars[n].style.setProperty('--f', 1);
   };
   const sync = () => { st.classList.toggle('is-paused', paused); st.classList.toggle('is-ended', ended);
+    if (!play) return;
     label.textContent = ended ? '重播' : paused ? '播放' : '暫停'; play.setAttribute('aria-label', ended ? '重新播放' : paused ? '繼續自動播放' : '暫停自動播放'); play.title = play.getAttribute('aria-label'); };
   const loop = now => {
     const dt = Math.min(100, now - last); last = now;
@@ -1078,6 +1263,10 @@ main.is-swapping { animation: mp-swap .35s ease; }
     requestAnimationFrame(loop);
   };
   bars.forEach((b, k) => b.addEventListener('click', () => { ended = false; go(k); sync(); }));
+  // 進度條移到說明卡上方：分頁上的 --f 同步到 .st-prog 的對應段
+  const segs = [...st.querySelectorAll('.st-prog i')];
+  new MutationObserver(() => bars.forEach((b, k) => segs[k] && segs[k].style.setProperty('--f', b.style.getPropertyValue('--f') || 0)))
+    .observe(st.querySelector('.st-bars'), { subtree: true, attributes: true, attributeFilter: ['style'] });
   const prev = st.querySelector('.st-nav.prev'), next = st.querySelector('.st-nav.next'), flash = st.querySelector('.st-flash');
   const step = d => { const n = i + d; if (n < 0) return; ended = false; go(n > bars.length - 1 ? 0 : n); sync(); };   // 第 5 步按下一步＝重播
   prev.addEventListener('click', () => step(-1)); next.addEventListener('click', () => step(1));
@@ -1085,7 +1274,7 @@ main.is-swapping { animation: mp-swap .35s ease; }
     if (ended) { ended = false; paused = false; go(0); } else paused = !paused;
     sync(); flash.className = 'st-flash ' + (paused ? 'is-pause' : 'is-play'); void flash.offsetWidth; flash.classList.add('is-show');
   };
-  play.addEventListener('click', toggle);
+  if (play) play.addEventListener('click', toggle);
   st.addEventListener('click', e => {
     if (e.target.closest('button, a, input, select, textarea')) return;   // 箭頭、進度條、按鈕自己處理
     if (String(getSelection()).trim()) return;                             // 正在選取文字時不切換
@@ -1134,7 +1323,8 @@ main.is-swapping { animation: mp-swap .35s ease; }
       amts[c].style.transform = `translate(${c * (colW + gap)}px, ${H - rows[c] * pitch - 48}px)`;
       bases[c].style.left = c * (colW + gap) + 'px'; bases[c].style.width = colW + 'px';
     });
-    $('dot-v').textContent = nt(dv); $('amt-out').textContent = nt(amt); $('pct-out').textContent = pct + '%';
+    if ($('dot-v')) $('dot-v').textContent = nt(dv);   // 11-19 圖表說明已移除
+    $('amt-out').textContent = nt(amt); $('pct-out').textContent = pct + '%';
     $('p-net').textContent = (100 - pct - FEE) + '%'; $('p-promo').textContent = pct + '%';
     $('e-amt').textContent = nt(amt); $('e-promo').textContent = nt(promo); $('e-fee').textContent = nt(fee); $('e-net').textContent = nt(net);
     document.querySelectorAll('.mp-chips').forEach(g => { const r = $(g.dataset.for); g.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.v === +r.value)); });
@@ -1278,6 +1468,121 @@ main.is-swapping { animation: mp-swap .35s ease; }
   new IntersectionObserver(([e]) => { visible = e.isIntersecting; run(); }).observe(kv);
   document.addEventListener('visibilitychange', run);
   if (reduce) new ResizeObserver(run).observe(kv);
+})();
+</script>
+<script>
+/* 適合誰：發牌卡片。每一組進到畫面 30% 時各自依序發牌（只播一次）；切換身份時，已看過的組別在新身份重發一次 */
+(() => {
+  const decks = [...document.querySelectorAll('.who-deal')]; if (!decks.length) return;
+  const deal = d => { d.classList.remove('is-dealt'); void d.offsetWidth; d.classList.add('is-dealt'); };
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { decks.forEach(d => d.classList.add('is-dealt')); return; }
+  let seen = false;
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { seen = true; deal(e.target); io.unobserve(e.target); } }), { threshold: .3 });
+  decks.forEach(d => io.observe(d));
+  new MutationObserver(() => { if (seen) decks.forEach(deal); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-role'] });
+})();
+</script>
+<script>
+/* 全頁滑鼠網點拖尾：每一格記錄亮度，滑鼠沿路徑加亮、每格逐格衰減；沒有亮點時停止重畫 */
+(() => {
+  const cv = document.querySelector('.mp-trail'); if (!cv) return;
+  if (!matchMedia('(hover: hover) and (pointer: fine)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches) { cv.remove(); return; }
+  const ctx = cv.getContext('2d'), CELL = 11, DECAY = .92;
+  // 只當背景（11-19）：卡片、插圖、表單、header 等元件上方不畫，滑鼠移到這些元件上也不產生軌跡
+  const SOLID = '.mp-card, .who-dcard, .st, .mp-viz, .mp-flow, .mp-kv, .book-card, .alt-header, .alt-browse-panel, .mp-rolebar, .alt-theme, .alt-foot, .alt-hbtn';
+  const solids = () => [...document.querySelectorAll(SOLID)].map(el => el.getBoundingClientRect()).filter(b => b.width && b.bottom > 0 && b.top < H);   // 11-19 縮小：網格 14→11px、筆刷半徑縮小約 1/3
+  const COLORS = ['#FF6100', '#FF6100', '#FF6100', '#FF9A5C', '#FF9A5C', '#ABB0BA'];
+  let W = 0, H = 0, cols = 0, rows = 0, E = new Float32Array(0), kind = [], col = [], dpr = 1, raf = 0, last = null;
+  const size = () => {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    cols = Math.ceil(W / CELL); rows = Math.ceil(H / CELL); E = new Float32Array(cols * rows);
+    kind = Array.from(E, () => Math.random() < .8); col = Array.from(E, () => COLORS[Math.random() * COLORS.length | 0]);
+  };
+  const stamp = (x, y, rad) => {
+    const c0 = Math.max(0, (x - rad) / CELL | 0), c1 = Math.min(cols - 1, (x + rad) / CELL | 0);
+    const r0 = Math.max(0, (y - rad) / CELL | 0), r1 = Math.min(rows - 1, (y + rad) / CELL | 0);
+    for (let j = r0; j <= r1; j++) for (let i = c0; i <= c1; i++) {
+      const dx = (i + .5) * CELL - x, dy = (j + .5) * CELL - y, d = Math.hypot(dx, dy) / rad; if (d > 1) continue;
+      const k = j * cols + i; E[k] = Math.min(1, E[k] + (1 - d * d) * .55);
+    }
+  };
+  const frame = () => {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); let alive = false;
+    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, H);   // 挖掉元件所在的區域（evenodd），軌跡只留在背景上
+    solids().forEach(b => ctx.roundRect ? ctx.roundRect(b.left, b.top, b.width, b.height, 24) : ctx.rect(b.left, b.top, b.width, b.height));
+    ctx.clip('evenodd');
+    for (let k = 0; k < E.length; k++) {
+      const e = E[k]; if (e < .04) { E[k] = 0; continue; } alive = true;
+      const x = (k % cols + .5) * CELL, y = ((k / cols | 0) + .5) * CELL, rr = CELL * .38 * Math.min(1, e + .25);
+      ctx.globalAlpha = Math.min(1, e) * .6; ctx.beginPath(); ctx.arc(x, y, kind[k] ? rr : rr * .45, 0, 6.2832);
+      if (kind[k]) { ctx.strokeStyle = col[k]; ctx.lineWidth = 1.3; ctx.stroke(); } else { ctx.fillStyle = col[k]; ctx.fill(); }
+      E[k] = e * DECAY;
+    }
+    ctx.restore(); ctx.globalAlpha = 1; raf = alive ? requestAnimationFrame(frame) : 0;
+  };
+  addEventListener('pointermove', ev => {
+    if (ev.pointerType !== 'mouse') return;
+    if (ev.target.closest && ev.target.closest(SOLID)) { last = null; return; }   // 在元件上不產生軌跡
+    const x = ev.clientX, y = ev.clientY;
+    if (last) {
+      const dist = Math.hypot(x - last.x, y - last.y), rad = 22 + Math.min(26, dist * .45), steps = Math.max(1, dist / (CELL * .6) | 0);
+      for (let s = 1; s <= steps; s++) stamp(last.x + (x - last.x) * s / steps, last.y + (y - last.y) * s / steps, rad);
+    }
+    last = { x, y }; if (!raf) raf = requestAnimationFrame(frame);
+  });
+  document.documentElement.addEventListener('pointerleave', () => { last = null; });
+  addEventListener('scroll', () => { last = null; }, { passive: true });   // 捲動時不把兩點連成長線
+  addEventListener('resize', size); size();
+})();
+</script>
+<script>
+/* 計價與保障：弧形輪播。每組四張卡片再複製一組（共 8 張，複製的不給螢幕閱讀器讀），依與中間那張的距離 d 擺放；
+   |d| > 2 的卡片隱藏。下方是分段進度條（同「怎麼運作」，目前那段隨時間填滿；點任一段可跳過去），點兩側卡片、鍵盤左右鍵也可以切換；
+   11-19 拿掉「上一個／下一個」按鈕與圓點 */
+(() => {
+  document.querySelectorAll('.pc-arc').forEach(arc => {
+    const orig = [...arc.querySelectorAll('.mp-item')], n = orig.length;
+    // 11-19：每張卡片上方加五顆橘色星星（裝飾，不給螢幕閱讀器讀）
+    const STAR = '<svg viewBox="0 0 20 20"><path d="M10 1.6l2.47 5.3 5.8.67-4.29 3.96 1.15 5.73L10 14.4l-5.13 2.86 1.15-5.73L1.73 7.57l5.8-.67Z"/></svg>';
+    orig.forEach(c => c.insertAdjacentHTML('afterbegin', '<span class="pc-stars" aria-hidden="true">' + STAR.repeat(5) + '</span>'));
+    orig.forEach(c => { const k = c.cloneNode(true); k.setAttribute('aria-hidden', 'true'); arc.append(k); });
+    const cards = [...arc.querySelectorAll('.mp-item')], N = cards.length;
+    const ctrl = document.createElement('div'); ctrl.className = 'pc-ctrl';
+    ctrl.innerHTML = '<div class="pc-prog" role="group" aria-label="切換卡片">' + Array.from({ length: n }, (_, k) => '<button type="button" aria-label="第 ' + (k + 1) + ' 張"><i></i></button>').join('') + '</div>';
+    arc.after(ctrl);
+    // 控制列跟著身份切換顯示／隱藏
+    [...arc.classList].filter(c => c.startsWith('for-')).forEach(c => ctrl.classList.add(c));
+    const segs = [...ctrl.querySelectorAll('.pc-prog button')];
+    let a = 0, t = 0;
+    const DUR = 4000;
+    const fill = () => { const cur = ((a % n) + n) % n; segs.forEach((b, k) => { b.classList.toggle('is-on', k === cur); b.setAttribute('aria-current', k === cur ? 'true' : 'false'); }); };   // 11-19 改成膠囊導覽點：目前那顆展開
+    const place = () => {
+      cards.forEach((c, k) => {
+        let d = ((k - a) % N + N) % N; if (d > N / 2) d -= N;
+        c.style.setProperty('--d', d); c.classList.toggle('is-center', d === 0); c.classList.toggle('is-off', Math.abs(d) > 2);
+        c.style.zIndex = 10 - Math.abs(d);
+      });
+      fill();
+    };
+    const go = step => { a = ((a + step) % N + N) % N; t = 0; place(); };
+    // 11-19 自動輪播：每 4 秒往下一張；滑鼠移上去或鍵盤聚焦時暫停，看不到這組時不跑；手動切換後重新計時；減少動態效果時不自動播
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let visible = false, last = performance.now();
+    // 每次要前進時才檢查滑鼠／焦點是否在輪播上（用 :hover 判斷，避免頁面捲動時 mouseleave 沒觸發而卡住）
+    const paused = () => arc.matches(':hover') || ctrl.matches(':hover') || arc.contains(document.activeElement) || ctrl.contains(document.activeElement);
+    const loop = now => {   // 進度條隨時間填滿，滿了就轉下一張
+      const dt = Math.min(100, now - last); last = now;
+      if (!reduce && !paused() && visible && !document.hidden && arc.offsetParent) { t += dt; if (t >= DUR) go(1); else fill(); }
+      requestAnimationFrame(loop);
+    };
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; }, { threshold: .4 }).observe(arc);
+    segs.forEach((b, k) => b.addEventListener('click', () => { const cur = ((a % n) + n) % n; go(k - cur); }));
+    cards.forEach(c => c.addEventListener('click', () => { const d = +c.style.getPropertyValue('--d'); if (d) go(d); }));
+    arc.tabIndex = 0;
+    arc.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); } else if (e.key === 'ArrowRight') { e.preventDefault(); go(1); } });
+    place(); requestAnimationFrame(loop);
+  });
 })();
 </script>
 </body>
