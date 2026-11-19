@@ -650,7 +650,7 @@ section.foot-col { gap: 0; }   /* 單一區塊的欄：標題與卡片間距沿�
   font: inherit; font-size: 12px; font-weight: 700; letter-spacing: var(--tracking-wider); cursor: pointer;
   background: var(--white); border: 1px solid var(--black-200); color: var(--black-700); filter: drop-shadow(0 2px 0 var(--black-200)); transition: filter .15s, background .15s; }
 .mp-chips button:hover { background: var(--black-50); }
-.mp-chips button[aria-pressed="true"] { background: var(--accent); border: 2px solid var(--accent-border); color: var(--white); }
+.mp-chips button[aria-pressed="true"] { background: var(--accent); border: 2px solid var(--accent); color: var(--white); }   /* 11-19 選取中：框線與底色同色 */
 .mp-chips button[aria-pressed="true"]:hover { filter: drop-shadow(0 2px 0 var(--black-200)) brightness(1.06); }
 .mp-viz { min-width: 0; }
 .mp-stage { position: relative; height: 400px;   /* 固定高度（2026-11-16）：點變多時改成縮小，區塊高度不變 */
@@ -945,13 +945,22 @@ main.is-swapping { animation: mp-swap .35s ease; }
 }
 
 /* 輪播導覽改成膠囊點（11-19，參考圖一）：一般是淺橘短膠囊，輪到的那張展開成較長的實心品牌橘；寬度以動畫展開 */
-.pc-prog { display: flex; justify-content: center; gap: 10px; width: auto; }
-.pc-prog button { width: 32px; height: 12px; padding: 0; border-radius: 6px; background: #FFE2D1; transition: width .4s cubic-bezier(.3, .8, .3, 1), background .3s; }
-.pc-prog button.is-on { width: 64px; background: var(--cta-orange); }
+.pc-prog { display: flex; justify-content: center; gap: 6px; width: auto; }
+.pc-prog button { width: 20px; height: 7px; padding: 0; border-radius: 4px;   /* 11-19 等比例縮小（約 0.6 倍） */ background: #FFE2D1; transition: width .4s cubic-bezier(.3, .8, .3, 1), background .3s; }
+.pc-prog button.is-on { width: 40px; background: var(--cta-orange); }
 .pc-prog button i { display: none; }
 [data-theme="dark"] .pc-prog button { background: rgba(255, 97, 0, .25); }
 [data-theme="dark"] .pc-prog button.is-on { background: var(--cta-orange); }
 @media (prefers-reduced-motion: reduce) { .pc-prog button { transition: none; } }
+
+/* 試算區（11-19）：移除下方算式列（和圖表金額重複），註解移到右側圖表下方、靠右 */
+#split .mp-viz-foot { margin-top: 20px; text-align: right; }
+@media (max-width: 767px) { #split .mp-viz-foot { text-align: left; } }
+
+/* 計價輪播可拖拉（11-19）：拖動時關掉位移動畫讓卡片即時跟手；游標顯示可抓取；上下滑動仍交給頁面捲動 */
+.mp-grid2.pc-arc { touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
+.pc-arc.is-drag { cursor: grabbing; }
+.pc-arc.is-drag .mp-item { transition: opacity .2s ease; }
 </style>
 </head>
 <body>
@@ -1061,15 +1070,9 @@ main.is-swapping { animation: mp-swap .35s ease; }
           <li><strong>行銷推廣費 <em class="mp-you for-promoter">你</em></strong><span id="p-promo">12%</span></li>
           <li><strong>商品處理費</strong><span>8%</span></li>
         </ul>
+        <p class="mp-note mp-viz-foot">※ 數字為示意，商品處理費以 8% 計算；實際比例以合作條件和平台設定為準。</p>
       </div>
     </div>
-    <div class="mp-eq" aria-live="polite">
-      <div><b id="e-amt">NT$ 1,200</b><span>訂單金額</span></div><i aria-hidden="true">−</i>
-      <div class="c-promo"><b id="e-promo">NT$ 144</b><span>行銷推廣費，給行銷方</span></div><i aria-hidden="true">−</i>
-      <div class="c-fee"><b id="e-fee">NT$ 96</b><span>商品處理費 8%，給平台</span></div><i aria-hidden="true">＝</i>
-      <div class="c-net"><b id="e-net">NT$ 960</b><span>商品方實收</span></div>
-    </div>
-    <p class="mp-note">※ 數字為示意，商品處理費以 8% 計算；實際比例以合作條件和平台設定為準。</p>
   </div>
 </section>
 
@@ -1326,7 +1329,7 @@ main.is-swapping { animation: mp-swap .35s ease; }
     if ($('dot-v')) $('dot-v').textContent = nt(dv);   // 11-19 圖表說明已移除
     $('amt-out').textContent = nt(amt); $('pct-out').textContent = pct + '%';
     $('p-net').textContent = (100 - pct - FEE) + '%'; $('p-promo').textContent = pct + '%';
-    $('e-amt').textContent = nt(amt); $('e-promo').textContent = nt(promo); $('e-fee').textContent = nt(fee); $('e-net').textContent = nt(net);
+    [['e-amt', amt], ['e-promo', promo], ['e-fee', fee], ['e-net', net]].forEach(([id, v]) => { if ($(id)) $(id).textContent = nt(v); });   // 11-19 算式列已移除，找不到就略過
     document.querySelectorAll('.mp-chips').forEach(g => { const r = $(g.dataset.for); g.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.v === +r.value)); });
     fill(amtR); fill(pctR);
   }
@@ -1570,7 +1573,8 @@ main.is-swapping { animation: mp-swap .35s ease; }
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     let visible = false, last = performance.now();
     // 每次要前進時才檢查滑鼠／焦點是否在輪播上（用 :hover 判斷，避免頁面捲動時 mouseleave 沒觸發而卡住）
-    const paused = () => arc.matches(':hover') || ctrl.matches(':hover') || arc.contains(document.activeElement) || ctrl.contains(document.activeElement);
+    let dragging = false;
+    const paused = () => dragging || arc.matches(':hover') || ctrl.matches(':hover') || arc.contains(document.activeElement) || ctrl.contains(document.activeElement);
     const loop = now => {   // 進度條隨時間填滿，滿了就轉下一張
       const dt = Math.min(100, now - last); last = now;
       if (!reduce && !paused() && visible && !document.hidden && arc.offsetParent) { t += dt; if (t >= DUR) go(1); else fill(); }
@@ -1578,7 +1582,30 @@ main.is-swapping { animation: mp-swap .35s ease; }
     };
     new IntersectionObserver(([e]) => { visible = e.isIntersecting; }, { threshold: .4 }).observe(arc);
     segs.forEach((b, k) => b.addEventListener('click', () => { const cur = ((a % n) + n) % n; go(k - cur); }));
-    cards.forEach(c => c.addEventListener('click', () => { const d = +c.style.getPropertyValue('--d'); if (d) go(d); }));
+    let moved = false;
+    cards.forEach(c => c.addEventListener('click', () => { if (moved) return; const d = +c.style.getPropertyValue('--d'); if (d) go(d); }));
+    // 11-19 拖拉：滑鼠／手指左右拖動時卡片即時跟著移動，放開後停在最近的那張；上下滑動交給頁面捲動（touch-action: pan-y）
+    let x0 = 0, dx = 0, base = [];
+    const gapPx = () => parseFloat(getComputedStyle(arc).getPropertyValue('--gap')) || 400;
+    arc.addEventListener('pointerdown', e => {
+      if (e.button !== 0) return;
+      dragging = true; moved = false; x0 = e.clientX; dx = 0; base = cards.map(c => +c.style.getPropertyValue('--d'));
+      arc.classList.add('is-drag'); arc.setPointerCapture(e.pointerId);
+    });
+    arc.addEventListener('pointermove', e => {
+      if (!dragging) return;
+      dx = e.clientX - x0; if (Math.abs(dx) > 6) moved = true;
+      const g = gapPx();
+      cards.forEach((c, k) => { const d = base[k] + dx / g; c.style.setProperty('--d', d.toFixed(3)); c.classList.toggle('is-off', Math.abs(d) > 2.4); });
+    });
+    const end = () => {
+      if (!dragging) return;
+      dragging = false; arc.classList.remove('is-drag');
+      const step = Math.round(-dx / gapPx());
+      if (step) go(step); else place();
+      setTimeout(() => { moved = false; }, 0);
+    };
+    arc.addEventListener('pointerup', end); arc.addEventListener('pointercancel', end);
     arc.tabIndex = 0;
     arc.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); } else if (e.key === 'ArrowRight') { e.preventDefault(); go(1); } });
     place(); requestAnimationFrame(loop);
