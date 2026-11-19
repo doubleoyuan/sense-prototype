@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="shared/tokens.css?v=20261110a">
+<link rel="stylesheet" href="shared/tokens.css?v=20261110b">
 <link rel="stylesheet" href="shared/components.css?v=20261117j">
 <link rel="stylesheet" href="shared/forms.css?v=20261109a">
 <style>
@@ -33,7 +33,7 @@
   .ex-stat-head .ic{width:18px;height:18px;flex:none;color:var(--black-400)}
   .ex-stat b{display:flex;align-items:flex-end;gap:6px;font-size:16px;font-weight:500;line-height:22px;letter-spacing:var(--tracking-wider);color:var(--black-600);white-space:nowrap}
 
-  /* 翻牌數字（參考 React Bits 的 Split Flap Text）：每個數字一塊深藍牌，中間一道接縫；
+  /* 翻牌數字：每個數字一塊深藍牌，中間一道接縫；
      進入畫面時上半片往下翻，依序翻過幾個亂數後停在實際數字，由左到右錯開。
      字級依卡片寬度縮放（container query），最多 30px，窄卡片也不會超出 */
   .ex-flaps{display:inline-flex;align-items:flex-end;gap:.08em;font-size:clamp(16px,15cqi,30px);font-weight:700;line-height:1;letter-spacing:0;
