@@ -842,6 +842,9 @@ main.is-swapping { animation: mp-swap .35s ease; }
 .st-stats b.is-empty { color: var(--alt-ink-soft); opacity: .45; }   /* 還沒有數字時的「–」 */
 .st-stats > div:first-child b { min-width: 5.6ch; }                    /* 曝光欄固定寬度，數字出現時「成交」不會跟著跳 */
 .st-stats { gap: 6px 36px; }
+/* 11-19 改成沒數字時整組隱藏（標籤、數字、示意字），保留原本高度避免版面跳動；有數字時淡入 */
+.st-stats { transition: opacity .5s ease; }
+.st-stats.is-hidden { opacity: 0; visibility: hidden; transition: opacity .25s ease, visibility 0s .25s; }
 .st-scene { grid-area: scene; aspect-ratio: auto; min-height: 520px; border-left: 1px solid var(--st-line);
   background: var(--st-scene); }
 .st-art { inset: 10% 8%; }
@@ -1229,7 +1232,7 @@ main.is-swapping { animation: mp-swap .35s ease; }
   const DUR = 6000, bars = [...st.querySelectorAll('.st-bar')], panels = [...st.querySelectorAll('.st-panel')];
   const play = st.querySelector('.st-play'), label = play && play.querySelector('span');   // 11-19 移除暫停按鈕：改成點區塊暫停／播放，結束後點區塊重播
   const EXP = [0, 0, 12400, 12400, 12400], DEAL = [0, 0, 0, 86, 86];   // 示意數字
-  const expEl = document.getElementById('st-exp'), dealEl = document.getElementById('st-deal');
+  const expEl = document.getElementById('st-exp'), dealEl = document.getElementById('st-deal'), stats = st.querySelector('.st-stats');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let i = 0, t = 0, last = 0, started = false, paused = reduce, visible = false, ended = false;
   const shown = { exp: 0, deal: 0 };
@@ -1246,6 +1249,7 @@ main.is-swapping { animation: mp-swap .35s ease; }
     panels.forEach(p => p.classList.toggle('is-on', +p.dataset.i === n));   // 兩種身份各一組，依 data-i 對應
     const pv = st.querySelector('.st-nav.prev'); if (pv) pv.disabled = n === 0;
     count(expEl, 'exp', EXP[n]); count(dealEl, 'deal', DEAL[n]);
+    if (stats) stats.classList.toggle('is-hidden', !EXP[n] && !DEAL[n]);   // 11-19 還沒有數字時整組隱藏（保留位置），有數字才淡入
     if (reduce) bars[n].style.setProperty('--f', 1);
   };
   const sync = () => { st.classList.toggle('is-paused', paused); st.classList.toggle('is-ended', ended);
