@@ -33,18 +33,14 @@
              { key:'academy',   label:'近期活動', href:'pr-sense.html#academy' },
              { key:'reports',   label:'活動回顧', href:'pr-sense.html#reports' },
              { key:'clubs',     label:'俱樂部',   href:'pr-sense.html#clubs' } ] },
-    // 財務 SENSE 先試開子選單（2026-10-26）。單頁切換（#hash），roles 依示範視角顯示
-    { key:'finance',   label:'財務SENSE', c:'var(--mod-finance)',   strong:'var(--mod-finance-strong)',   href:'finance-sense.html', showSubs:true,
-      subs:[ { key:'browse',    label:'瀏覽投資',   href:'finance-sense.html#browse' },
-             { key:'investors', label:'瀏覽投資人', href:'finance-sense.html#investors' },
-             { key:'profile',   label:'我的檔案',   href:'finance-sense.html#profile' },
-             { key:'views',     label:'誰看過我',   href:'finance-sense.html#views',     roles:['company'] },
-             { key:'requests',  label:'連結請求',   href:'finance-sense.html#requests',  roles:['company'] },
-             { key:'links',     label:'我的連結',   href:'finance-sense.html#links',     roles:['investor'] },
-             { key:'roomadmin', label:'資料室',     href:'finance-sense.html#roomadmin', roles:['company'] },
-             { key:'messages',  label:'訊息',       href:'finance-sense.html#messages' },
-             { key:'financing', label:'融資服務',   href:'finance-sense.html#financing' },
-             { key:'ma',        label:'併購顧問',   href:'finance-sense.html#ma' } ] }
+    // 財務 SENSE（2026-11-26 改版）：入口頁改為 finance-sense-v2.html，只保留投資／募資／融資。
+    // 同日使用者要求側欄不展開子選單（與其他模組一致，拿掉 showSubs）；subs 只留作資料，roles 依示範視角篩選
+    { key:'finance',   label:'財務SENSE', c:'var(--mod-finance)',   strong:'var(--mod-finance-strong)',   href:'finance-sense-v2.html',
+      subs:[ { key:'companies', label:'瀏覽募資中的公司', href:'finance-sense-v2.html#companies', roles:['investor'] },
+             { key:'investors', label:'瀏覽投資方',       href:'finance-sense-v2.html#investors', roles:['company'] },
+             { key:'invest',    label:'投資', roles:['investor'] },
+             { key:'raise',     label:'募資', roles:['company'] },
+             { key:'loan',      label:'融資', roles:['company'] } ] }
   ];
 
   const SECTIONS = [
@@ -63,7 +59,7 @@
   const ROOT_HREF = null;
 
   /* ── 通知（2026-11-17）：header 鈴鐺展開下拉預覽，「查看全部」到 notifications.html。
-     本階段不含財務、公關。level：action 需處理／progress 進度／system 系統／announce 公告；
+     本階段不含公關（財務 2026-11-26 加入，承接原財務入口頁的待處理事項）。level：action 需處理／progress 進度／system 系統／announce 公告；
      time 為相對時間（m 分、h 小時、d 天）；day 為舊版分組欄位，目前未使用。read:true 為示範的預設已讀；
      使用者點過的 id 記在 localStorage（失敗時只用預設）。
      行銷事件為推測，待確認實際流程。
@@ -80,6 +76,12 @@
   const NOTIFS = [
     { id:'n1',  src:'points',    level:'action',   day:'today',   time:'10m',
       title:'拾光百貨邀請你開通雙向點數交換', desc:'比例依雙方點數兌台幣比值自動換算，同意後即可開始交換。', cta:'前往處理', href:'points-sense.html#co=c5' },
+    { id:'f1',  src:'finance',   level:'action',   day:'today',   time:'30m',
+      title:'2 位投資人已簽保密協議，等你開放資料室', desc:'募資第 6 步。開放後投資人才能查看詳細資料。', cta:'前往處理', todo:'資料室' },
+    { id:'f2',  src:'finance',   level:'action',   day:'today',   time:'2h',
+      title:'募資資料還缺「單位經濟」', desc:'補齊後投資人能更快完成初步評估。', cta:'前往補上', todo:'募資資料' },
+    { id:'f3',  src:'finance',   level:'progress', day:'today',   time:'3h',
+      title:'雲帆數據已開放詳細資料', desc:'可以開始深入評估。', cta:'查看公司', todo:'公司詳情頁' },
     { id:'n2',  src:'product',   level:'action',   day:'today',   time:'5h',
       title:'商品「手沖咖啡體驗組」審核未通過', desc:'商品主圖解析度不足，請修改後重新送出審核。', cta:'修改後重送', href:'product-sense-add-product.html' },
     { id:'n3',  src:'mine',      level:'action',   day:'today',   time:'6h',
@@ -88,6 +90,8 @@
       title:'媒合預估已完成', desc:'預估交集人數已更新，可以查看結果。', cta:'查看結果', href:'strategy-sense.html#browse' },
     { id:'n5',  src:'product',   level:'progress', day:'week',    time:'1d', read:true,
       title:'商品「冬季保暖禮盒」已通過審核並上架', desc:'合作夥伴現在可以在瀏覽商品看到這項商品。', cta:'查看商品', href:'product-sense.html#browse' },
+    { id:'f4',  src:'finance',   level:'progress', day:'week',    time:'1d', read:true,
+      title:'安康精準醫療更新了本輪募資資訊', desc:'可以到公司頁查看最新內容。', cta:'查看公司', todo:'公司詳情頁' },
     { id:'n6',  src:'exchange',  level:'progress', day:'week',    time:'1d', read:true,
       title:'兌換平台申請已受理', desc:'專人將與你聯繫，洽談 SSO 與點數串接細節。', cta:'查看申請', href:'exchange-sense.html' },
     { id:'n7',  src:'points',    level:'progress', day:'week',    time:'2d', read:true,

@@ -43,7 +43,7 @@
   </div>
 </div>
 
-<script src="shared/shell.js?v=20261117m"></script>
+<script src="shared/shell.js?v=20261126b"></script>
 <script src="shared/components.js?v=20261028d"></script>
 <script>
 SenseShell.mount();
@@ -51,7 +51,7 @@ const N = SenseShell.notify, esc = SenseUI.esc;
 
 // 篩選標籤：全部＋各來源（2026-11-17 使用者確認：拿掉來源下拉，來源改成左側篩選標籤；
 // 先前的未讀／需處理／進度／系統／公告標籤已拿掉）。依側欄模組順序，只列有通知的來源
-const SRC_ORDER = ['product', 'marketing', 'strategy', 'exchange', 'points', 'mine', 'system'];
+const SRC_ORDER = ['product', 'marketing', 'strategy', 'exchange', 'points', 'finance', 'mine', 'system'];  // 財務 2026-11-26 加入
 const SOURCES = SRC_ORDER.filter(k => N.items().some(n => n.src === k));
 const FILTERS = [ { key:'all', label:'全部' }, ...SOURCES.map(k => ({ key:k, label:N.source(k).label })) ];
 const state = { src:'all' };

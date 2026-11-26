@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>財務 SENSE</title>
+<link rel="icon" type="image/svg+xml" href="shared/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="shared/tokens.css?v=20261110b">
+<link rel="stylesheet" href="shared/components.css?v=20261126r">
+<link rel="stylesheet" href="shared/forms.css?v=20261109a">
+<style>
+  /* ── 財務 SENSE v2 入口頁（2026-11-24 起）：投資／募資為主、融資為簡易入口，步驟依業務流程整理。
+     2026-11-26 改版：首屏改為瀏覽（投資人看募資中的公司、企業看投資方），融資改為入口橫幅；「這個階段的重點」與投資／募資流程卡同日移除；
+     待處理事項移除，改由 header 通知（shell.js NOTIFS 的財務事件）承接。
+     頁內元件，需求定案前不進 shared/ ── */
+  .fs-note{font-size:var(--fs-12);line-height:var(--lh-12);letter-spacing:var(--tracking-wider);color:var(--black-500)}
+  .status-tag.gold{background:#FFF6DB;color:var(--mod-finance-strong)}
+
+  /* 公司卡（2026-11-26 使用者要求參考兌換 SENSE 案例卡，樣式照搬 exchange-sense.html 的 .ex-* 改為 fs- 前綴，留在頁內）：
+     ① 公司頁籤＋右側小頁籤（公司：募資輪次；投資方：類型）② 服務截圖 ③ 產業＋時間 ④ 關鍵字 ⑤ 一句話描述（同日使用者要求移到關鍵字下方）⑥ 公司網站＋主要動作 */
+  .fs-co .tab-card-body{gap:16px}
+  .fs-co:hover:has(.fs-co-actions:hover):not(:focus-visible){--tab-line:var(--black-300)}  /* 滑到按鈕上時卡片框線不轉色 */
+  .fs-shot{aspect-ratio:16/10;border:1px solid var(--black-200);border-radius:var(--r-16);overflow:hidden}
+  /* 灰底示意框：尚無截圖素材 */
+  .fs-ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:12px;background:var(--black-100);color:var(--black-500);
+    font-size:13px;font-weight:500;line-height:20px;letter-spacing:var(--tracking-wider);text-align:center}
+  .fs-ph svg{width:28px;height:28px;flex:none;color:var(--black-400)}
+  .fs-ph small{font-size:12px;font-weight:400;color:var(--black-400)}
+  .fs-meta{display:flex;flex-wrap:wrap;align-items:center;column-gap:20px}
+  .fs-meta-item{display:inline-flex;align-items:center;gap:6px;padding:4px 0;color:var(--accent);font-size:13px;font-weight:600;line-height:20px;letter-spacing:var(--tracking-wider)}
+  .fs-meta-item svg{width:16px;height:16px;flex:none}
+  .fs-kw{display:flex;flex-wrap:wrap;gap:6px;margin-top:-10px}
+  .fs-co-actions{display:flex;gap:12px;margin-top:auto}
+  .fs-co-actions .btn{flex:1;min-width:0;padding:0 12px;letter-spacing:var(--tracking-wider);white-space:nowrap}
+  .fs-co-actions .btn[disabled]{opacity:.45;cursor:default;filter:none}
+
+  /* 融資入口橫幅：高度客製，不做進度卡；進行中時改顯示目前步驟 */
+  /* 2026-11-26 使用者要求：按鈕移到文字下方、卡片不要整排寬、說明不斷行 → 直排，寬度依內容（max-content），
+     空間不夠時（手機）才以 max-width:100% 限寬並換行 */
+  .fs-loan{width:max-content;max-width:100%;display:flex;flex-direction:column;align-items:flex-start;gap:var(--sp-12);padding:var(--sp-16) var(--sp-20);border:1px solid var(--line-soft);border-radius:var(--r-16);background:var(--black-50)}
+  .fs-loan-text{align-self:stretch}
+  .fs-loan-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--sp-4)}
+  .fs-loan-text b{font-size:var(--fs-14);line-height:var(--lh-14);font-weight:700;letter-spacing:1.6px}
+
+
+  /* 原型示範用：視角切換（不是產品功能） */
+  .fs-demo{position:fixed;right:20px;bottom:20px;z-index:50;display:flex;align-items:center;gap:8px;padding:8px 10px 8px 14px;border-radius:30px;
+    background:var(--black-800);color:var(--white);box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:12px;letter-spacing:var(--tracking-wider)}
+  .fs-demo > span{font-weight:700;white-space:nowrap}
+  .fs-demo button{height:28px;padding:0 12px;border-radius:20px;color:var(--black-300);font-size:12px;font-weight:600;white-space:nowrap}
+  .fs-demo button:hover{color:var(--white)}
+  .fs-demo button[aria-pressed="true"]{background:var(--white);color:var(--black-800)}
+
+  @media (max-width:1023px){
+  }
+  @media (max-width:767px){
+    .fs-demo{left:16px;right:16px;bottom:12px;justify-content:center}
+    .fs-demo > span{display:none}
+    .content{padding-bottom:80px}
+  }
+</style>
+</head>
+<body>
+<!-- 僅供內部使用，非經許可不得外流。頁面中的公司與數據皆為示意。 -->
+<div class="app" data-module="finance" data-page="home" data-role="company investor">
+  <aside class="sidebar" id="sidebar" aria-label="主選單"></aside>
+  <div class="main">
+    <header class="header" id="header"></header>
+    <main class="content" id="view">
+      <section class="content-section" aria-labelledby="h-browse">
+        <div class="section-title" id="browse"><h2 id="h-browse">公司列表</h2></div>
+        <div class="list-toolbar">
+          <div class="chips" id="chips" role="group" aria-label="產業分類"></div>
+          <div class="list-actions" id="list-actions"></div>
+        </div>
+        <div class="card-grid" id="grid" aria-live="polite"></div>
+        <div class="pager" id="pager"></div>
+      </section>
+
+      <section class="content-section" aria-labelledby="h-loan" id="loan"></section>
+    </main>
+  </div>
+</div>
+
+<!-- 原型示範用：切換企業／投資人視角（正式產品依帳號決定角色） -->
+<div class="fs-demo" role="group" aria-label="原型示範：切換視角">
+  <span>原型示範・視角</span>
+  <button type="button" data-demo-role="company">企業</button>
+  <button type="button" data-demo-role="investor">投資人</button>
+  <button type="button" data-demo-role="both">兩者</button>
+</div>
+
+<script src="shared/shell.js?v=20261126b"></script>
+<script src="shared/components.js?v=20261028d"></script>
+<script>
+/* ═════════ 資料：各流程的步驟名稱 ═════════ */
+const FLOWS = {
+  invest: { title:'投資', role:'investor', for:'給投資人：找案源、評估、投後追蹤',
+    steps:['訂投資方向','找案源','初篩','接觸＋簽保密協議','深入評估','估值與談條件','盡職調查＋內部審查','交割＋投資後追蹤'] },
+  raise:  { title:'募資', role:'company', for:'給企業：引進股東、出讓股份',
+    steps:['確認資金需求','準備募資資料','訂估值與募資條件','建立投資人名單','接觸與簡報','簽保密協議＋開資料室','協商投資條件','配合盡職調查','簽約交割','投資後關係維護'] },
+  loan:   { title:'融資', role:'company',
+    steps:['確認資金需求','自我健檢：條件','自我健檢：揭露','自我健檢：殘值','選擇融資工具','準備申貸資料','送件與銀行審查','比較與協商核貸條件','簽約撥款','貸後管理與還款'] } };
+
+// 示範狀態：融資尚未開始（網址加 ?loan=3 可看進行中的樣子）。投資／募資步驟留作之後流程頁的資料
+const loanStep = Math.min(10, Math.max(0, parseInt(new URLSearchParams(location.search).get('loan'), 10) || 0));
+const DEMO = { loan:{ step:loanStep } };
+
+/* 瀏覽：示意資料（虛構公司，僅供原型展示；不放金額，財務細節簽保密協議後才在詳情頁顯示） */
+const INDUSTRIES = [
+  { key:'all',      label:'ALL' },
+  { key:'saas',     label:'企業軟體' },
+  { key:'health',   label:'醫療健康' },
+  { key:'consumer', label:'消費零售' },
+  { key:'fintech',  label:'金融科技' },
+  { key:'green',    label:'永續' } ];
+const IND = Object.fromEntries(INDUSTRIES.map(i => [i.key, i.label]));
+
+// 募資中的公司（投資人看）：rank 越小越近期更新、joined 越大越新加入；start 為募資開始時間（晚於現在＝即將開始，取代原本的狀態標籤）；kw 為關鍵字
+const COMPANIES = [
+  { name:'雲帆數據科技股份有限公司',   color:'#5AB0D6', ind:'saas',     stage:'A 輪',   status:'募資中',   intro:'給中小企業的訂閱制營運分析平台，串接 POS 與電商後台。', start:'2026/10', kw:['SaaS', 'POS 串接', '訂閱制'], rank:1, joined:8 },
+  { name:'安康精準醫療股份有限公司',   color:'#4FB7A8', ind:'health',   stage:'A 輪',   status:'募資中',   intro:'居家檢測搭配遠距判讀，與診所合作提供追蹤服務。', start:'2026/09', kw:['居家檢測', '遠距醫療', '診所合作'], rank:2, joined:5 },
+  { name:'綠循材料股份有限公司',       color:'#8DC26F', ind:'green',    stage:'種子輪', status:'募資中',   intro:'把回收塑料再製成工業包材，已與兩家物流業者試用。', start:'2026/11', kw:['循環經濟', '工業包材', 'B2B'], rank:3, joined:7 },
+  { name:'好食光餐飲科技股份有限公司', color:'#E89A5B', ind:'consumer', stage:'Pre-A',  status:'即將開始', intro:'連鎖餐飲的中央廚房排程與點餐系統。', start:'2027/01', kw:['餐飲科技', '中央廚房', '點餐系統'], rank:4, joined:6 },
+  { name:'穩付金融科技股份有限公司',   color:'#6F7FD8', ind:'fintech',  stage:'B 輪',   status:'募資中',   intro:'跨境電商的收付款與自動對帳服務。', start:'2026/08', kw:['跨境支付', '自動對帳', '電商'], rank:5, joined:2 },
+  { name:'晨光物流科技股份有限公司',   color:'#C98BB9', ind:'saas',     stage:'種子輪', status:'募資中',   intro:'倉儲排程與車隊調度系統，主打中型物流業者。', start:'2026/10', kw:['倉儲', '車隊調度', 'SaaS'], rank:6, joined:4 },
+  { name:'森沐生技股份有限公司',       color:'#7A9E7E', ind:'health',   stage:'Pre-A',  status:'即將開始', intro:'植物萃取保健原料開發，供應保健食品品牌。', start:'2027/02', kw:['保健原料', '植物萃取', 'B2B'], rank:7, joined:3 },
+  { name:'光合能源股份有限公司',       color:'#D6A85A', ind:'green',    stage:'A 輪',   status:'募資中',   intro:'工廠屋頂太陽能與儲能整合方案。', start:'2026/07', kw:['太陽能', '儲能', '節能'], rank:8, joined:1 } ];
+
+// 投資方（企業看）：open = 是否開放接洽（由投資方自行設定）；founded 為成立年份；kw 為關鍵字（含偏好階段）
+const INVESTORS = [
+  { name:'遠見創業投資股份有限公司', color:'#5A8FD6', type:'創投',     inds:['saas', 'fintech'],     stages:'種子輪～A 輪', open:true,  intro:'專注 B2B 軟體，投後提供業務拓展與招募支援。', founded:'2014', kw:['B2B 軟體', '投後支援', '種子輪～A 輪'], rank:1, joined:6 },
+  { name:'和光資本股份有限公司',     color:'#4FB7A8', type:'創投',     inds:['health'],              stages:'A 輪～B 輪',   open:true,  intro:'醫療與生技，偏好已有臨床或認證成果的團隊。', founded:'2011', kw:['醫療生技', '臨床驗證', 'A 輪～B 輪'], rank:2, joined:4 },
+  { name:'青松企業創投股份有限公司', color:'#8DC26F', type:'企業創投', inds:['consumer', 'green'],    stages:'Pre-A～A 輪',  open:true,  intro:'可串接集團零售通路，協助新品牌快速驗證市場。', founded:'2019', kw:['通路資源', '新品牌', 'Pre-A～A 輪'], rank:3, joined:5 },
+  { name:'曜石天使投資俱樂部',       color:'#C98BB9', type:'天使',     inds:['saas', 'consumer'],     stages:'種子輪',       open:true,  intro:'由連續創業家組成，著重創辦團隊與早期驗證。', founded:'2020', kw:['創辦人導向', '早期驗證', '種子輪'], rank:4, joined:3 },
+  { name:'長河成長投資股份有限公司', color:'#6F7FD8', type:'創投',     inds:['fintech', 'green'],     stages:'B 輪以上',     open:false, intro:'成長期擴張與海外布局，目前專注既有投資組合。', founded:'2008', kw:['海外布局', '成長期', 'B 輪以上'], rank:5, joined:2 },
+  { name:'承啟企業創投股份有限公司', color:'#E89A5B', type:'企業創投', inds:['health', 'saas'],       stages:'A 輪',         open:true,  intro:'集團旗下醫院與通路可做為產品的早期場域。', founded:'2017', kw:['醫院場域', '產業綜效', 'A 輪'], rank:6, joined:1 } ];
+
+// 公司列表（2026-11-26 使用者要求標題統一為「公司列表」、不分頁籤）：投資人看募資中的公司、企業看投資方，兩者都有時合併列出
+const LISTS = {
+  companies: { role:'investor', items:COMPANIES, card:(x) => companyCard(x) },
+  investors: { role:'company',  items:INVESTORS, card:(x) => investorCard(x) } };
+const SORTS = [ { key:'recent', label:'近期更新' }, { key:'new', label:'最新加入' } ];
+const PER_PAGE = 8;  // 2026-11-26 使用者決定每頁 8 張（同兌換 SENSE，4／2 欄剛好排滿）
+
+const state = { roles:['company', 'investor'], ind:'all', query:'', sort:'recent', page:1 };
+
+/* ═════════ 小工具 ═════════ */
+const { esc } = SenseUI;
+const has = (r) => state.roles.includes(r);
+const tag = (color, text) => `<span class="status-tag ${color}">${esc(text)}</span>`;
+const stepLabel = (flow, n) => `第 ${n}／${FLOWS[flow].steps.length} 步 · ${FLOWS[flow].steps[n - 1]}`;
+// 目前身分可看到的公司（每筆帶上卡片樣式）
+const listItems = () => Object.values(LISTS).filter(L => has(L.role)).flatMap(L => L.items.map(x => ({ ...x, card:L.card })));
+
+/* ═════════ 瀏覽 ═════════ */
+const IC_INDUSTRY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V6.5L12 4v16M12 9l7 2.5V20M3.5 20h17M8 9h1M8 12h1M8 15h1M15 14h1M15 17h1"/></svg>';
+const IC_DATE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/></svg>';
+const IC_IMG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M20.5 16l-5-5-8.5 8.5"/></svg>';
+
+// 兩種卡片共用的版型；side 為右側小頁籤、meta 為產業＋時間、action 為主要按鈕
+function coCard(x, { detail, side, shotLabel, meta, action }){
+  return `
+    <article class="tab-card fs-co" data-todo="${detail}" tabindex="0" aria-label="${esc(x.name)}，${esc(side)}">
+      <div class="tab-card-tabs">
+        <div class="tab-card-org" title="${esc(x.name)}">${SenseUI.orgLogo(x)}<span class="org-name">${esc(x.name)}</span></div>
+        <div class="tab-card-side">${esc(side)}</div>
+      </div>
+      <div class="tab-card-body">
+        <div class="fs-shot fs-ph">${IC_IMG}<span>${shotLabel}</span><small>示意</small></div>
+        <div class="fs-meta">${meta}</div>
+        <div class="fs-kw" aria-label="關鍵字">${x.kw.map(k => tag('', k)).join('')}</div>
+        <p class="tab-card-desc">${esc(x.intro)}</p>
+        <div class="fs-co-actions">
+          <button type="button" class="btn btn-secondary" data-todo="公司網站">公司網站</button>
+          ${action}
+        </div>
+      </div>
+    </article>`;
+}
+const metaItem = (icon, text, title) => `<span class="fs-meta-item" title="${title}">${icon}${esc(text)}</span>`;
+
+function companyCard(c){
+  return coCard(c, { detail:'公司詳情頁', side:c.stage, shotLabel:'產品服務截圖',
+    meta: metaItem(IC_INDUSTRY, IND[c.ind], '產業') + metaItem(IC_DATE, `${c.start} 起募資`, '募資開始時間'),
+    action:'<button type="button" class="btn btn-primary" data-todo="洽談投資">洽談投資</button>' });
+}
+
+function investorCard(v){
+  return coCard(v, { detail:'投資方詳情頁', side:v.type, shotLabel:'官網截圖',
+    meta: metaItem(IC_INDUSTRY, v.inds.map(k => IND[k]).join('、'), '偏好產業') + metaItem(IC_DATE, `${v.founded} 年成立`, '成立年份'),
+    action: v.open ? '<button type="button" class="btn btn-primary" data-todo="提出募資">提出募資</button>'
+                   : '<button type="button" class="btn btn-primary" disabled>暫停接洽</button>' });
+}
+
+function renderChips(){
+  document.getElementById('chips').innerHTML = SenseUI.chips(INDUSTRIES, state.ind);
+}
+
+function renderGrid(){
+  const q = state.query.toLowerCase();
+  const items = listItems()
+    .filter(x => state.ind === 'all' || (x.inds ? x.inds.includes(state.ind) : x.ind === state.ind))
+    .filter(x => !q || (x.name + x.intro).toLowerCase().includes(q))
+    .sort((a, b) => state.sort === 'new' ? b.joined - a.joined : a.rank - b.rank);
+  const pages = Math.max(1, Math.ceil(items.length / PER_PAGE));
+  state.page = Math.min(state.page, pages);
+  const shown = items.slice((state.page - 1) * PER_PAGE, state.page * PER_PAGE);
+  document.getElementById('grid').innerHTML = shown.length
+    ? shown.map(x => x.card(x)).join('')
+    : `<p class="empty" style="grid-column:1/-1">找不到符合「${esc(state.query || IND[state.ind])}」的公司<br>換個關鍵字或分類試試看</p>`;
+  document.getElementById('pager').innerHTML = SenseUI.pagination(state.page, pages);
+}
+
+/* ═════════ 融資入口（只有企業看得到） ═════════ */
+function loanBanner(){
+  const s = DEMO.loan.step;
+  return s
+    ? `<div class="fs-loan"><div class="fs-loan-text"><b>融資進行中</b><span class="fs-note">${stepLabel('loan', s)}</span></div>
+        <button type="button" class="btn btn-outline-blue btn-sm" data-todo="融資專屬流程">繼續融資</button></div>`
+    : `<div class="fs-loan"><div class="fs-loan-text"><b>需要向銀行融資？</b><span class="fs-note">融資條件因公司而異，由專人協助規劃，從確認資金需求開始。</span></div>
+        <button type="button" class="btn btn-outline-blue btn-sm" data-todo="融資申請">融資申請</button></div>`;
+}
+
+function renderLoan(){
+  const box = document.getElementById('loan');
+  box.hidden = !has('company');
+  // 標題「融資服務」（2026-11-26 使用者確認），樣式同公司列表的區塊標題
+  box.innerHTML = has('company') ? `<div class="section-title"><h2 id="h-loan">融資服務</h2></div>${loanBanner()}` : '';
+}
+
+function render(){
+  renderChips(); renderGrid(); renderLoan();
+  document.querySelectorAll('[data-demo-role]').forEach(b =>
+    b.setAttribute('aria-pressed', b.dataset.demoRole === (state.roles.length === 2 ? 'both' : state.roles[0])));
+}
+
+/* ═════════ 事件 ═════════ */
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('[data-demo-role],[data-chip],.pagination [data-page]');
+  if (!t) return;
+  if (t.dataset.demoRole){
+    state.roles = t.dataset.demoRole === 'both' ? ['company', 'investor'] : [t.dataset.demoRole];
+    state.page = 1;
+    document.querySelector('.app').dataset.role = state.roles.join(' ');
+    SenseShell.refresh(); render();
+  } else if (t.dataset.chip){
+    state.ind = t.dataset.chip; state.page = 1; renderChips(); renderGrid();
+  } else if (t.dataset.page && !t.disabled){
+    state.page = +t.dataset.page; renderGrid();
+    document.getElementById('browse').scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+});
+// 整張卡可用鍵盤開啟
+document.getElementById('grid').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && e.target.matches('.tab-card')) e.target.click();
+});
+
+SenseShell.mount();
+const actions = document.getElementById('list-actions');
+actions.innerHTML = SenseUI.listActions({ sorts:SORTS, sort:state.sort, placeholder:'搜尋公司或簡介' });
+SenseUI.bindListActions(actions, {
+  onQuery: (q) => { state.query = q; state.page = 1; renderGrid(); },
+  onSort:  (k) => { state.sort = k; state.page = 1; renderGrid(); }
+});
+render();
+
+</script>
+</body>
+</html>
