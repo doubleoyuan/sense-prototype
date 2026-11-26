@@ -33,11 +33,11 @@
              { key:'academy',   label:'近期活動', href:'pr-sense.html#academy' },
              { key:'reports',   label:'活動回顧', href:'pr-sense.html#reports' },
              { key:'clubs',     label:'俱樂部',   href:'pr-sense.html#clubs' } ] },
-    // 財務 SENSE（2026-11-26 改版）：入口頁改為 finance-sense-v2.html，只保留投資／募資／融資。
+    // 財務 SENSE（2026-11-26 改版）：入口頁改版（舊版已由新版取代），只保留投資／募資／融資。
     // 同日使用者要求側欄不展開子選單（與其他模組一致，拿掉 showSubs）；subs 只留作資料，roles 依示範視角篩選
-    { key:'finance',   label:'財務SENSE', c:'var(--mod-finance)',   strong:'var(--mod-finance-strong)',   href:'finance-sense-v2.html',
-      subs:[ { key:'companies', label:'瀏覽募資中的公司', href:'finance-sense-v2.html#companies', roles:['investor'] },
-             { key:'investors', label:'瀏覽投資方',       href:'finance-sense-v2.html#investors', roles:['company'] },
+    { key:'finance',   label:'財務SENSE', c:'var(--mod-finance)',   strong:'var(--mod-finance-strong)',   href:'finance-sense.html',
+      subs:[ { key:'companies', label:'瀏覽募資中的公司', href:'finance-sense.html#companies', roles:['investor'] },
+             { key:'investors', label:'瀏覽投資方',       href:'finance-sense.html#investors', roles:['company'] },
              { key:'invest',    label:'投資', roles:['investor'] },
              { key:'raise',     label:'募資', roles:['company'] },
              { key:'loan',      label:'融資', roles:['company'] } ] }
